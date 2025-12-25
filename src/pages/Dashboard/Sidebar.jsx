@@ -7,6 +7,7 @@ import {
   SettingOutlined,
   FileTextOutlined,
   TeamOutlined,
+  ShoppingOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -22,6 +23,11 @@ function Sidebar({ collapsed, user }) {
       key: '/dashboard',
       icon: <DashboardOutlined />,
       label: 'Tổng quan',
+    },
+    {
+      key: '/products',
+      icon: <ShoppingOutlined />,
+      label: 'Sản phẩm',
     },
     {
       key: '/dashboard/users',

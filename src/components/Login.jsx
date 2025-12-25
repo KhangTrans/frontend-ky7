@@ -178,7 +178,7 @@ function Login() {
           </Form.Item>
         </Form>
 
-        <div className="login-footer">
+        {/* <div className="login-footer">
           <p>Chưa có tài khoản? <a href="#">Đăng ký ngay</a></p>
         </div>
 
@@ -199,7 +199,7 @@ function Login() {
           >
             Facebook
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
     </>

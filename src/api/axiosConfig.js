@@ -1,14 +1,18 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://backend-node-lilac-seven.vercel.app/api';
+// Sử dụng proxy khi dev, full URL khi production
+const API_BASE_URL = import.meta.env.DEV 
+  ? '/api'  // Proxy qua Vite dev server
+  : 'https://backend-node-lilac-seven.vercel.app/api';
 
 // Tạo axios instance với config mặc định
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000, // 10 seconds
+  timeout: 30000, // 30 seconds (cho upload file lớn)
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: false, // Không cần credentials cho CORS
 });
 
 // Request interceptor - Tự động thêm token vào header

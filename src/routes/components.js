@@ -3,6 +3,7 @@ import { lazy } from 'react';
 // Lazy load components để tối ưu performance
 export const Login = lazy(() => import('../components/Login'));
 export const Dashboard = lazy(() => import('../pages/Dashboard'));
+export const ProductManagement = lazy(() => import('../pages/ProductManagement'));
 export const NotFound = lazy(() => import('../pages/NotFound'));
 
 // Thêm các pages khác ở đây khi cần
@@ -13,6 +14,7 @@ export const NotFound = lazy(() => import('../pages/NotFound'));
 const componentsMap = {
   Login,
   Dashboard,
+  ProductManagement,
   NotFound,
   // Profile,
   // Settings,

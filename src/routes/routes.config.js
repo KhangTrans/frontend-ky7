@@ -30,6 +30,16 @@ const routesData = [
     },
   },
   {
+    path: '/products',
+    name: 'ProductManagement',
+    component: 'ProductManagement',
+    meta: {
+      title: 'Quản lý sản phẩm',
+      requiresAuth: true,
+      roles: ['admin', 'user'],
+    },
+  },
+  {
     path: '/settings',
     name: 'Settings',
     component: 'Settings',
