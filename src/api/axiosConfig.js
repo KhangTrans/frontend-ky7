@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { API_CONFIG } from '../utils/constants';
 
 // Sử dụng proxy khi dev, full URL khi production
 const API_BASE_URL = import.meta.env.DEV 
   ? '/api'  // Proxy qua Vite dev server
-  : 'https://backend-node-lilac-seven.vercel.app/api';
+  : `${API_CONFIG.REST_URL}/api`;
 
 // Tạo axios instance với config mặc định
 const axiosInstance = axios.create({
