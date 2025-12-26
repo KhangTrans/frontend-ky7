@@ -9,6 +9,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../redux/slices/authSlice';
 import Sidebar from '../pages/Dashboard/Sidebar';
+import NotificationBell from './NotificationBell';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -58,6 +59,7 @@ function DashboardLayout() {
           />
 
           <Space size="middle" align="center">
+            <NotificationBell />
             <Space size="small">
               <Text strong>{user.fullName}</Text>
               <Tag color={user.role === 'admin' ? 'red' : 'blue'}>
