@@ -11,43 +11,63 @@ const routesData = [
     },
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: 'Dashboard',
+    path: '/',
+    name: 'DashboardLayout',
+    component: 'DashboardLayout',
     meta: {
-      title: 'Dashboard',
-      requiresAuth: true,
-      roles: ['admin', 'user'],
-    },
-  },
-  {
-    path: '/profile',
-    name: 'Profile',
-    component: 'Profile',
-    meta: {
-      title: 'Hồ sơ',
       requiresAuth: true,
     },
-  },
-  {
-    path: '/products',
-    name: 'ProductManagement',
-    component: 'ProductManagement',
-    meta: {
-      title: 'Quản lý sản phẩm',
-      requiresAuth: true,
-      roles: ['admin', 'user'],
-    },
-  },
-  {
-    path: '/settings',
-    name: 'Settings',
-    component: 'Settings',
-    meta: {
-      title: 'Cài đặt',
-      requiresAuth: true,
-      roles: ['admin'],
-    },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: 'DashboardContent',
+        meta: {
+          title: 'Dashboard',
+          requiresAuth: true,
+          roles: ['admin', 'user'],
+        },
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: 'Profile',
+        meta: {
+          title: 'Hồ sơ',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'products',
+        name: 'ProductManagement',
+        component: 'ProductManagement',
+        meta: {
+          title: 'Quản lý sản phẩm',
+          requiresAuth: true,
+          roles: ['admin', 'user'],
+        },
+      },
+      {
+        path: 'categories',
+        name: 'CategoryManagement',
+        component: 'CategoryManagement',
+        meta: {
+          title: 'Quản lý thể loại',
+          requiresAuth: true,
+          roles: ['admin', 'user'],
+        },
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: 'Settings',
+        meta: {
+          title: 'Cài đặt',
+          requiresAuth: true,
+          roles: ['admin'],
+        },
+      },
+    ],
   },
   {
     path: '*',

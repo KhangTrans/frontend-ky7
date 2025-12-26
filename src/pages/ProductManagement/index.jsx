@@ -39,30 +39,32 @@ const ProductManagement = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  // Active filters - những filter đang được áp dụng
+  const [activeSearch, setActiveSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [form] = Form.useForm();
 
-  // Load products function
-  const loadProducts = useCallback((search = searchText) => {
+  // Load products function - chỉ phụ thuộc vào activeSearch và activeCategory
+  const loadProducts = useCallback(() => {
     const params = {
       page: currentPage,
       limit: pageSize,
     };
     
-    if (search) params.search = search;
-    if (selectedCategory) params.category = selectedCategory;
+    if (activeSearch) params.search = activeSearch;
+    if (activeCategory) params.category = activeCategory;
     
     dispatch(fetchProducts(params));
-  }, [currentPage, pageSize, selectedCategory, searchText, dispatch]);
+  }, [currentPage, pageSize, activeSearch, activeCategory, dispatch]);
 
   // Load categories và products khi component mount
   useEffect(() => {
     dispatch(fetchCategories());
-    loadProducts();
-  }, [dispatch, loadProducts]);
+  }, [dispatch]);
 
-  // Load products khi filter thay đổi
+  // Load products khi component mount hoặc currentPage/pageSize/activeFilters thay đổi
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
@@ -129,13 +131,25 @@ const ProductManagement = () => {
   };
 
   const handleSearch = () => {
-    setCurrentPage(1);
-    loadProducts(searchText);
+    setActiveSearch(searchText.trim());
+    setActiveCategory(selectedCategory);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      // Nếu đã ở page 1, trigger load manually
+      const params = {
+        page: 1,
+        limit: pageSize,
+      };
+      if (searchText.trim()) params.search = searchText.trim();
+      if (selectedCategory) params.category = selectedCategory;
+      dispatch(fetchProducts(params));
+    }
   };
 
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
-    setCurrentPage(1);
+    // Không tự động search, chờ user nhấn nút
   };
 
   const handleTableChange = (paginationConfig) => {
@@ -146,8 +160,13 @@ const ProductManagement = () => {
   const handleReset = () => {
     setSearchText('');
     setSelectedCategory('');
-    setCurrentPage(1);
-    dispatch(fetchProducts({ page: 1, limit: pageSize }));
+    setActiveSearch('');
+    setActiveCategory('');
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      dispatch(fetchProducts({ page: 1, limit: pageSize }));
+    }
   };
 
   const columns = [

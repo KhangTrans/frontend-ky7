@@ -5,17 +5,15 @@ import {
   MenuUnfoldOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logoutUser } from '../../redux/slices/authSlice';
-import Sidebar from './Sidebar';
-import DashboardContent from './DashboardContent';
+import { logoutUser } from '../redux/slices/authSlice';
+import Sidebar from '../pages/Dashboard/Sidebar';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
 
-// Keep this for backward compatibility, but mainly use DashboardLayout now
-function Dashboard() {
+function DashboardLayout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, isLoading } = useSelector((state) => state.auth);
@@ -76,14 +74,12 @@ function Dashboard() {
             </Button>
           </Space>
         </Header>
-        <Content style={{ padding: '24px', background: '#f0f2f5' }}>
-          <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-            <DashboardContent user={user} />
-          </div>
+        <Content style={{ background: '#f0f2f5' }}>
+          <Outlet />
         </Content>
       </Layout>
     </Layout>
   );
 }
 
-export default Dashboard;
+export default DashboardLayout;

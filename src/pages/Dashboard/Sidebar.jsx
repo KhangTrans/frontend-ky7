@@ -8,6 +8,7 @@ import {
   FileTextOutlined,
   TeamOutlined,
   ShoppingOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -28,6 +29,11 @@ function Sidebar({ collapsed, user }) {
       key: '/products',
       icon: <ShoppingOutlined />,
       label: 'Sản phẩm',
+    },
+    {
+      key: '/categories',
+      icon: <AppstoreOutlined />,
+      label: 'Thể loại',
     },
     {
       key: '/dashboard/users',

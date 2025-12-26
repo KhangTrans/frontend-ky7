@@ -13,10 +13,10 @@ function DashboardContent({ user }) {
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <div>
         <Title level={1} style={{ marginBottom: 8 }}>
-          Chào mừng {user.fullName}!
+          Chào mừng {user?.fullName || user?.username || 'Người dùng'}!
         </Title>
         <Text type="secondary">
-          Email: {user.email} | Username: {user.username}
+          Email: {user?.email || 'N/A'} | Username: {user?.username || 'N/A'}
         </Text>
       </div>
 

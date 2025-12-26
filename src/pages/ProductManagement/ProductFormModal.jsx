@@ -24,6 +24,7 @@ import {
   UploadOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
+import RichTextEditor from '../../components/RichTextEditor';
 import { uploadImage, uploadMultipleImages, deleteImage } from '../../utils/imageUpload';
 
 const ProductFormModal = ({ 
@@ -67,7 +68,7 @@ const ProductFormModal = ({
           label="Mô tả"
           rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}
         >
-          <Input.TextArea rows={4} placeholder="Nhập mô tả sản phẩm" />
+          <RichTextEditor placeholder="Nhập mô tả chi tiết về sản phẩm..." />
         </Form.Item>
 
         <Row gutter={16}>

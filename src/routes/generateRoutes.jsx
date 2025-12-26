@@ -22,7 +22,7 @@ const LoadingFallback = () => (
  */
 export const generateRoutes = (routesConfig) => {
   return routesConfig.map((route) => {
-    const { path, component, redirect, meta } = route;
+    const { path, component, redirect, meta, children } = route;
 
     // Nếu là redirect route
     if (redirect) {
@@ -55,11 +55,18 @@ export const generateRoutes = (routesConfig) => {
       element = <ProtectedRoute>{element}</ProtectedRoute>;
     }
 
-    return {
+    const routeObject = {
       path,
       element,
       meta,
     };
+
+    // Nếu có children routes, generate recursively
+    if (children && children.length > 0) {
+      routeObject.children = generateRoutes(children);
+    }
+
+    return routeObject;
   });
 };
 
