@@ -57,7 +57,11 @@ export const createProduct = createAsyncThunk(
       const response = await axiosInstance.post('/products', productData);
       return response.data.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Không thể tạo sản phẩm');
+      const data = error.response?.data;
+      if (data?.errors && Array.isArray(data.errors)) {
+         return rejectWithValue(data.errors.map(err => err.msg || err.message || JSON.stringify(err)).join('; '));
+      }
+      return rejectWithValue(data?.message || 'Không thể tạo sản phẩm');
     }
   }
 );

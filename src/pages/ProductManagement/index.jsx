@@ -84,7 +84,7 @@ const ProductManagement = () => {
         description: product.description,
         price: product.price,
         stock: product.stock,
-        categoryId: product.categoryId,
+        categoryId: product.category?.id || product.category?._id || product.categoryId,
         images: product.images || [],
         variants: product.variants || [],
       };
@@ -104,6 +104,7 @@ const ProductManagement = () => {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+      console.log('Submitting Product Data:', JSON.stringify(values, null, 2));
       
       if (editingProduct) {
         await dispatch(updateProduct({ id: editingProduct._id || editingProduct.id, productData: values })).unwrap();
@@ -291,7 +292,7 @@ const ProductManagement = () => {
               loading={loading && categories.length === 0}
             >
               {categories.map((cat) => (
-                <Select.Option key={cat.id} value={cat.name}>
+                <Select.Option key={cat._id || cat.id} value={cat.name}>
                   {cat.name}
                 </Select.Option>
               ))}

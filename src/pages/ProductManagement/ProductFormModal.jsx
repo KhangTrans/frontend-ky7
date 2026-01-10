@@ -68,7 +68,10 @@ const ProductFormModal = ({
           label="Mô tả"
           rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}
         >
-          <RichTextEditor placeholder="Nhập mô tả chi tiết về sản phẩm..." />
+          <Input.TextArea 
+            placeholder="Nhập mô tả chi tiết về sản phẩm..." 
+            rows={6}
+          />
         </Form.Item>
 
         <Row gutter={16}>
@@ -123,14 +126,13 @@ const ProductFormModal = ({
         <Form.Item
           name="categoryId"
           label="Danh mục"
-          rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
         >
           <Select
             placeholder="Chọn danh mục sản phẩm"
             loading={loading && categories.length === 0}
           >
             {categories.map((cat) => (
-              <Select.Option key={cat.id} value={cat.id}>
+              <Select.Option key={cat.id || cat._id} value={cat.id || cat._id}>
                 {cat.name}
               </Select.Option>
             ))}
