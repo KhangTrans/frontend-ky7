@@ -93,4 +93,94 @@ export const categoryAPI = {
   },
 };
 
+// Cart API
+export const cartAPI = {
+  // Lấy giỏ hàng của user hiện tại
+  getCart: async () => {
+    const response = await axiosInstance.get('/cart');
+    return response.data;
+  },
+  
+  // Thêm sản phẩm vào giỏ hàng
+  addToCart: async (productId, quantity = 1) => {
+    const response = await axiosInstance.post('/cart', { productId, quantity });
+    return response.data;
+  },
+  
+  // Cập nhật số lượng sản phẩm trong giỏ
+  updateCartItem: async (productId, quantity) => {
+    const response = await axiosInstance.put(`/cart/${productId}`, { quantity });
+    return response.data;
+  },
+  
+  // Xóa sản phẩm khỏi giỏ hàng
+  removeFromCart: async (productId) => {
+    const response = await axiosInstance.delete(`/cart/${productId}`);
+    return response.data;
+  },
+  
+  // Xóa toàn bộ giỏ hàng
+  clearCart: async () => {
+    const response = await axiosInstance.delete('/cart');
+    return response.data;
+  },
+};
+
+// Address API
+export const addressAPI = {
+  getAll: async () => {
+    const response = await axiosInstance.get('/addresses');
+    return response.data;
+  },
+  create: async (data) => {
+    const response = await axiosInstance.post('/addresses', data);
+    return response.data;
+  },
+  update: async (id, data) => {
+    const response = await axiosInstance.put(`/addresses/${id}`, data);
+    return response.data;
+  },
+  delete: async (id) => {
+    const response = await axiosInstance.delete(`/addresses/${id}`);
+    return response.data;
+  },
+};
+
+// Order API
+export const orderAPI = {
+  create: async (orderData) => {
+    const response = await axiosInstance.post('/orders', orderData);
+    return response.data;
+  },
+  getAll: async () => {
+    const response = await axiosInstance.get('/orders/my');
+    return response.data;
+  },
+  getById: async (id) => {
+    const response = await axiosInstance.get(`/orders/${id}`);
+    return response.data;
+  },
+};
+
+// Payment API
+export const paymentAPI = {
+  createVNPayUrl: async (amount, orderId, orderInfo) => {
+    const response = await axiosInstance.post('/payment/vnpay/create', { 
+        amount, 
+        orderId, 
+        orderInfo: orderInfo || `Thanh toan don hang ${orderId}`,
+        locale: 'vn' 
+    });
+    return response.data;
+  },
+  createZaloPayUrl: async (amount, orderId, orderInfo) => {
+    const response = await axiosInstance.post('/payment/zalopay/create', { 
+        amount, 
+        orderId, 
+        orderInfo: orderInfo || `Thanh toan don hang ${orderId}`
+    });
+    return response.data;
+  },
+};
+
 export default axiosInstance;

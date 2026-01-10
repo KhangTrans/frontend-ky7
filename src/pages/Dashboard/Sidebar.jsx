@@ -9,6 +9,7 @@ import {
   TeamOutlined,
   ShoppingOutlined,
   AppstoreOutlined,
+  HomeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 

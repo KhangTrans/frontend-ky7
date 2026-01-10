@@ -1,0 +1,55 @@
+.payment-callback-container {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.callback-card {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.callback-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 0;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Ant Design Result Customization */
+.ant-result-title {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+}
+
+.ant-result-subtitle {
+    font-size: 16px !important;
+    margin-bottom: 32px !important;
+}
+
+.ant-btn-lg {
+    min-width: 140px;
+    height: 48px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

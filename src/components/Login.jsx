@@ -11,15 +11,20 @@ function Login() {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
-  const { isLoading, isAuthenticated } = useSelector((state) => state.auth);
+  const { isLoading, isAuthenticated, user } = useSelector((state) => state.auth);
   const isLoggingIn = useRef(false);
 
   useEffect(() => {
     // Chỉ tự động chuyển nếu không phải trong quá trình login
     if (isAuthenticated && !isLoggingIn.current) {
-      navigate('/dashboard', { replace: true });
+      // Phân quyền redirect dựa vào role
+      if (user?.role === 'admin') {
+        navigate('/dashboard', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const onFinish = async (values) => {
     try {
@@ -51,7 +56,17 @@ function Login() {
         // Đợi notification hiện rồi mới chuyển trang
         setTimeout(() => {
           isLoggingIn.current = false;
-          navigate('/dashboard', { replace: true });
+          
+          // Phân quyền redirect: admin vào dashboard, user vào home
+          const userRole = result.payload?.user?.role;
+          console.log('User role:', userRole);
+          
+          if (userRole === 'admin') {
+            navigate('/dashboard', { replace: true });
+          } else {
+            // User hoặc các role khác về home
+            navigate('/', { replace: true });
+          }
         }, 2000);
       } else if (loginUser.rejected.match(result)) {
         isLoggingIn.current = false;
@@ -178,11 +193,11 @@ function Login() {
           </Form.Item>
         </Form>
 
-        {/* <div className="login-footer">
-          <p>Chưa có tài khoản? <a href="#">Đăng ký ngay</a></p>
+        <div className="login-footer">
+          <p>Chưa có tài khoản? <a href="#" onClick={(e) => { e.preventDefault(); navigate('/register'); }}>Đăng ký ngay</a></p>
         </div>
 
-        <Divider plain>Hoặc đăng nhập với</Divider>
+        {/* <Divider plain>Hoặc đăng nhập với</Divider>
 
         <div className="social-login">
           <Button 

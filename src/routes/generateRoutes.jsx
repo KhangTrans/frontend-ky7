@@ -2,6 +2,7 @@ import { Navigate, Suspense } from 'react';
 import routesData from './routes.config';
 import componentsMap from './components';
 import ProtectedRoute from '../components/ProtectedRoute';
+import AdminRoute from '../components/AdminRoute';
 
 // Loading component
 const LoadingFallback = () => (
@@ -50,8 +51,12 @@ export const generateRoutes = (routesConfig) => {
       </Suspense>
     );
 
-    // Nếu route yêu cầu authentication, wrap với ProtectedRoute
-    if (meta?.requiresAuth) {
+    // Nếu route yêu cầu admin role, wrap với AdminRoute
+    if (meta?.roles?.includes('admin') && component === 'DashboardLayout') {
+      element = <AdminRoute>{element}</AdminRoute>;
+    }
+    // Nếu route yêu cầu authentication (nhưng không phải admin-only), wrap với ProtectedRoute
+    else if (meta?.requiresAuth) {
       element = <ProtectedRoute>{element}</ProtectedRoute>;
     }
 

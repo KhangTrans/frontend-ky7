@@ -1,0 +1,145 @@
+/* Order Detail Container */
+.order-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.order-detail-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.order-meta {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Sections */
+.section-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 12px;
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.info-item {
+  margin-bottom: 12px;
+}
+
+.info-label {
+  color: #888;
+  width: 120px;
+  display: inline-block;
+}
+
+.info-value {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Product List */
+.order-items-table {
+  width: 100%;
+}
+
+.product-cell {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.product-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.product-info h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.product-info p {
+  margin: 4px 0 0;
+  color: #888;
+  font-size: 12px;
+}
+
+/* Summary Section */
+.order-summary {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.summary-content {
+  width: 300px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: #666;
+}
+
+.summary-row.total {
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+  margin-top: 12px;
+  font-weight: 700;
+  color: #333;
+  font-size: 18px;
+}
+
+.summary-row.total .value {
+  color: #1677ff;
+}
+
+/* Status Steps/Timeline if needed */
+.status-timeline {
+  margin: 30px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .order-detail-container {
+    padding: 16px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .product-cell {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

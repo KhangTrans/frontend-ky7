@@ -3,25 +3,43 @@ import DashboardLayout from '../components/DashboardLayout';
 
 // Lazy load components để tối ưu performance
 export const Login = lazy(() => import('../components/Login'));
+export const Register = lazy(() => import('../components/Register'));
+export const Home = lazy(() => import('../pages/Home'));
+export const ProductDetail = lazy(() => import('../pages/ProductDetail'));
+export const Cart = lazy(() => import('../pages/Cart'));
+export const Checkout = lazy(() => import('../pages/Checkout'));
+export const PaymentCallback = lazy(() => import('../pages/PaymentCallback'));
+export const OrderSuccess = lazy(() => import('../pages/OrderSuccess'));
+export const OrderDetail = lazy(() => import('../pages/OrderDetail')); // Thêm mới
+export const MockPayment = lazy(() => import('../pages/MockPayment'));
 export const DashboardContent = lazy(() => import('../pages/Dashboard/DashboardContent'));
 export const ProductManagement = lazy(() => import('../pages/ProductManagement'));
 export const CategoryManagement = lazy(() => import('../pages/CategoryManagement'));
 export const NotFound = lazy(() => import('../pages/NotFound'));
-
-// Thêm các pages khác ở đây khi cần
-// export const Profile = lazy(() => import('../pages/Profile'));
-// export const Settings = lazy(() => import('../pages/Settings'));
+export const Profile = lazy(() => import('../pages/Profile'));
+export const OrderHistory = lazy(() => import('../pages/OrderHistory'));
+export const AddressBook = lazy(() => import('../pages/AddressBook'));
 
 // Map string name to component
 const componentsMap = {
   Login,
+  Register,
+  Home,
+  ProductDetail,
+  Cart,
+  Checkout,
+  PaymentCallback,
+  OrderSuccess,
+  OrderDetail,
+  OrderHistory,
+  AddressBook,
+  MockPayment,
   DashboardLayout, // Layout không lazy load
   DashboardContent,
   ProductManagement,
   CategoryManagement,
   NotFound,
-  // Tạm thời dùng DashboardContent
-  Profile: DashboardContent,
+  Profile,
   Settings: DashboardContent,
 };
 
