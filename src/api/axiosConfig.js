@@ -53,11 +53,15 @@ axiosInstance.interceptors.response.use(
     // Xử lý các lỗi khác - giữ nguyên structure để dễ xử lý
     if (error.response) {
       // Server trả về response với status code khác 2xx
-      const errorMessage = error.response.data?.message || 'Có lỗi xảy ra!';
+      const backendMsg = error.response.data?.message || 'Có lỗi xảy ra!';
+      const backendError = error.response.data?.error || '';
+      const fullMessage = backendError ? `${backendMsg} (${backendError})` : backendMsg;
+      
       // Throw error với message để dễ xử lý
-      const customError = new Error(errorMessage);
+      const customError = new Error(fullMessage);
       customError.response = error.response;
       customError.status = error.response.status;
+      customError.config = error.config; // Attach config to debug URL
       return Promise.reject(customError);
     } else if (error.request) {
       // Request được gửi nhưng không nhận được response

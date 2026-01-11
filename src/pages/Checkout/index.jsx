@@ -224,13 +224,14 @@ function Checkout() {
       // CASE 2: Regular Cart Checkout
       else {
         const orderData = {
-          orderItems: items.map(item => ({
+          // Changed from 'orderItems' to 'items' to match Backend Schema/Usage
+          items: items.map(item => ({
             productId: item.productId?._id || item.product?._id,
             name: item.productId?.name || item.product?.name || 'Sản phẩm',
             image: item.productId?.images?.[0] || item.productId?.image || '',
             quantity: item.quantity,
             price: item.productId?.salePrice || item.productId?.price || 0
-          })),
+          })).filter(i => i.productId),
           totalPrice: finalTotal,
           itemsPrice: finalTotal,
           shippingPrice: 0,
@@ -253,7 +254,7 @@ function Checkout() {
           }
         };
 
-        console.log('Sending Order Data (Final):', orderData);
+        console.log('Sending Order Data (Final - V2 Fixed):', JSON.stringify(orderData, null, 2));
         response = await orderAPI.create(orderData);
       }
       console.log('Order Response:', response);
