@@ -42,7 +42,7 @@ const Home = () => {
     // Filter by category
     if (selectedCategory && selectedCategory !== 'all') {
       filtered = filtered.filter(product => 
-        product.category?.name === selectedCategory
+        (product.categoryId?.name || product.category?.name) === selectedCategory
       );
     }
     
@@ -175,7 +175,7 @@ const Home = () => {
               
               {categories.map((category) => {
                 const categoryCount = products?.filter(
-                  p => p.category?.name === category.name
+                  p => (p.categoryId?.name || p.category?.name) === category.name
                 ).length || 0;
                 
                 return (
@@ -269,7 +269,7 @@ const Home = () => {
 
                       <div className="product-info">
                         <div className="product-category">
-                          {product.category?.name || 'Chưa phân loại'}
+                          {product.categoryId?.name || product.category?.name || 'Chưa phân loại'}
                         </div>
                         <h3 className="product-name" title={product.name}>
                           {product.name}

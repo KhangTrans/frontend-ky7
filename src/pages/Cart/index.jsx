@@ -10,6 +10,7 @@ import {
   PlusOutlined
 } from '@ant-design/icons';
 import { fetchCart, updateCartItem, removeFromCart } from '../../redux/slices/cartSlice';
+import { fetchCategories } from '../../redux/slices/productSlice';
 import HomeNavbar from '../../components/HomeNavbar';
 import './Cart.css';
 
@@ -17,6 +18,7 @@ function Cart() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { items, loading, total } = useSelector((state) => state.cart);
+  const { categories } = useSelector((state) => state.products); // Lấy categories để lookup tên
   const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -27,8 +29,9 @@ function Cart() {
       return;
     }
 
-    // Fetch cart data
+    // Fetch cart data & categories
     dispatch(fetchCart());
+    dispatch(fetchCategories());
   }, [dispatch, isAuthenticated, navigate]);
 
   const handleQuantityChange = (productId, newQuantity) => {
@@ -121,9 +124,16 @@ function Cart() {
                 const price = product.salePrice || product.price || 0;
                 const originalPrice = product.price || 0;
                 const hasDiscount = product.salePrice && product.salePrice < product.price;
-                const imageUrl = Array.isArray(product.images) 
-                  ? product.images[0] 
+                const imageUrl = Array.isArray(product.images) && product.images.length > 0
+                  ? (typeof product.images[0] === 'object' ? product.images[0].imageUrl : product.images[0])
                   : product.image || 'https://via.placeholder.com/150';
+
+                // Tìm tên danh mục từ ID (vì API cart chỉ trả về categoryId string)
+                const catId = product.categoryId?._id || product.categoryId?.id || product.categoryId;
+                const categoryName = categories?.find(c => c._id === catId || c.id === catId)?.name 
+                                    || product.categoryId?.name // Phòng trường hợp đã populate
+                                    || product.category?.name   // Fallback cũ
+                                    || 'Chưa phân loại';
 
                 return (
                   <div key={item._id || product._id} className="cart-item">
@@ -143,7 +153,7 @@ function Cart() {
                       >
                         {product.name}
                       </h3>
-                      <p className="item-category">{product.category?.name || 'Chưa phân loại'}</p>
+                      <p className="item-category">{categoryName}</p>
                       
                       <div className="item-price">
                         <span className="current-price">

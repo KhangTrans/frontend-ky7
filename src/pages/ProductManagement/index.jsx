@@ -84,7 +84,7 @@ const ProductManagement = () => {
         description: product.description,
         price: product.price,
         stock: product.stock,
-        categoryId: product.category?.id || product.category?._id || product.categoryId,
+        categoryId: product.categoryId?._id || product.categoryId?.id || product.categoryId,
         images: product.images || [],
         variants: product.variants || [],
       };
@@ -251,8 +251,8 @@ const ProductManagement = () => {
     },
     {
       title: 'Danh mục',
-      dataIndex: 'category',
-      key: 'category',
+      dataIndex: 'categoryId',
+      key: 'categoryId',
       render: (category) => <Tag color="blue">{category?.name || 'Chưa phân loại'}</Tag>,
     },
     {

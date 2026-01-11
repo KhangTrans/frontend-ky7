@@ -96,8 +96,9 @@ function ProductDetail() {
   }
 
   // Parse images (có thể là array hoặc string)
-  const images = Array.isArray(product.images) 
-    ? product.images 
+  // Parse images (có thể là array objects, array strings hoặc string)
+  const images = Array.isArray(product.images) && product.images.length > 0
+    ? product.images.map(img => (typeof img === 'object' ? img.imageUrl : img))
     : product.image 
     ? [product.image] 
     : ['https://via.placeholder.com/600x600?text=No+Image'];
@@ -197,7 +198,7 @@ function ProductDetail() {
               </div>
               <div className="meta-item">
                 <span className="meta-label">Danh mục:</span>
-                <span className="meta-value">{product.category?.name || 'Chưa phân loại'}</span>
+                <span className="meta-value">{product.categoryId?.name || product.category?.name || 'Chưa phân loại'}</span>
               </div>
             </div>
 
