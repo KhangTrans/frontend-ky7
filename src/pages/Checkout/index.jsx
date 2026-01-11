@@ -206,7 +206,6 @@ function Checkout() {
           productId: localDirectItem.product._id,
           quantity: localDirectItem.quantity, // Use updated quantity
           customerName: selectedAddress.fullName,
-          customerName: selectedAddress.fullName,
           customerEmail: user?.email || 'email@example.com',
           customerPhone: selectedAddress.phoneNumber,
           shippingAddress: selectedAddress.address,
