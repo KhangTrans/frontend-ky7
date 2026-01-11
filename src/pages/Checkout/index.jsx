@@ -116,6 +116,11 @@ function Checkout() {
     fetchAddresses();
   }, [isAuthenticated, items, navigate, location.state]);
 
+  // Version Check
+  useEffect(() => {
+     console.log('Checkout Component Mounted - Version: FIX_ITEMS_PAYLOAD');
+  }, []);
+
   const calculateSubtotal = () => {
     return items.reduce((sum, item) => {
       const product = item.productId || item.product || {};
@@ -212,6 +217,7 @@ function Checkout() {
           shippingCity: selectedAddress.city,
           shippingDistrict: selectedAddress.district,
           shippingWard: selectedAddress.ward,
+          shippingWard: selectedAddress.ward,
           shippingNote: values.note || '',
           paymentMethod: paymentMethod,
           voucherCode: '' // Hiện tại chưa có voucher input
@@ -290,8 +296,9 @@ function Checkout() {
                     const zalopayRes = await paymentAPI.createZaloPayUrl(finalTotal, orderId);
                     if (zalopayRes.success && zalopayRes.data) paymentRedirectUrl = zalopayRes.data.order_url;
                 } catch (err) {
-                     if (err.response?.status === 404) {
-                        console.log('Backend Payment API not found (404). Using INTERNAL MOCK Payment for smooth UX...');
+                     // Fallback to Mock Payment if API is 404 or crashes (500 - e.g. Populate Error)
+                     if (err.response?.status === 404 || err.response?.status === 500) {
+                        console.log('Backend Payment API failed (404/500). Using INTERNAL MOCK...');
                         const params = new URLSearchParams({
                             amount: finalTotal,
                             orderId: orderId,

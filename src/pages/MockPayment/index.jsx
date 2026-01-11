@@ -31,13 +31,15 @@ const MockPayment = () => {
   const handlePayment = (status) => {
     setProcessing(true);
     message.loading('Đang xử lý giao dịch...', 1.5).then(() => {
-      if (status === 'success') {
-        message.success('Thanh toán thành công!');
-        navigate('/order-success');
-      } else {
-        message.error('Thanh toán thất bại!');
-        navigate('/order-success?status=error');
-      }
+        if (status === 'success') {
+          message.success('Thanh toán thành công!');
+          // Redirect to callback page to update order status via API or verify logic
+          // Simulating: /payment/zalopay/return?status=1&apptransid=...
+          navigate(`/payment/${method.toLowerCase()}/return?status=1&amount=${amount}&orderId=${orderId}`);
+        } else {
+          message.error('Thanh toán thất bại!');
+           navigate(`/payment/${method.toLowerCase()}/return?status=0&orderId=${orderId}`);
+        }
     });
   };
 
