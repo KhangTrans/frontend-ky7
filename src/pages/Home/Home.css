@@ -253,6 +253,13 @@
   font-size: 18px;
 }
 
+.chip-image {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .chip-text {
   font-weight: 600;
 }

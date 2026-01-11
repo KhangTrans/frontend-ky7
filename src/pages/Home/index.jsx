@@ -184,7 +184,18 @@ const Home = () => {
                     className={`category-chip ${selectedCategory === category.name ? 'active' : ''}`}
                     onClick={() => handleCategoryChange(category.name)}
                   >
-                    <span className="chip-icon">📦</span>
+                    {category.imageUrl ? (
+                      <img 
+                        src={category.imageUrl} 
+                        alt={category.name} 
+                        className="chip-image" 
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'inline';
+                        }}
+                      />
+                    ) : null}
+                    {!category.imageUrl && <span className="chip-icon">📦</span>}
                     <span className="chip-text">{category.name}</span>
                     <span className="chip-count">{categoryCount}</span>
                   </button>
