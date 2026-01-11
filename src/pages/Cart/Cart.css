@@ -448,17 +448,34 @@
 
 @media (max-width: 480px) {
   .cart-item {
-    grid-template-columns: 80px 1fr auto;
-    gap: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    position: relative;
+    padding-top: 40px; /* Space for Remove button */
+  }
+
+  .item-remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: auto;
   }
 
   .item-image {
     width: 80px;
     height: 80px;
+    flex-shrink: 0;
+  }
+
+  .item-info {
+    flex: 1;
+    min-width: 200px; /* Ensure info takes full width if needed */
   }
 
   .item-name {
     font-size: 16px;
+    padding-right: 0;
   }
 
   .item-price .current-price {

@@ -111,7 +111,7 @@ const HomeNavbar = () => {
                   <ShoppingCartOutlined style={{ fontSize: '20px' }} />
                 </Badge>
               }
-              className="action-btn"
+              className="action-btn mobile-visible"
               onClick={() => navigate('/cart')}
             />
             
@@ -158,9 +158,39 @@ const HomeNavbar = () => {
             <a href="#categories" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
               Danh mục
             </a>
-            <a href="#about" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
-              Về chúng tôi
-            </a>
+            
+            <div style={{ height: '1px', background: '#eee', margin: '10px 15px' }}></div>
+            
+            <Link to="/cart" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+              Giỏ hàng ({cartCount || 0})
+            </Link>
+
+            {isLoggedIn ? (
+              <>
+                <Link to="/profile" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+                  Hồ sơ cá nhân
+                </Link>
+                <Link to="/order-history" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+                  Lịch sử đơn hàng
+                </Link>
+                 {(user?.role === 'admin') && (
+                    <Link to="/dashboard" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+                      Dashboard
+                    </Link>
+                )}
+                <div 
+                  className="mobile-nav-link" 
+                  onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                  style={{ color: '#ff4d4f' }}
+                >
+                  Đăng xuất
+                </div>
+              </>
+            ) : (
+              <Link to="/login" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+                Đăng nhập / Đăng ký
+              </Link>
+            )}
           </div>
         )}
       </div>

@@ -160,6 +160,10 @@
   .action-btn {
     display: none;
   }
+  
+  .action-btn.mobile-visible {
+    display: flex;
+  }
 }
 
 /* Mobile Menu */
