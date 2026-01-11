@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, fetchCart } from '../../redux/slices/cartSlice';
 import axiosInstance from '../../api/axiosConfig';
 import HomeNavbar from '../../components/HomeNavbar';
+import Footer from '../../components/Footer';
 import './ProductDetail.css';
 
 function ProductDetail() {
@@ -26,7 +27,9 @@ function ProductDetail() {
   const fetchProductDetail = async () => {
     try {
       setLoading(true);
+      console.log('Fetching Product Detail for ID:', id);
       const response = await axiosInstance.get(`/products/${id}`);
+      console.log('API Response Data:', response.data?.data);
       
       if (response.data.success) {
         setProduct(response.data.data);
@@ -306,6 +309,7 @@ function ProductDetail() {
           {/* TODO: Add related products */}
         </div>
       </div>
+      <Footer />
     </>
   );
 }

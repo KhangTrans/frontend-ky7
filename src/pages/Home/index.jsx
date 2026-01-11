@@ -6,6 +6,7 @@ import { SearchOutlined, ShoppingCartOutlined, HeartOutlined, EyeOutlined, Excla
 import { fetchProducts, fetchCategories } from '../../redux/slices/productSlice';
 import { addToCart, fetchCart } from '../../redux/slices/cartSlice';
 import HomeNavbar from '../../components/HomeNavbar';
+import Footer from '../../components/Footer';
 import './Home.css';
 
 const { Search } = Input;
@@ -74,6 +75,7 @@ const Home = () => {
   };
 
   const handleProductClick = (productId) => {
+    console.log('Clicked Product ID:', productId);
     // Navigate to product detail page
     navigate(`/product/${productId}`);
   };
@@ -319,6 +321,7 @@ const Home = () => {
           </div>
         </section>
       </div>
+      <Footer />
     </div>
   );
 };
