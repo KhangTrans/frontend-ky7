@@ -126,6 +126,7 @@ const ProductFormModal = ({
         <Form.Item
           name="categoryId"
           label="Danh mục"
+          rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
         >
           <Select
             placeholder="Chọn danh mục sản phẩm"

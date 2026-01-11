@@ -104,20 +104,44 @@ const ProductManagement = () => {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      console.log('Submitting Product Data:', JSON.stringify(values, null, 2));
+      
+      // Chuẩn hóa dữ liệu theo đúng format yêu cầu
+      const formattedValues = {
+          ...values,
+          // Đảm bảo images có đủ trường
+          images: values.images?.map((img, index) => ({
+              imageUrl: img.imageUrl,
+              publicId: img.publicId, // Giữ lại publicId để xóa ảnh nếu cần
+              isPrimary: !!img.isPrimary, // Convert sang boolean
+              order: img.order !== undefined ? Number(img.order) : index
+          })) || [],
+          // Đảm bảo variants số liệu chuẩn
+          variants: values.variants?.map(v => ({
+              name: v.name,
+              sku: v.sku,
+              price: Number(v.price), // Ensure number
+              stock: Number(v.stock), // Ensure number
+              color: v.color,
+              size: v.size
+          })) || []
+      };
+
+      console.log('Submitting Product Data:', JSON.stringify(formattedValues, null, 2));
       
       if (editingProduct) {
-        await dispatch(updateProduct({ id: editingProduct._id || editingProduct.id, productData: values })).unwrap();
+        await dispatch(updateProduct({ id: editingProduct._id || editingProduct.id, productData: formattedValues })).unwrap();
         message.success('Cập nhật sản phẩm thành công!');
       } else {
-        await dispatch(createProduct(values)).unwrap();
+        await dispatch(createProduct(formattedValues)).unwrap();
         message.success('Thêm sản phẩm thành công!');
       }
       
       handleCancel();
       loadProducts();
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Submit Error:', error);
+      // Lỗi chi tiết đã được handle trong slice và trả về message string
+      // message.error đã được hiển thị nếu component dùng useEffect error
     }
   };
 

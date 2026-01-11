@@ -61,7 +61,9 @@ export const createProduct = createAsyncThunk(
       if (data?.errors && Array.isArray(data.errors)) {
          return rejectWithValue(data.errors.map(err => err.msg || err.message || JSON.stringify(err)).join('; '));
       }
-      return rejectWithValue(data?.message || 'Không thể tạo sản phẩm');
+      const detail = data?.error || '';
+      const message = data?.message || 'Không thể tạo sản phẩm';
+      return rejectWithValue(detail ? `${message}: ${detail}` : message);
     }
   }
 );
@@ -74,7 +76,13 @@ export const updateProduct = createAsyncThunk(
       const response = await axiosInstance.put(`/products/${id}`, productData);
       return response.data.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Không thể cập nhật sản phẩm');
+      const data = error.response?.data;
+      if (data?.errors && Array.isArray(data.errors)) {
+         return rejectWithValue(data.errors.map(err => err.msg || err.message || JSON.stringify(err)).join('; '));
+      }
+      const detail = data?.error || '';
+      const message = data?.message || 'Không thể cập nhật sản phẩm';
+      return rejectWithValue(detail ? `${message}: ${detail}` : message);
     }
   }
 );
