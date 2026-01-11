@@ -296,9 +296,10 @@ function Checkout() {
                     const zalopayRes = await paymentAPI.createZaloPayUrl(finalTotal, orderId);
                     if (zalopayRes.success && zalopayRes.data) paymentRedirectUrl = zalopayRes.data.order_url;
                 } catch (err) {
-                     // Fallback to Mock Payment if API is 404 or crashes (500 - e.g. Populate Error)
-                     if (err.response?.status === 404 || err.response?.status === 500) {
-                        console.log('Backend Payment API failed (404/500). Using INTERNAL MOCK...');
+                     // Fallback to Mock Payment if API fails (404 Not Found or 500 Crash)
+                     // Removed 400 check to let you see the real ZaloPay validation error
+                     if ([404, 500].includes(err.response?.status)) {
+                        console.log('Backend Payment API failed. Using INTERNAL MOCK...');
                         const params = new URLSearchParams({
                             amount: finalTotal,
                             orderId: orderId,
