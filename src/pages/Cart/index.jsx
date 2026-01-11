@@ -7,7 +7,8 @@ import {
   ShoppingOutlined, 
   ArrowLeftOutlined,
   MinusOutlined,
-  PlusOutlined
+  PlusOutlined,
+  LoadingOutlined
 } from '@ant-design/icons';
 import { fetchCart, updateCartItem, removeFromCart } from '../../redux/slices/cartSlice';
 import { fetchCategories } from '../../redux/slices/productSlice';
@@ -20,6 +21,7 @@ function Cart() {
   const { items, loading, total } = useSelector((state) => state.cart);
   const { categories } = useSelector((state) => state.products); // Lấy categories để lookup tên
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const [updatingItems, setUpdatingItems] = useState(new Set());
 
   useEffect(() => {
     // Kiểm tra đăng nhập
@@ -34,17 +36,28 @@ function Cart() {
     dispatch(fetchCategories());
   }, [dispatch, isAuthenticated, navigate]);
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
     
-    dispatch(updateCartItem({
-      productId,
-      quantity: newQuantity
-    }));
+    setUpdatingItems(prev => new Set(prev).add(itemId));
+    try {
+      await dispatch(updateCartItem({
+        itemId,
+        quantity: newQuantity
+      })).unwrap();
+    } catch (error) {
+       message.error('Không thể cập nhật số lượng');
+    } finally {
+       setUpdatingItems(prev => {
+         const newSet = new Set(prev);
+         newSet.delete(itemId);
+         return newSet;
+       });
+    }
   };
 
-  const handleRemoveItem = (productId) => {
-    dispatch(removeFromCart(productId));
+  const handleRemoveItem = (itemId) => {
+    dispatch(removeFromCart(itemId));
     message.success('Đã xóa sản phẩm khỏi giỏ hàng!');
   };
 
@@ -177,14 +190,14 @@ function Cart() {
                           <Button
                             size="small"
                             icon={<MinusOutlined />}
-                            onClick={() => handleQuantityChange(product._id, item.quantity - 1)}
+                            onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
                             disabled={item.quantity <= 1}
                           />
                           <span className="quantity-value">{item.quantity}</span>
                           <Button
                             size="small"
                             icon={<PlusOutlined />}
-                            onClick={() => handleQuantityChange(product._id, item.quantity + 1)}
+                            onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
                             disabled={item.quantity >= (product.stock || 999)}
                           />
                         </div>
@@ -196,21 +209,22 @@ function Cart() {
                       <div className="quantity-control">
                         <Button
                           icon={<MinusOutlined />}
-                          onClick={() => handleQuantityChange(product._id, item.quantity - 1)}
+                          onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
                           disabled={item.quantity <= 1}
                         />
                         <InputNumber
                           min={1}
                           max={product.stock || 999}
                           value={item.quantity}
-                          onChange={(value) => handleQuantityChange(product._id, value)}
+                          onChange={(value) => handleQuantityChange(item._id, value)}
                           className="quantity-input"
                         />
                         <Button
                           icon={<PlusOutlined />}
-                          onClick={() => handleQuantityChange(product._id, item.quantity + 1)}
+                          onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
                           disabled={item.quantity >= (product.stock || 999)}
                         />
+                        {updatingItems.has(item._id) && <LoadingOutlined style={{ marginLeft: 8, color: '#1890ff' }} />}
                       </div>
                     </div>
 
@@ -227,7 +241,7 @@ function Cart() {
                       <Popconfirm
                         title="Xóa sản phẩm"
                         description="Bạn có chắc muốn xóa sản phẩm này?"
-                        onConfirm={() => handleRemoveItem(product._id)}
+                        onConfirm={() => handleRemoveItem(item._id)}
                         okText="Xóa"
                         cancelText="Hủy"
                       >

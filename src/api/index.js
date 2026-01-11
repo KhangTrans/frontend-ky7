@@ -108,14 +108,16 @@ export const cartAPI = {
   },
   
   // Cập nhật số lượng sản phẩm trong giỏ
-  updateCartItem: async (productId, quantity) => {
-    const response = await axiosInstance.put(`/cart/${productId}`, { quantity });
+  // API: PUT /api/cart/:itemId
+  updateCartItem: async (itemId, quantity) => {
+    const response = await axiosInstance.put(`/cart/${itemId}`, { quantity });
     return response.data;
   },
   
   // Xóa sản phẩm khỏi giỏ hàng
-  removeFromCart: async (productId) => {
-    const response = await axiosInstance.delete(`/cart/${productId}`);
+  // API: DELETE /api/cart/:itemId
+  removeFromCart: async (itemId) => {
+    const response = await axiosInstance.delete(`/cart/${itemId}`);
     return response.data;
   },
   

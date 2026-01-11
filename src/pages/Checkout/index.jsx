@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
   Form, 
@@ -15,7 +15,8 @@ import {
   Row,
   Col,
   List,
-  Popconfirm
+  Popconfirm,
+  InputNumber
 } from 'antd';
 import { 
   UserOutlined, 
@@ -25,12 +26,13 @@ import {
   EnvironmentOutlined,
   PlusOutlined,
   EditOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  MinusOutlined
 } from '@ant-design/icons';
 import HomeNavbar from '../../components/HomeNavbar';
 import axiosInstance from '../../api/axiosConfig';
 import { addressAPI, orderAPI, paymentAPI } from '../../api';
-import { clearCart } from '../../redux/slices/cartSlice';
+import { clearCart, updateCartItem } from '../../redux/slices/cartSlice';
 import './Checkout.css';
 
 const { TextArea } = Input;
@@ -41,8 +43,22 @@ function Checkout() {
   const [form] = Form.useForm(); // Main form (Note/Payment)
   const [addressForm] = Form.useForm(); // Add address form
   
-  // Get cart data from Redux
-  const { items, totalQuantity } = useSelector((state) => state.cart);
+  const location = useLocation();
+  // State for direct purchase item to allow quantity updates locally
+  const [localDirectItem, setLocalDirectItem] = useState(location.state?.directPurchaseItem || null);
+
+  // Get cart data from Redux if not direct purchase
+  const { items: cartItems, totalQuantity } = useSelector((state) => state.cart);
+  
+  // Determine items to show/checkout
+  const items = localDirectItem 
+    ? [{ 
+        productId: localDirectItem.product, 
+        quantity: localDirectItem.quantity,
+        _id: 'direct_item',
+        isDirect: true
+      }]
+    : cartItems;
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -90,14 +106,15 @@ function Checkout() {
       return;
     }
 
-    if (items.length === 0) {
+    // Only redirect if cart is empty AND not a direct buy
+    if (items.length === 0 && !location.state?.directPurchaseItem) {
       message.warning('Giỏ hàng trống! Vui lòng mua sắm thêm.');
       navigate('/');
       return;
     }
 
     fetchAddresses();
-  }, [isAuthenticated, items, navigate]);
+  }, [isAuthenticated, items, navigate, location.state]);
 
   const calculateSubtotal = () => {
     return items.reduce((sum, item) => {
@@ -125,6 +142,20 @@ function Checkout() {
       setSelectedAddress(newSelected);
     }
     setIsAddressModalVisible(false);
+  };
+
+  const handleQuantityChange = (itemId, productId, newQuantity, isDirect) => {
+    if (newQuantity < 1) return;
+
+    if (isDirect) {
+      setLocalDirectItem(prev => ({
+        ...prev,
+        quantity: newQuantity
+      }));
+    } else {
+      // For cart items, use itemId (item._id) as required by new API: PUT /api/cart/:itemId
+      dispatch(updateCartItem({ itemId: itemId, quantity: newQuantity }));
+    }
   };
 
   const handleAddNewAddress = async (values) => {
@@ -167,40 +198,65 @@ function Checkout() {
     try {
       const fullAddress = `${selectedAddress.address}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.city}`;
       
-      const orderData = {
-        orderItems: items.map(item => ({
-          productId: item.productId?._id || item.product?._id,
-          name: item.productId?.name || item.product?.name || 'Sản phẩm',
-          image: item.productId?.images?.[0] || item.productId?.image || '',
-          quantity: item.quantity,
-          price: item.productId?.salePrice || item.productId?.price || 0
-        })),
-        totalPrice: finalTotal,
-        itemsPrice: finalTotal,
-        shippingPrice: 0,
-        paymentMethod: paymentMethod,
-        
-        // Flatten fields as per backend requirement
-        customerName: selectedAddress.fullName,
-        customerEmail: user?.email || 'test@example.com',
-        customerPhone: selectedAddress.phoneNumber,
-        shippingAddress: selectedAddress.address, // Chỉ gửi tên đường
-        shippingCity: selectedAddress.city,
-        shippingDistrict: selectedAddress.district, // Backend cần trường này
-        shippingWard: selectedAddress.ward,         // Backend cần trường này
-        shippingNote: values.note || '',            // Đổi 'note' -> 'shippingNote'
-        
-        // Optional extended details (giữ lại cho chắc)
-        shippingDetails: {
-           address: selectedAddress.address,
-           ward: selectedAddress.ward,
-           district: selectedAddress.district,
-           city: selectedAddress.city
-        }
-      };
+      let response;
+      
+      // CASE 1: Direct Buy Now (API riêng theo yêu cầu)
+      if (localDirectItem) {
+        const buyNowPayload = {
+          productId: localDirectItem.product._id,
+          quantity: localDirectItem.quantity, // Use updated quantity
+          customerName: selectedAddress.fullName,
+          customerName: selectedAddress.fullName,
+          customerEmail: user?.email || 'email@example.com',
+          customerPhone: selectedAddress.phoneNumber,
+          shippingAddress: selectedAddress.address,
+          shippingCity: selectedAddress.city,
+          shippingDistrict: selectedAddress.district,
+          shippingWard: selectedAddress.ward,
+          shippingNote: values.note || '',
+          paymentMethod: paymentMethod,
+          voucherCode: '' // Hiện tại chưa có voucher input
+        };
+        console.log('Sending Buy Now Payload:', buyNowPayload);
+        // Call direct API endpoint
+        const res = await axiosInstance.post('/orders/buy-now', buyNowPayload);
+        response = res.data; // axios returns { data: ... }
+      } 
+      // CASE 2: Regular Cart Checkout
+      else {
+        const orderData = {
+          orderItems: items.map(item => ({
+            productId: item.productId?._id || item.product?._id,
+            name: item.productId?.name || item.product?.name || 'Sản phẩm',
+            image: item.productId?.images?.[0] || item.productId?.image || '',
+            quantity: item.quantity,
+            price: item.productId?.salePrice || item.productId?.price || 0
+          })),
+          totalPrice: finalTotal,
+          itemsPrice: finalTotal,
+          shippingPrice: 0,
+          paymentMethod: paymentMethod,
+          
+          customerName: selectedAddress.fullName,
+          customerEmail: user?.email || 'test@example.com',
+          customerPhone: selectedAddress.phoneNumber,
+          shippingAddress: selectedAddress.address, 
+          shippingCity: selectedAddress.city,
+          shippingDistrict: selectedAddress.district,
+          shippingWard: selectedAddress.ward,
+          shippingNote: values.note || '',            
+          
+          shippingDetails: {
+             address: selectedAddress.address,
+             ward: selectedAddress.ward,
+             district: selectedAddress.district,
+             city: selectedAddress.city
+          }
+        };
 
-      console.log('Sending Order Data (Final):', orderData);
-      const response = await orderAPI.create(orderData);
+        console.log('Sending Order Data (Final):', orderData);
+        response = await orderAPI.create(orderData);
+      }
       console.log('Order Response:', response);
 
       if (response && response.success) {
@@ -393,7 +449,14 @@ function Checkout() {
                 {items.map((item) => {
                   const product = item.productId || item.product || {};
                   const price = product.salePrice || product.price || 0;
-                  const imageUrl = Array.isArray(product.images) ? product.images[0] : product.image || '';
+                  let imageUrl = '';
+                  if (Array.isArray(product.images) && product.images.length > 0) {
+                      const firstImg = product.images[0];
+                      imageUrl = (typeof firstImg === 'object' && firstImg?.imageUrl) ? firstImg.imageUrl : firstImg;
+                  } else {
+                      imageUrl = product.image || '';
+                  }
+
 
                   return (
                     <div key={item._id || product._id} className="order-item">
@@ -404,6 +467,35 @@ function Checkout() {
                       <div className="order-item-info">
                         <h4 className="order-item-name">{product.name}</h4>
                         <p className="order-item-price">{price.toLocaleString('vi-VN')}đ</p>
+                        <div className="order-item-qty-control" style={{ marginTop: 8, display: 'flex', alignItems: 'center' }}>
+                           <span style={{ marginRight: 8, fontSize: 13, color: '#666' }}>Số lượng:</span>
+                           <Button 
+                             size="small" 
+                             icon={<MinusOutlined />} 
+                             onClick={() => handleQuantityChange(item._id, product._id, item.quantity - 1, !!item.isDirect)}
+                             disabled={item.quantity <= 1}
+                           />
+                           <InputNumber 
+                              min={1} 
+                              max={product.stock || 100} 
+                              value={item.quantity} 
+                              size="small"
+                              controls={false}
+                              style={{ width: '40px', margin: '0 4px', textAlign: 'center' }}
+                              onChange={(val) => handleQuantityChange(
+                                item._id, 
+                                product._id, 
+                                val, 
+                                !!item.isDirect
+                              )}
+                           />
+                           <Button 
+                             size="small" 
+                             icon={<PlusOutlined />} 
+                             onClick={() => handleQuantityChange(item._id, product._id, item.quantity + 1, !!item.isDirect)}
+                             disabled={item.quantity >= (product.stock || 100)}
+                           />
+                        </div>
                       </div>
                     </div>
                   );

@@ -66,8 +66,16 @@ const OrderDetail = () => {
       key: 'product',
       render: (product, record) => {
         const productData = record.productId || {};
-        // Check multiple image sources: singular image, first of images array, or root productImage
-        const imgUrl = productData.image || productData.images?.[0] || record.productImage || 'https://via.placeholder.com/60';
+        
+        let imgUrl = '';
+        if (Array.isArray(productData.images) && productData.images.length > 0) {
+             const firstImg = productData.images[0];
+             imgUrl = (typeof firstImg === 'object' && firstImg?.imageUrl) ? firstImg.imageUrl : firstImg;
+        }
+        
+        if (!imgUrl) {
+             imgUrl = productData.image || record.productImage || 'https://via.placeholder.com/60';
+        }
         const name = productData.name || record.productName || 'Sản phẩm';
 
         return (

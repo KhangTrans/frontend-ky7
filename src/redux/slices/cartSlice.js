@@ -28,9 +28,10 @@ export const addToCart = createAsyncThunk(
 
 export const updateCartItem = createAsyncThunk(
   'cart/updateCartItem',
-  async ({ productId, quantity }, { rejectWithValue }) => {
+  // Change input param to itemId
+  async ({ itemId, quantity }, { rejectWithValue }) => {
     try {
-      const response = await cartAPI.updateCartItem(productId, quantity);
+      const response = await cartAPI.updateCartItem(itemId, quantity);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Không thể cập nhật giỏ hàng');
@@ -40,10 +41,10 @@ export const updateCartItem = createAsyncThunk(
 
 export const removeFromCart = createAsyncThunk(
   'cart/removeFromCart',
-  async (productId, { rejectWithValue }) => {
+  async (itemId, { rejectWithValue }) => {
     try {
-      const response = await cartAPI.removeFromCart(productId);
-      return { ...response, productId };
+      const response = await cartAPI.removeFromCart(itemId);
+      return { ...response, itemId };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Không thể xóa sản phẩm');
     }
@@ -136,18 +137,33 @@ const cartSlice = createSlice({
 
       // Update Cart Item
       .addCase(updateCartItem.pending, (state) => {
-        state.loading = true;
+        // Không set loading = true để tránh re-render toàn bộ trang
         state.error = null;
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
         state.loading = false;
-        const data = action.payload.data || action.payload;
-        const cart = data.cart || data;
+        
+        // Response structure: { success: true, data: { _id, productId, quantity, price, ... } }
+        const updatedItem = action.payload.data || action.payload;
 
-        if (cart && cart.items) {
-          state.items = cart.items || [];
+        if (updatedItem && updatedItem._id) {
+          // Update specific item in the list
+          const index = state.items.findIndex(item => item._id === updatedItem._id);
+          if (index !== -1) {
+            state.items[index] = { 
+               ...state.items[index], 
+               ...updatedItem,
+               // Ensure productId is preserved if backend returns only ID or populated object
+               productId: state.items[index].productId 
+            };
+          }
+          
+          // Recalculate totals
           state.totalQuantity = state.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-          state.totalPrice = cart.totalPrice || 0;
+          state.totalPrice = state.items.reduce((sum, item) => {
+             const price = item.productId?.salePrice || item.productId?.price || item.price || 0;
+             return sum + (price * item.quantity);
+          }, 0);
         }
       })
       .addCase(updateCartItem.rejected, (state, action) => {
@@ -157,7 +173,7 @@ const cartSlice = createSlice({
 
       // Remove from Cart
       .addCase(removeFromCart.pending, (state) => {
-        state.loading = true;
+        // state.loading = true; // Disable loading to prevent flicker
         state.error = null;
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
@@ -173,8 +189,7 @@ const cartSlice = createSlice({
         } else {
            // Optimistic update fallback
            state.items = state.items.filter(item => {
-             const pId = item.productId._id || item.productId;
-             return pId !== action.payload.productId;
+             return item._id !== action.payload.itemId;
            });
            state.totalQuantity = state.items.reduce((sum, item) => sum + item.quantity, 0);
         }

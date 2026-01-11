@@ -77,9 +77,15 @@ function ProductDetail() {
       return;
     }
 
-    handleAddToCart();
-    // TODO: Navigate to checkout page
-    messageApi.info('Chức năng thanh toán đang được phát triển!');
+    // Chuyển hướng sang Checkout kèm data sản phẩm (không thêm vào giỏ hàng)
+    navigate('/checkout', { 
+      state: { 
+        directPurchaseItem: {
+          product: product,
+          quantity: quantity
+        }
+      } 
+    });
   };
 
   if (loading) {
