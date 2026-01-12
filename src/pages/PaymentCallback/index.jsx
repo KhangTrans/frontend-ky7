@@ -38,9 +38,21 @@ function PaymentCallback() {
         else if (path.includes('/vnpay')) {
             const vnp_ResponseCode = params.get('vnp_ResponseCode');
             const vnp_TxnRef = params.get('vnp_TxnRef');
+            const vnp_OrderInfo = params.get('vnp_OrderInfo');
+            
             if (vnp_ResponseCode === '00') {
+                // Trích xuất OrderId thực (MongoDB ID) từ OrderInfo nếu có
+                // Format: "Thanh toan don hang <OrderId>"
+                let realOrderId = vnp_TxnRef;
+                if (vnp_OrderInfo) {
+                    const match = vnp_OrderInfo.match(/([a-f0-9]{24})/);
+                    if (match && match[1]) {
+                        realOrderId = match[1];
+                    }
+                }
+
                 // Thay vì hiển thị luôn, chuyển hướng sang trang success cho đẹp URL
-                navigate('/payment/success', { state: { orderId: vnp_TxnRef } });
+                navigate('/payment/success', { state: { orderId: realOrderId } });
                 return;
             } else {
                 setStatus('error');
