@@ -463,36 +463,81 @@
 
 @media (max-width: 576px) {
   .product-detail-container {
-    padding: 20px 15px;
+    padding: 15px 12px;
+    margin-top: 10px;
+    padding-bottom: 80px; /* Space for fixed bottom bar */
   }
 
-  .main-image {
-    height: 300px;
-  }
-
-  .product-title {
-    font-size: 24px;
-  }
-
-  .current-price {
-    font-size: 28px;
-  }
-
-  .action-buttons {
+  .product-detail-content {
+    display: flex;
     flex-direction: column;
+    gap: 20px;
   }
 
-  .add-to-cart-btn,
-  .buy-now-btn {
+  /* Shopee-style: Fixed Bottom Action Bar */
+  .action-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
+    height: 60px;
+    background: white;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    gap: 0;
   }
+
+  /* "Chat/Cart" Icon Button (Optional - simulates generic icons) */
+  .wishlist-btn {
+    display: none !important; /* Hide wishlist for now to match simplified bar */
+  }
+
+  .add-to-cart-btn {
+    flex: 1;
+    border-radius: 0 !important;
+    height: 100% !important;
+    background: #26aa99 !important; /* Shopee Teal/Green */
+    color: white !important;
+    font-size: 14px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: none !important;
+  }
+  
+  .add-to-cart-btn::before {
+    /* content: '\e73d'; Antd icon code for shopping cart if needed, or just keep icon component */
+    font-size: 20px;
+  }
+
+  .buy-now-btn {
+    flex: 1;
+    border-radius: 0 !important;
+    height: 100% !important;
+    background: #ee4d2d !important; /* Shopee Orange */
+    color: white !important;
+    border: none !important;
+    font-size: 15px !important;
+    box-shadow: none !important;
+  }
+
+  /* Adjust other elements */
+  .breadcrumb-section { display: none; }
 
   .thumbnail-list {
-    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 10px;
   }
-
-  .spec-item {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  
+  .thumbnail {
+    flex: 0 0 60px;
+    width: 60px;
+    height: 60px;
+    border-radius: 4px;
   }
 }
