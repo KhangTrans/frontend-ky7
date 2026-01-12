@@ -4,6 +4,7 @@ import { Result, Button, Spin, Card } from 'antd';
 import { CheckCircleFilled, CloseCircleFilled, HomeOutlined, ShoppingOutlined } from '@ant-design/icons';
 import HomeNavbar from '../../components/HomeNavbar';
 import axiosInstance from '../../api/axiosConfig';
+import { orderAPI } from '../../api';
 import './PaymentCallback.css';
 
 function PaymentCallback() {
@@ -25,9 +26,28 @@ function PaymentCallback() {
         if (path.includes('/payment/success')) {
             setStatus('success');
             setMessage('Thanh toán thành công! Cảm ơn bạn đã mua hàng.');
-            // Lấy orderId từ state nếu có (do redirect từ VNPay/ZaloPay qua)
-            if (location.state?.orderId) {
-                setOrderInfo({ orderId: location.state.orderId });
+            
+            // Logic xử lý ID đơn hàng (Handle ZaloPay/VNPay non-ObjectId codes)
+            let finalOrderId = location.state?.orderId;
+            const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+
+            // Nếu không có ID hoặc ID không chuẩn MongoDB (VD: mã ZaloPay 260112_...), lấy đơn mới nhất
+            if (!finalOrderId || !isObjectId(finalOrderId)) {
+                try {
+                    const res = await orderAPI.getAll();
+                    if (res.success && res.data?.length > 0) {
+                        // Sort desc by createdAt to get latest
+                        const sorted = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                        finalOrderId = sorted[0]._id || sorted[0].id;
+                    }
+                } catch (err) {
+                    console.error('Error fetching latest order:', err);
+                }
+            }
+
+            if (finalOrderId) {
+                // Lưu key '_id' để khớp với code check ở button phía dưới
+                setOrderInfo({ _id: finalOrderId });
             }
         } else if (path.includes('/payment/failed')) {
             setStatus('error');
