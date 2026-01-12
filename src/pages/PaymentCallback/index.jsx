@@ -135,9 +135,9 @@ function PaymentCallback() {
                 icon={<ShoppingOutlined />}
                 onClick={() => {
                    // Check if ID is a valid MongoDB ObjectId (24 hex characters)
-                   const isValidId = orderInfo?.orderId && /^[0-9a-fA-F]{24}$/.test(orderInfo.orderId);
+                   const isValidId = orderInfo?._id && /^[0-9a-fA-F]{24}$/.test(orderInfo._id);
                    if (isValidId) {
-                       navigate(`/orders/${orderInfo.orderId}`);
+                       navigate(`/orders/${orderInfo._id}`);
                    } else {
                        navigate('/order-history');
                    }
