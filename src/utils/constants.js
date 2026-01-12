@@ -1,10 +1,10 @@
 // Constants cho API
-export const API_BASE_URL = 'https://backend-node-lilac-seven.vercel.app/api';
+export const API_BASE_URL = 'https://backend-node-5re9.onrender.com/api';
 export const API_TIMEOUT = 10000; // 10 seconds
 
 // Frontend config - Sử dụng environment variables
 export const API_CONFIG = {
-  REST_URL: import.meta.env.VITE_API_REST_URL || 'https://backend-node-lilac-seven.vercel.app',
+  REST_URL: import.meta.env.VITE_API_REST_URL || 'https://backend-node-5re9.onrender.com',
   SOCKET_URL: import.meta.env.VITE_API_SOCKET_URL || 'https://backend-node-5re9.onrender.com'
 };
 
