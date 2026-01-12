@@ -169,10 +169,7 @@ function ProductDetail() {
           <div className="product-info">
             <h1 className="product-title">{product.name}</h1>
             
-            <div className="product-rating">
-              <Rate disabled defaultValue={4.5} allowHalf />
-              <span className="rating-text">(128 đánh giá)</span>
-            </div>
+
 
             <div className="product-price">
               {product.salePrice < product.price && (
@@ -190,9 +187,7 @@ function ProductDetail() {
               )}
             </div>
 
-            <div className="product-short-desc">
-              <p>{product.shortDescription || product.description?.substring(0, 200) + '...' || 'Sản phẩm chất lượng cao'}</p>
-            </div>
+
 
             <div className="product-meta">
               <div className="meta-item">
@@ -275,35 +270,8 @@ function ProductDetail() {
                   </div>
                 ),
               },
-              {
-                key: '2',
-                label: 'Thông số kỹ thuật',
-                children: (
-                  <div className="tab-content">
-                    <div className="specifications">
-                      {product.specifications ? (
-                        Object.entries(product.specifications).map(([key, value]) => (
-                          <div className="spec-item" key={key}>
-                            <span className="spec-label">{key}:</span>
-                            <span className="spec-value">{value}</span>
-                          </div>
-                        ))
-                      ) : (
-                        <p>Đang cập nhật thông số kỹ thuật...</p>
-                      )}
-                    </div>
-                  </div>
-                ),
-              },
-              {
-                key: '3',
-                label: 'Đánh giá (128)',
-                children: (
-                  <div className="tab-content">
-                    <p>Chức năng đánh giá đang được phát triển...</p>
-                  </div>
-                ),
-              },
+
+
             ]}
           />
         </div>
