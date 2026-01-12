@@ -25,6 +25,10 @@ function PaymentCallback() {
         if (path.includes('/payment/success')) {
             setStatus('success');
             setMessage('Thanh toán thành công! Cảm ơn bạn đã mua hàng.');
+            // Lấy orderId từ state nếu có (do redirect từ VNPay/ZaloPay qua)
+            if (location.state?.orderId) {
+                setOrderInfo({ orderId: location.state.orderId });
+            }
         } else if (path.includes('/payment/failed')) {
             setStatus('error');
             const msgCode = params.get('message') || params.get('code') || 'Lỗi không xác định';
@@ -35,18 +39,19 @@ function PaymentCallback() {
             const vnp_ResponseCode = params.get('vnp_ResponseCode');
             const vnp_TxnRef = params.get('vnp_TxnRef');
             if (vnp_ResponseCode === '00') {
-                setStatus('success');
-                setMessage('Thanh toán thành công qua VNPay!');
-                setOrderInfo({ orderId: vnp_TxnRef });
+                // Thay vì hiển thị luôn, chuyển hướng sang trang success cho đẹp URL
+                navigate('/payment/success', { state: { orderId: vnp_TxnRef } });
+                return;
             } else {
                 setStatus('error');
                 setMessage('Thanh toán VNPay thất bại hoặc bị hủy.');
             }
         } else if (path.includes('/zalopay')) {
             const statusParams = params.get('status');
+            const apptransid = params.get('apptransid'); // ZaloPay thường trả về apptransid
              if (statusParams === '1') {
-                setStatus('success');
-                setMessage('Thanh toán thành công qua ZaloPay!');
+                navigate('/payment/success', { state: { orderId: apptransid } }); // Note: ZaloPay ID format might differ
+                return;
             } else {
                 setStatus('error');
                 setMessage('Thanh toán ZaloPay thất bại.');
