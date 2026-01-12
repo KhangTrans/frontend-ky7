@@ -493,6 +493,7 @@
     padding: 0;
     margin: 0;
     gap: 0;
+    flex-wrap: nowrap !important;
   }
 
   /* "Chat/Cart" Icon Button (Optional - simulates generic icons) */
@@ -502,9 +503,10 @@
 
   .add-to-cart-btn {
     flex: 1;
+    min-width: 0 !important; /* Reset min-width to allow sharing space */
     border-radius: 0 !important;
     height: 100% !important;
-    background: #26aa99 !important; /* Shopee Teal/Green */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; /* Desktop Theme Gradient */
     color: white !important;
     font-size: 14px !important;
     display: flex;
@@ -522,11 +524,13 @@
 
   .buy-now-btn {
     flex: 1;
+    min-width: 0 !important; /* Reset min-width to allow sharing space */
     border-radius: 0 !important;
     height: 100% !important;
-    background: #ee4d2d !important; /* Shopee Orange */
-    color: white !important;
+    background: white !important; /* Desktop Theme Secondary */
+    color: #667eea !important;
     border: none !important;
+    border-top: 1px solid #f0f0f0 !important;
     font-size: 15px !important;
     box-shadow: none !important;
   }
