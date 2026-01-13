@@ -167,9 +167,9 @@ export const orderAPI = {
       const response = await axiosInstance.get(`/orders/admin/all${queryString}`);
       return response.data;
   },
-  updateStatus: async (orderId, status) => {
-      console.log('Updating status for order:', orderId, 'to', status);
-      const response = await axiosInstance.put(`/orders/admin/${orderId}/status`, { status });
+  updateStatus: async (orderId, data) => {
+      console.log('Updating status for order:', orderId, 'data:', data);
+      const response = await axiosInstance.put(`/orders/admin/${orderId}/status`, data);
       return response.data;
   },
 };

@@ -128,7 +128,7 @@ const OrderManagement = () => {
 
         setUpdatingStatus(true);
         try {
-            const res = await orderAPI.updateStatus(selectedOrder._id, newStatus);
+            const res = await orderAPI.updateStatus(selectedOrder._id, { orderStatus: newStatus });
             if (res.success || res.message) {
                  message.success('Cập nhật trạng thái thành công');
                  setIsModalVisible(false);
