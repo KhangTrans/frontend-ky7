@@ -2,7 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Tag, Space, Button, message, Card, Input, Select, Row, Col, Statistic, Tooltip, Modal } from 'antd';
 import { orderAPI } from '../../api';
 import { useNavigate } from 'react-router-dom';
-import { SearchOutlined, FilterOutlined, ReloadOutlined, ShoppingCartOutlined, DollarCircleOutlined, SyncOutlined, EditOutlined } from '@ant-design/icons';
+import { SearchOutlined, FilterOutlined, ReloadOutlined, ShoppingCartOutlined, DollarCircleOutlined, SyncOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import OrderDetailModal from './OrderDetailModal';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -17,10 +18,14 @@ const OrderManagement = () => {
     });
 
     // Update Status State
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [newStatus, setNewStatus] = useState('');
     const [updatingStatus, setUpdatingStatus] = useState(false);
+
+    // Detail Modal State
+    const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+    const [detailOrder, setDetailOrder] = useState(null);
 
     // Filter states
     const [searchText, setSearchText] = useState('');
@@ -120,7 +125,7 @@ const OrderManagement = () => {
     const openUpdateStatusModal = (order) => {
         setSelectedOrder(order);
         setNewStatus(order.orderStatus);
-        setIsModalVisible(true);
+        setIsStatusModalVisible(true);
     };
 
     const handleUpdateStatus = async () => {
@@ -131,7 +136,7 @@ const OrderManagement = () => {
             const res = await orderAPI.updateStatus(selectedOrder._id, { orderStatus: newStatus });
             if (res.success || res.message) {
                  message.success('Cập nhật trạng thái thành công');
-                 setIsModalVisible(false);
+                 setIsStatusModalVisible(false);
                  fetchOrders(); // Reload list
             } else {
                 message.error('Cập nhật thất bại');
@@ -141,6 +146,24 @@ const OrderManagement = () => {
             message.error('Lỗi cập nhật: ' + (error.message || 'Unknown error'));
         } finally {
             setUpdatingStatus(false);
+        }
+    };
+
+    // Detail Modal Logic
+    const openDetailModal = async (order) => {
+        setIsDetailModalVisible(true);
+        try {
+            const res = await orderAPI.getById(order._id);
+            if (res.success) {
+                setDetailOrder(res.data);
+            } else {
+                // Fallback to table data if API fails, though unlikely
+                 setDetailOrder(order);
+            }
+        } catch (error) {
+            console.error("Failed to fetch order details:", error);
+            // Fallback content or error message could be better, but for now fallback to row data
+            setDetailOrder(order);
         }
     };
 
@@ -250,7 +273,9 @@ const OrderManagement = () => {
             align: 'center',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" size="small" ghost onClick={() => navigate(`/orders/${record._id}`)}>Chi tiết</Button>
+                    <Tooltip title="Xem chi tiết">
+                        <Button type="primary" size="small" ghost icon={<EyeOutlined />} onClick={() => openDetailModal(record)} />
+                    </Tooltip>
                 </Space>
             ),
         },
@@ -357,11 +382,12 @@ const OrderManagement = () => {
                 />
             </Card>
 
+            {/* Update Status Modal */}
             <Modal
                 title="Cập nhật trạng thái đơn hàng"
-                open={isModalVisible}
+                open={isStatusModalVisible}
                 onOk={handleUpdateStatus}
-                onCancel={() => setIsModalVisible(false)}
+                onCancel={() => setIsStatusModalVisible(false)}
                 confirmLoading={updatingStatus}
                 okText="Cập nhật"
                 cancelText="Hủy"
@@ -384,6 +410,13 @@ const OrderManagement = () => {
                    </Select>
                 </div>
             </Modal>
+
+            {/* Order Details Modal Component */}
+            <OrderDetailModal 
+                open={isDetailModalVisible}
+                onClose={() => setIsDetailModalVisible(false)}
+                order={detailOrder}
+            />
         </div>
     );
 };
