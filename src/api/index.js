@@ -172,6 +172,10 @@ export const orderAPI = {
       const response = await axiosInstance.put(`/orders/admin/${orderId}/status`, data);
       return response.data;
   },
+  getStatistics: async () => {
+      const response = await axiosInstance.get('/orders/admin/statistics');
+      return response.data;
+  },
 };
 
 // Payment API

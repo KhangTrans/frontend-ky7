@@ -78,9 +78,34 @@ const OrderManagement = () => {
         }
     }, [pagination.current, pagination.pageSize, searchText, statusFilter, paymentMethodFilter]);
 
+    // Stats State
+    const [stats, setStats] = useState({
+        totalOrders: 0,
+        ordersByStatus: {
+            pending: 0,
+            processing: 0,
+            shipping: 0,
+            delivered: 0,
+            cancelled: 0
+        },
+        totalRevenue: 0
+    });
+
+    const fetchStats = async () => {
+        try {
+            const res = await orderAPI.getStatistics();
+            if (res.success) {
+                setStats(res.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch statistics:", error);
+        }
+    };
+
     // Initial load
     useEffect(() => {
         fetchOrders({ page: 1 });
+        fetchStats();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); 
 
@@ -138,6 +163,7 @@ const OrderManagement = () => {
                  message.success('Cập nhật trạng thái thành công');
                  setIsStatusModalVisible(false);
                  fetchOrders(); // Reload list
+                 fetchStats(); // Reload stats
             } else {
                 message.error('Cập nhật thất bại');
             }
@@ -282,8 +308,42 @@ const OrderManagement = () => {
         },
     ];
 
+
     return (
         <div style={{ padding: '20px' }}>
+            {/* Quick Stats Section */}
+            <Row gutter={[16, 16]} style={{ marginBottom: '20px' }}>
+                <Col xs={24} sm={8}>
+                    <Card bordered={false} style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                        <Statistic 
+                            title="Tổng đơn hàng" 
+                            value={stats.totalOrders} 
+                            prefix={<ShoppingCartOutlined style={{ color: '#1890ff' }} />} 
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} sm={8}>
+                    <Card bordered={false} style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                        <Statistic 
+                            title="Tổng doanh thu" 
+                            value={stats.totalRevenue} 
+                            prefix={<DollarCircleOutlined style={{ color: '#52c41a' }} />} 
+                            precision={0}
+                            formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} sm={8}>
+                    <Card bordered={false} style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                        <Statistic 
+                            title="Đơn chờ xử lý" 
+                            value={stats.ordersByStatus?.pending || 0} 
+                            prefix={<SyncOutlined spin={stats.ordersByStatus?.pending > 0} style={{ color: '#faad14' }} />} 
+                        />
+                    </Card>
+                </Col>
+            </Row>
+
             <Card title="Danh sách đơn hàng" bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
                 <div style={{ marginBottom: 20 }}>
                     <Row gutter={[16, 16]}>
