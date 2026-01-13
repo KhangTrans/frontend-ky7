@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Table, Tag, Space, Button, message, Card, Input, Select, Row, Col, Statistic } from 'antd';
+import { Table, Tag, Space, Button, message, Card, Input, Select, Row, Col, Statistic, Tooltip, Modal } from 'antd';
 import { orderAPI } from '../../api';
 import { useNavigate } from 'react-router-dom';
-import { SearchOutlined, FilterOutlined, ReloadOutlined, ShoppingCartOutlined, DollarCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import { SearchOutlined, FilterOutlined, ReloadOutlined, ShoppingCartOutlined, DollarCircleOutlined, SyncOutlined, EditOutlined } from '@ant-design/icons';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -15,6 +15,12 @@ const OrderManagement = () => {
         pageSize: 10,
         total: 0
     });
+
+    // Update Status State
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [newStatus, setNewStatus] = useState('');
+    const [updatingStatus, setUpdatingStatus] = useState(false);
 
     // Filter states
     const [searchText, setSearchText] = useState('');
@@ -78,7 +84,7 @@ const OrderManagement = () => {
         fetchOrders({ page: 1, search: value });
     };
 
-    const handleStatusChange = (value) => {
+    const handleStatusChangeFilter = (value) => {
         const newVal = value || ''; 
         setStatusFilter(newVal);
         fetchOrders({ page: 1, status: newVal });
@@ -108,6 +114,34 @@ const OrderManagement = () => {
             page: newPagination.current, 
             limit: newPagination.pageSize 
         });
+    };
+
+    // Update Status Logic
+    const openUpdateStatusModal = (order) => {
+        setSelectedOrder(order);
+        setNewStatus(order.orderStatus);
+        setIsModalVisible(true);
+    };
+
+    const handleUpdateStatus = async () => {
+        if (!selectedOrder || !newStatus) return;
+
+        setUpdatingStatus(true);
+        try {
+            const res = await orderAPI.updateStatus(selectedOrder._id, newStatus);
+            if (res.success || res.message) {
+                 message.success('Cập nhật trạng thái thành công');
+                 setIsModalVisible(false);
+                 fetchOrders(); // Reload list
+            } else {
+                message.error('Cập nhật thất bại');
+            }
+        } catch (error) {
+            console.error(error);
+            message.error('Lỗi cập nhật: ' + (error.message || 'Unknown error'));
+        } finally {
+            setUpdatingStatus(false);
+        }
     };
 
     // Calculate quick stats for the current page
@@ -166,9 +200,9 @@ const OrderManagement = () => {
             title: 'Trạng thái',
             dataIndex: 'orderStatus',
             key: 'orderStatus',
-            width: 140,
+            width: 150,
             align: 'center',
-            render: (status) => {
+            render: (status, record) => {
                 let color = 'default';
                 let label = 'Unknown';
                 
@@ -181,7 +215,19 @@ const OrderManagement = () => {
                     default: label = status;
                 }
                 
-                return <Tag color={color} style={{ minWidth: 80, textAlign: 'center' }}>{label}</Tag>;
+                return (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                         <Tag color={color} style={{ minWidth: 80, textAlign: 'center', margin: 0 }}>{label}</Tag>
+                         <Tooltip title="Cập nhật trạng thái">
+                             <Button 
+                                type="text" 
+                                icon={<EditOutlined />} 
+                                size="small" 
+                                onClick={() => openUpdateStatusModal(record)}
+                             />
+                         </Tooltip>
+                    </div>
+                );
             }
         },
         {
@@ -262,7 +308,7 @@ const OrderManagement = () => {
                             <Select
                                 placeholder="Trạng thái đơn hàng"
                                 style={{ width: '100%' }}
-                                onChange={handleStatusChange}
+                                onChange={handleStatusChangeFilter}
                                 value={statusFilter || undefined}
                                 allowClear
                             >
@@ -310,6 +356,34 @@ const OrderManagement = () => {
                     scroll={{ x: 1000 }}
                 />
             </Card>
+
+            <Modal
+                title="Cập nhật trạng thái đơn hàng"
+                open={isModalVisible}
+                onOk={handleUpdateStatus}
+                onCancel={() => setIsModalVisible(false)}
+                confirmLoading={updatingStatus}
+                okText="Cập nhật"
+                cancelText="Hủy"
+            >
+                <div style={{ marginBottom: 16 }}>
+                    <span style={{ fontWeight: 'bold' }}>Mã đơn hàng:</span> {selectedOrder?.orderNumber}
+                </div>
+                <div>
+                   <span style={{ fontWeight: 'bold', display: 'block', marginBottom: 8 }}>Trạng thái mới:</span>
+                   <Select 
+                        value={newStatus} 
+                        onChange={setNewStatus} 
+                        style={{ width: '100%' }}
+                    >
+                        <Option value="pending">Chờ xử lý (Pending)</Option>
+                        <Option value="processing">Đang xử lý (Processing)</Option>
+                        <Option value="shipped">Đang giao hàng (Shipped)</Option>
+                        <Option value="delivered">Đã giao hàng (Delivered)</Option>
+                        <Option value="cancelled">Hủy đơn hàng (Cancelled)</Option>
+                   </Select>
+                </div>
+            </Modal>
         </div>
     );
 };

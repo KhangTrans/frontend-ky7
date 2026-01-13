@@ -167,6 +167,10 @@ export const orderAPI = {
       const response = await axiosInstance.get(`/orders/admin/all${queryString}`);
       return response.data;
   },
+  updateStatus: async (orderId, status) => {
+      const response = await axiosInstance.put(`/orders/${orderId}/status`, { status });
+      return response.data;
+  },
 };
 
 // Payment API
