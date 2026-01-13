@@ -162,6 +162,11 @@ export const orderAPI = {
     const response = await axiosInstance.get(`/orders/${id}`);
     return response.data;
   },
+  getAdminOrders: async (params) => {
+      const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+      const response = await axiosInstance.get(`/orders/admin/all${queryString}`);
+      return response.data;
+  },
 };
 
 // Payment API

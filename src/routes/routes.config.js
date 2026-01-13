@@ -157,28 +157,38 @@ const routesData = [
         meta: {
           title: 'Dashboard',
           requiresAuth: true,
-          roles: ['admin', 'user'],
+          roles: ['admin'],
+        },
+      },
+      {
+        path: 'dashboard/orders',
+        name: 'OrderManagement',
+        component: 'OrderManagement',
+        meta: {
+          title: 'Quản lý đơn hàng',
+          requiresAuth: true,
+          roles: ['admin'],
         },
       },
 
       {
-        path: 'products',
+        path: 'dashboard/products',
         name: 'ProductManagement',
         component: 'ProductManagement',
         meta: {
           title: 'Quản lý sản phẩm',
           requiresAuth: true,
-          roles: ['admin', 'user'],
+          roles: ['admin'],
         },
       },
       {
-        path: 'categories',
+        path: 'dashboard/categories',
         name: 'CategoryManagement',
         component: 'CategoryManagement',
         meta: {
           title: 'Quản lý thể loại',
           requiresAuth: true,
-          roles: ['admin', 'user'],
+          roles: ['admin'],
         },
       },
       {

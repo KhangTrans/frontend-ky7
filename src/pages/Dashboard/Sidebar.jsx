@@ -27,40 +27,42 @@ function Sidebar({ collapsed, user }) {
       label: 'Tổng quan',
     },
     {
-      key: '/products',
+      key: '/dashboard/products',
       icon: <ShoppingOutlined />,
       label: 'Sản phẩm',
     },
     {
-      key: '/categories',
+      key: '/dashboard/categories',
       icon: <AppstoreOutlined />,
       label: 'Thể loại',
     },
-    {
-      key: '/dashboard/users',
-      icon: <TeamOutlined />,
-      label: 'Người dùng',
-    },
-    {
-      key: '/dashboard/orders',
-      icon: <ShoppingCartOutlined />,
-      label: 'Đơn hàng',
-    },
-    {
-      key: '/dashboard/reports',
-      icon: <BarChartOutlined />,
-      label: 'Báo cáo',
-    },
-    {
-      key: '/dashboard/documents',
-      icon: <FileTextOutlined />,
-      label: 'Tài liệu',
-    },
-    {
-      key: '/dashboard/settings',
-      icon: <SettingOutlined />,
-      label: 'Cài đặt',
-    },
+    ...(user?.role === 'admin' ? [
+      {
+        key: '/dashboard/users',
+        icon: <TeamOutlined />,
+        label: 'Người dùng',
+      },
+      {
+        key: '/dashboard/orders',
+        icon: <ShoppingCartOutlined />,
+        label: 'Đơn hàng',
+      },
+      {
+        key: '/dashboard/reports',
+        icon: <BarChartOutlined />,
+        label: 'Báo cáo',
+      },
+      {
+        key: '/dashboard/documents',
+        icon: <FileTextOutlined />,
+        label: 'Tài liệu',
+      },
+      {
+        key: '/dashboard/settings',
+        icon: <SettingOutlined />,
+        label: 'Cài đặt',
+      },
+    ] : []),
   ];
 
   const handleMenuClick = ({ key }) => {
