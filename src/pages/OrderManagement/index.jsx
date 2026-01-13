@@ -231,8 +231,9 @@ const OrderManagement = () => {
                 
                 switch(status) {
                     case 'pending': color = 'orange'; label = 'Chờ xử lý'; break;
-                    case 'processing': color = 'blue'; label = 'Đang xử lý'; break;
-                    case 'shipped': color = 'cyan'; label = 'Đang giao'; break;
+                    case 'confirmed': color = 'blue'; label = 'Đã xác nhận'; break;
+                    case 'processing': color = 'cyan'; label = 'Đang xử lý'; break;
+                    case 'shipping': color = 'purple'; label = 'Đang giao'; break;
                     case 'delivered': color = 'green'; label = 'Đã giao'; break;
                     case 'cancelled': color = 'red'; label = 'Đã hủy'; break;
                     default: label = status;
@@ -337,11 +338,12 @@ const OrderManagement = () => {
                                 value={statusFilter || undefined}
                                 allowClear
                             >
-                                <Option value="pending">Chờ xử lý</Option>
-                                <Option value="processing">Đang xử lý</Option>
-                                <Option value="shipped">Đang giao hàng</Option>
-                                <Option value="delivered">Đã giao hàng</Option>
-                                <Option value="cancelled">Đã hủy</Option>
+                                <Option value="pending">Chờ xử lý (Pending)</Option>
+                                <Option value="confirmed">Đã xác nhận (Confirmed)</Option>
+                                <Option value="processing">Đang xử lý (Processing)</Option>
+                                <Option value="shipping">Đang giao hàng (Shipping)</Option>
+                                <Option value="delivered">Đã giao hàng (Delivered)</Option>
+                                <Option value="cancelled">Đã hủy (Cancelled)</Option>
                             </Select>
                         </Col>
                         <Col xs={24} sm={12} md={6} lg={4}>
@@ -403,8 +405,9 @@ const OrderManagement = () => {
                         style={{ width: '100%' }}
                     >
                         <Option value="pending">Chờ xử lý (Pending)</Option>
+                        <Option value="confirmed">Đã xác nhận (Confirmed)</Option>
                         <Option value="processing">Đang xử lý (Processing)</Option>
-                        <Option value="shipped">Đang giao hàng (Shipped)</Option>
+                        <Option value="shipping">Đang giao hàng (Shipping)</Option>
                         <Option value="delivered">Đã giao hàng (Delivered)</Option>
                         <Option value="cancelled">Hủy đơn hàng (Cancelled)</Option>
                    </Select>

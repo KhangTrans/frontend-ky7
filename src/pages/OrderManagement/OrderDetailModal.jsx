@@ -20,7 +20,12 @@ const OrderDetailModal = ({ open, onClose, order }) => {
                 <Descriptions title="Thông tin chung" bordered size="small" column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}>
                     <Descriptions.Item label="Ngày đặt">{new Date(order.createdAt).toLocaleString('vi-VN')}</Descriptions.Item>
                     <Descriptions.Item label="Trạng thái">
-                        <Tag color={order.orderStatus === 'paid' ? 'green' : 'orange'}>
+                        <Tag color={
+                            order.orderStatus === 'delivered' ? 'green' : 
+                            order.orderStatus === 'cancelled' ? 'red' : 
+                            order.orderStatus === 'shipped' || order.orderStatus === 'shipping' ? 'purple' :
+                            'orange'
+                        }>
                             {order.orderStatus ? order.orderStatus.toUpperCase() : 'UNKNOWN'}
                         </Tag>
                     </Descriptions.Item>
