@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Tag, Space, Button, message, Card, Input, Select, Row, Col } from 'antd';
 import { orderAPI } from '../../api';
 import { useNavigate } from 'react-router-dom';
@@ -23,25 +23,38 @@ const OrderManagement = () => {
 
     const navigate = useNavigate();
 
-    const fetchOrders = async (page = 1, limit = 10, search = searchText, status = statusFilter, payment = paymentMethodFilter) => {
+    // Use a single param object to fetch orders, defaulting to current state if not provided
+    const fetchOrders = useCallback(async (paramsObj = {}) => {
         setLoading(true);
         try {
-            const params = {
+            // Merge params: Priority passed params > state > default
+            const page = paramsObj.page || pagination.current;
+            const limit = paramsObj.limit || pagination.pageSize;
+            
+            // For filters, we check if they are explicitly passed (including empty string to clear), 
+            // otherwise use current state. Using 'undefined' check allows passing empty string to clear.
+            const search = paramsObj.search !== undefined ? paramsObj.search : searchText;
+            const status = paramsObj.status !== undefined ? paramsObj.status : statusFilter;
+            const paymentMethod = paramsObj.paymentMethod !== undefined ? paramsObj.paymentMethod : paymentMethodFilter;
+
+            const apiParams = {
                 page,
                 limit,
                 search,
                 status,
-                paymentMethod: payment
+                paymentMethod
             };
 
-            // Remove empty keys
-            Object.keys(params).forEach(key => {
-                if (params[key] === '' || params[key] === null || params[key] === undefined) {
-                    delete params[key];
+            // Remove empty keys to verify null/undefined/empty string
+            Object.keys(apiParams).forEach(key => {
+                if (apiParams[key] === '' || apiParams[key] === null || apiParams[key] === undefined) {
+                    delete apiParams[key];
                 }
             });
+            
+            console.log('Fetching orders with params:', apiParams);
 
-            const res = await orderAPI.getAdminOrders(params);
+            const res = await orderAPI.getAdminOrders(apiParams);
             if (res.success) {
                 setOrders(res.data);
                 setPagination({
@@ -56,33 +69,54 @@ const OrderManagement = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [pagination.current, pagination.pageSize, searchText, statusFilter, paymentMethodFilter]);
 
+    // Initial load
     useEffect(() => {
-        // Initial load
-        fetchOrders();
-    }, []);
+        // We only want to run this once on mount, or when pagination changes (handled by Table onChange usually)
+        // But since we have filters, we need to be careful.
+        // Let's call it manually from effects when meaningful changes happen or just once on mount
+        fetchOrders({ page: 1 });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); 
 
     const handleSearch = (value) => {
         setSearchText(value);
-        fetchOrders(1, pagination.pageSize, value, statusFilter, paymentMethodFilter);
+        // Reset to page 1 when searching
+        fetchOrders({ page: 1, search: value });
     };
 
     const handleStatusChange = (value) => {
-        setStatusFilter(value);
-        fetchOrders(1, pagination.pageSize, searchText, value, paymentMethodFilter);
+        const newVal = value || ''; 
+        setStatusFilter(newVal);
+        fetchOrders({ page: 1, status: newVal });
     };
 
     const handlePaymentChange = (value) => {
-        setPaymentMethodFilter(value);
-        fetchOrders(1, pagination.pageSize, searchText, statusFilter, value);
+        const newVal = value || '';
+        setPaymentMethodFilter(newVal);
+        fetchOrders({ page: 1, paymentMethod: newVal });
     };
 
     const handleReset = () => {
         setSearchText('');
         setStatusFilter('');
         setPaymentMethodFilter('');
-        fetchOrders(1, pagination.pageSize, '', '', '');
+        fetchOrders({ 
+            page: 1, 
+            search: '', 
+            status: '', 
+            paymentMethod: '' 
+        });
+    };
+
+    const handleTableChange = (newPagination) => {
+        // Table pagination change. Keep current filters.
+        setPagination(prev => ({ ...prev, current: newPagination.current, pageSize: newPagination.pageSize }));
+        fetchOrders({ 
+            page: newPagination.current, 
+            limit: newPagination.pageSize 
+        });
     };
 
     const columns = [
@@ -90,6 +124,7 @@ const OrderManagement = () => {
             title: 'Mã đơn hàng',
             dataIndex: 'orderNumber',
             key: 'orderNumber',
+            width: 150,
             render: (text) => <span style={{ fontWeight: 'bold' }}>{text}</span>
         },
         {
@@ -107,6 +142,7 @@ const OrderManagement = () => {
             title: 'Tổng tiền',
             dataIndex: 'total',
             key: 'total',
+            width: 120,
             render: (total) => <span style={{ color: '#d48806', fontWeight: 'bold' }}>
                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total)}
             </span>,
@@ -114,9 +150,10 @@ const OrderManagement = () => {
         {
             title: 'Thanh toán',
             key: 'payment',
+            width: 150,
             render: (_, record) => (
                 <Space direction="vertical" size="small">
-                    <Tag color="cyan">{record.paymentMethod ? record.paymentMethod.toUpperCase() : 'N/A'}</Tag>
+                    <Tag color="geekblue">{record.paymentMethod ? record.paymentMethod.toUpperCase() : 'N/A'}</Tag>
                     <Tag color={record.paymentStatus === 'paid' ? 'success' : 'warning'}>
                         {record.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
                     </Tag>
@@ -127,6 +164,7 @@ const OrderManagement = () => {
             title: 'Trạng thái',
             dataIndex: 'orderStatus',
             key: 'orderStatus',
+            width: 120,
             render: (status) => {
                 let color = 'default';
                 let label = 'Unknown';
@@ -147,11 +185,14 @@ const OrderManagement = () => {
             title: 'Ngày tạo',
             dataIndex: 'createdAt',
             key: 'createdAt',
+            width: 150,
             render: (date) => new Date(date).toLocaleString('vi-VN'),
         },
         {
             title: 'Hành động',
             key: 'action',
+            fixed: 'right',
+            width: 100,
             render: (_, record) => (
                 <Space size="middle">
                     <Button type="primary" size="small" ghost onClick={() => navigate(`/orders/${record._id}`)}>Chi tiết</Button>
@@ -159,10 +200,6 @@ const OrderManagement = () => {
             ),
         },
     ];
-
-    const handleTableChange = (newPagination) => {
-        fetchOrders(newPagination.current, newPagination.pageSize, searchText, statusFilter, paymentMethodFilter);
-    };
 
     return (
         <Card title="Quản lý đơn hàng" style={{ margin: '20px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
