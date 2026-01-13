@@ -168,7 +168,8 @@ export const orderAPI = {
       return response.data;
   },
   updateStatus: async (orderId, status) => {
-      const response = await axiosInstance.put(`/orders/${orderId}/status`, { status });
+      console.log('Updating status for order:', orderId, 'to', status);
+      const response = await axiosInstance.patch(`/orders/${orderId}/status`, { status });
       return response.data;
   },
 };
