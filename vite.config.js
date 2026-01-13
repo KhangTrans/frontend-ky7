@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://backend-node-lilac-seven.vercel.app',
+        target: 'https://backend-node-5re9.onrender.com',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path
