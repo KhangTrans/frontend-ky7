@@ -284,39 +284,6 @@ const OrderManagement = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            {/* Quick Stats Section */}
-            <Row gutter={[16, 16]} style={{ marginBottom: '20px' }}>
-                <Col xs={24} sm={8}>
-                    <Card bordered={false} style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                        <Statistic 
-                            title="Tổng đơn hàng" 
-                            value={pagination.total} 
-                            prefix={<ShoppingCartOutlined style={{ color: '#1890ff' }} />} 
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={8}>
-                    <Card bordered={false} style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                        <Statistic 
-                            title="Doanh thu (Trang hiện tại)" 
-                            value={currentPageRevenue} 
-                            prefix={<DollarCircleOutlined style={{ color: '#52c41a' }} />} 
-                            precision={0}
-                            formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={8}>
-                    <Card bordered={false} style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                        <Statistic 
-                            title="Đơn chờ xử lý (Trang này)" 
-                            value={pendingOrdersCount} 
-                            prefix={<SyncOutlined spin={pendingOrdersCount > 0} style={{ color: '#faad14' }} />} 
-                        />
-                    </Card>
-                </Col>
-            </Row>
-
             <Card title="Danh sách đơn hàng" bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
                 <div style={{ marginBottom: 20 }}>
                     <Row gutter={[16, 16]}>
