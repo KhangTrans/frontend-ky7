@@ -22,6 +22,7 @@ import axiosInstance from '../../api/axiosConfig';
 import dayjs from 'dayjs';
 import VoucherFormModal from './VoucherFormModal';
 import VoucherDetailModal from './VoucherDetailModal';
+import VoucherStatistics from '../Dashboard/VoucherStatistics';
 
 const { Option } = Select;
 
@@ -325,6 +326,8 @@ const VoucherManagement = () => {
 
   return (
     <div style={{ padding: '24px' }}>
+      <VoucherStatistics />
+      
       <Card>
         <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
           <Col>

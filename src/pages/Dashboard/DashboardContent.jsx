@@ -1,6 +1,7 @@
 import React from 'react';
 import { Space, Typography } from 'antd';
 import OrderStatistics from './OrderStatistics';
+import VoucherStatistics from './VoucherStatistics';
 
 const { Title, Text } = Typography;
 
@@ -18,6 +19,8 @@ function DashboardContent({ user }) {
 
       <OrderStatistics />
       
+      <VoucherStatistics />
+
       {/* Trong tương lai có thể thêm:
           <ProductStatistics />
           <UserStatistics /> 
