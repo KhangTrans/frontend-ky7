@@ -308,7 +308,6 @@ function Checkout() {
           shippingCity: selectedAddress.city,
           shippingDistrict: selectedAddress.district,
           shippingWard: selectedAddress.ward,
-          shippingWard: selectedAddress.ward,
           shippingNote: values.note || '',
           paymentMethod: paymentMethod,
           ...commonOrderData // Include voucher info
