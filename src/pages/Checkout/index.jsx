@@ -38,6 +38,7 @@ import { addressAPI, orderAPI, paymentAPI } from '../../api';
 import { clearCart, updateCartItem } from '../../redux/slices/cartSlice';
 import AddressFormModal from '../../components/AddressFormModal';
 import AddressSelectionModal from '../../components/AddressSelectionModal';
+import VoucherSelectionModal from '../../components/VoucherSelectionModal';
 import './Checkout.css';
 
 const { TextArea } = Input;
@@ -74,6 +75,8 @@ function Checkout() {
   const [appliedVoucher, setAppliedVoucher] = useState(null);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [validatingVoucher, setValidatingVoucher] = useState(false);
+  const [myVouchers, setMyVouchers] = useState([]);
+  const [isVoucherModalVisible, setIsVoucherModalVisible] = useState(false);
   
   // Address State
   const [userAddresses, setUserAddresses] = useState([]);
@@ -82,7 +85,7 @@ function Checkout() {
   const [isAddAddressModalVisible, setIsAddAddressModalVisible] = useState(false);
   const [tempSelectedAddressId, setTempSelectedAddressId] = useState(null); // For selection in modal
 
-  // Fetch Addresses
+  // Fetch Addresses AND Vouchers
   const fetchAddresses = async () => {
     try {
       const res = await addressAPI.getAll();
@@ -110,6 +113,17 @@ function Checkout() {
     }
   };
 
+  const fetchMyVouchers = async () => {
+      try {
+          const res = await axiosInstance.get('/vouchers/my-vouchers');
+          if (res.data.success) {
+              setMyVouchers(res.data.data);
+          }
+      } catch (error) {
+          console.error("Error fetching my vouchers:", error);
+      }
+  };
+
   useEffect(() => {
     if (!isAuthenticated) {
       message.warning('Vui lòng đăng nhập để thanh toán!');
@@ -125,6 +139,7 @@ function Checkout() {
     }
 
     fetchAddresses();
+    fetchMyVouchers();
   }, [isAuthenticated, items, navigate, location.state]);
 
   // Version Check
@@ -161,8 +176,10 @@ function Checkout() {
     }
   }, [rawTotal]);
 
-  const handleApplyVoucher = async () => {
-      if (!voucherCode.trim()) {
+  const handleApplyVoucher = async (codeOverride = null) => {
+      const codeToUse = codeOverride || voucherCode;
+      
+      if (!codeToUse || !codeToUse.trim()) {
           message.error('Vui lòng nhập mã voucher');
           return;
       }
@@ -170,7 +187,7 @@ function Checkout() {
       setValidatingVoucher(true);
       try {
           const res = await axiosInstance.post('/vouchers/validate', {
-              code: voucherCode,
+              code: codeToUse,
               orderAmount: rawTotal
           });
           
@@ -180,17 +197,14 @@ function Checkout() {
               const voucherData = voucher.voucher || voucher; 
               
               setAppliedVoucher(voucherData);
+              if (codeOverride) setVoucherCode(codeOverride); // Sync input if selected from modal
               
               if (voucherData.type === 'DISCOUNT') {
                   const discount = (rawTotal * voucherData.discountPercent) / 100;
                   setDiscountAmount(Math.min(discount, voucherData.maxDiscount));
                   message.success(`Áp dụng mã ${voucherData.code} thành công!`);
               } else if (voucherData.type === 'FREE_SHIP') {
-                   // Logic for free ship
-                   // If shipping fee is static (e.g. 0), this might not show effect.
-                   // Let's assume for now it just marks as Applied.
                    message.success(`Áp dụng mã FREESHIP thành công!`);
-                   // If we had shipping fee logic, we would set shipping discount here.
                    setDiscountAmount(0); // For now
               }
               
@@ -208,6 +222,11 @@ function Checkout() {
       } finally {
           setValidatingVoucher(false);
       }
+  };
+
+  const handleSelectVoucherFromModal = (voucher) => {
+      setIsVoucherModalVisible(false);
+      handleApplyVoucher(voucher.code);
   };
 
   const handleRemoveVoucher = () => {
@@ -631,21 +650,34 @@ function Checkout() {
                           />
                       </div>
                   ) : (
-                      <div style={{ display: 'flex', gap: 8 }}>
-                          <Input 
-                              placeholder="Nhập mã voucher" 
-                              value={voucherCode} 
-                              onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
-                              onPressEnter={handleApplyVoucher}
-                          />
-                          <Button 
-                             type="primary" 
-                             onClick={handleApplyVoucher} 
-                             loading={validatingVoucher}
-                             disabled={!voucherCode.trim()}
-                          >
-                             Áp dụng
-                          </Button>
+                      <div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <Input 
+                                placeholder="Nhập mã voucher" 
+                                value={voucherCode} 
+                                onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+                                onPressEnter={() => handleApplyVoucher()}
+                            />
+                            <Button 
+                               type="primary" 
+                               onClick={() => handleApplyVoucher()} 
+                               loading={validatingVoucher}
+                               disabled={!voucherCode.trim()}
+                            >
+                               Áp dụng
+                            </Button>
+                        </div>
+                        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: 12, color: '#888' }}>Có thể áp dụng 1 voucher</span>
+                            <Button 
+                                type="link" 
+                                size="small" 
+                                onClick={() => setIsVoucherModalVisible(true)}
+                                style={{ padding: 0, fontWeight: 500 }}
+                            >
+                                <TagOutlined /> Chọn Voucher
+                            </Button>
+                        </div>
                       </div>
                   )}
               </div>
@@ -712,6 +744,15 @@ function Checkout() {
         onCancel={() => setIsAddAddressModalVisible(false)}
         onSuccess={handleAddNewAddress}
         form={addressForm}
+      />
+      
+      {/* MODAL: Select Voucher */}
+      <VoucherSelectionModal
+           visible={isVoucherModalVisible}
+           onCancel={() => setIsVoucherModalVisible(false)}
+           onSelect={handleSelectVoucherFromModal}
+           vouchers={myVouchers}
+           orderTotal={rawTotal}
       />
     </>
   );

@@ -1,0 +1,132 @@
+.voucher-selection-modal .ant-modal-body {
+    padding: 20px;
+    background: #f5f5f5;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.voucher-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.voucher-select-item {
+    display: flex;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    position: relative;
+}
+
+.voucher-select-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #667eea;
+}
+
+.voucher-select-item.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #fcfcfc;
+}
+
+.voucher-select-item.disabled:hover {
+    transform: none;
+    border-color: transparent;
+}
+
+.voucher-left-part {
+    width: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 2px dashed #e8e8e8;
+    position: relative;
+}
+
+/* Semi-circles for ticket effect */
+.voucher-left-part::before,
+.voucher-left-part::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #f5f5f5; /* Matches modal background */
+    border-radius: 50%;
+    right: -6px;
+}
+
+.voucher-left-part::before { top: -6px; }
+.voucher-left-part::after { bottom: -6px; }
+
+.voucher-right-part {
+    flex: 1;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.voucher-row-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.voucher-code-text {
+    font-size: 15px;
+    color: #333;
+}
+
+.voucher-description {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.voucher-conditions {
+    font-size: 12px;
+    color: #888;
+}
+
+.voucher-expiry {
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
+}
+
+.voucher-reason {
+    margin-top: 6px;
+    color: #ff4d4f;
+    font-size: 12px;
+    background: #fff1f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.voucher-radio {
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.radio-circle {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #d9d9d9;
+    border-radius: 50%;
+}
+
+.voucher-select-item:hover .radio-circle.active {
+    border-color: #667eea;
+}
