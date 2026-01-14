@@ -8,19 +8,17 @@ import {
   Col,
   Tag,
   message,
-  Input,
-  DatePicker,
   Popconfirm
 } from 'antd';
 import {
   ReloadOutlined,
-  SearchOutlined,
   PlusOutlined,
   EditOutlined,
   DeleteOutlined
 } from '@ant-design/icons';
 import axiosInstance from '../../api/axiosConfig';
 import dayjs from 'dayjs';
+import VoucherFormModal from './VoucherFormModal';
 
 const VoucherManagement = () => {
   const [data, setData] = useState([]);
@@ -31,18 +29,14 @@ const VoucherManagement = () => {
     total: 0
   });
 
+  // Modal State
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [editingVoucher, setEditingVoucher] = useState(null);
+
   const fetchData = useCallback(async (page = 1, pageSize = 20) => {
     setLoading(true);
     try {
-      // API call to /vouchers/admin/all
-      // Note: Assuming the API supports query params for pagination if needed, 
-      // but the prompt only gave the response format. 
-      // I will assume standard query params or just fetch all if pagination is handled client side or server side for 'all'.
-      // Given the response has pagination object, the server likely supports pagination params.
-      // But the endpoint is ".../all", which implies retrieving everything? 
-      // However, the JSON response contains "pagination", so it's paginated.
-      // I'll pass page and limit.
-      
       const response = await axiosInstance.get('/vouchers/admin/all', {
         params: {
           page,
@@ -53,9 +47,9 @@ const VoucherManagement = () => {
       if (response.data.success) {
         setData(response.data.data);
         setPagination({
-          current: response.data.pagination.page,
-          pageSize: response.data.pagination.limit,
-          total: response.data.pagination.total
+          current: response.data.pagination?.page || 1,
+          pageSize: response.data.pagination?.limit || 20,
+          total: response.data.pagination?.total || 0
         });
       }
     } catch (error) {
@@ -78,20 +72,55 @@ const VoucherManagement = () => {
     fetchData(pagination.current, pagination.pageSize);
   };
 
-  // Placeholder functions for CRUD
+  // Open Modal for Create
   const handleAdd = () => {
-    message.info('Chức năng thêm voucher đang phát triển');
+    setEditingVoucher(null);
+    setIsModalVisible(true);
   };
 
+  // Open Modal for Edit
   const handleEdit = (record) => {
-    message.info(`Chỉnh sửa voucher: ${record.code}`);
+    setEditingVoucher(record);
+    setIsModalVisible(true);
+  };
+
+  const handleCancelModal = () => {
+    setIsModalVisible(false);
+    setEditingVoucher(null);
+  };
+
+  const handleSubmitModal = async (values) => {
+    setModalLoading(true);
+    try {
+        if (editingVoucher) {
+            // Update existing voucher
+            // Assuming endpoint might be PUT /vouchers/admin/:id or similar
+            // Since User only gave POST example, I'll assume standard REST if possible, 
+            // but for now I'll just focus on Create as requested specifically.
+            // However, to make the Edit button work if clicked:
+            message.info('Tính năng cập nhật chưa được cấu hình API cụ thể');
+             // TODO: Add Update API call here
+        } else {
+            // Create new voucher
+            const response = await axiosInstance.post('/vouchers/admin', values);
+            if (response.data.success || response.data) { // Check response format based on typical responses
+                message.success('Tạo voucher thành công');
+                setIsModalVisible(false);
+                fetchData(1, pagination.pageSize); // Reset to first page to see new item
+            }
+        }
+    } catch (error) {
+        console.error('Error submitting voucher:', error);
+        const errorMsg = error.response?.data?.message || 'Có lỗi xảy ra khi lưu voucher';
+        message.error(errorMsg);
+    } finally {
+        setModalLoading(false);
+    }
   };
 
   const handleDelete = (id) => {
     message.info(`Xóa voucher id: ${id}`);
-    // Implement delete API call here if available, e.g.:
-    // await axiosInstance.delete(`/vouchers/${id}`);
-    // fetchData(pagination.current, pagination.pageSize);
+    // Implement delete API call here if available
   };
 
   const columns = [
@@ -222,6 +251,14 @@ const VoucherManagement = () => {
           scroll={{ x: 1000 }}
         />
       </Card>
+
+      <VoucherFormModal
+        visible={isModalVisible}
+        onCancel={handleCancelModal}
+        onSubmit={handleSubmitModal}
+        loading={modalLoading}
+        initialValues={editingVoucher}
+      />
     </div>
   );
 };
