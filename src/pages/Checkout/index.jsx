@@ -206,13 +206,12 @@ function Checkout() {
               if (codeOverride) setVoucherCode(codeOverride);;
               
               if (voucherData.type === 'DISCOUNT') {
-                  // Ensure we access fields even if they are nested one level deeper unexpectedly
                   const percent = Number(voucherData.discountPercent) || Number(voucherData.voucher?.discountPercent) || 0;
                   const maxDisc = Number(voucherData.maxDiscount) || Number(voucherData.voucher?.maxDiscount) || 0;
                   
                   const discount = (rawTotal * percent) / 100;
                   setDiscountAmount(Math.min(discount, maxDisc));
-                  message.success(`Áp dụng mã ${voucherData.code} thành công!`);
+                  message.success(`Áp dụng mã ${voucherData.code || voucherData.voucher?.code} thành công!`);
               } else if (voucherData.type === 'FREE_SHIP') {
                    message.success(`Áp dụng mã FREESHIP thành công!`);
                    setDiscountAmount(SHIPPING_FEE); 
@@ -647,7 +646,11 @@ function Checkout() {
                           <div>
                              <strong style={{ color: '#52c41a' }}>{appliedVoucher.code || appliedVoucher.voucher?.code}</strong>
                              <div style={{ fontSize: 12, color: '#666' }}>
-                                Giảm {appliedVoucher.discountPercent || appliedVoucher.voucher?.discountPercent || 0}% (Tối đa {(appliedVoucher.maxDiscount || appliedVoucher.voucher?.maxDiscount || 0).toLocaleString()}đ)
+                                {(appliedVoucher.type === 'FREE_SHIP' || appliedVoucher.voucher?.type === 'FREE_SHIP') ? (
+                                    <span>Miễn phí vận chuyển (Tối đa {SHIPPING_FEE.toLocaleString()}đ)</span>
+                                ) : (
+                                    <span>Giảm {appliedVoucher.discountPercent || appliedVoucher.voucher?.discountPercent || 0}% (Tối đa {(appliedVoucher.maxDiscount || appliedVoucher.voucher?.maxDiscount || 0).toLocaleString()}đ)</span>
+                                )}
                              </div>
                           </div>
                           <Button 
