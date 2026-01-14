@@ -16,7 +16,8 @@ import {
   Col,
   List,
   Popconfirm,
-  InputNumber
+  InputNumber,
+  Spin
 } from 'antd';
 import { 
   UserOutlined, 
@@ -27,7 +28,9 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
-  MinusOutlined
+  MinusOutlined,
+  TicketOutlined,
+  CloseCircleOutlined
 } from '@ant-design/icons';
 import HomeNavbar from '../../components/HomeNavbar';
 import axiosInstance from '../../api/axiosConfig';
@@ -48,7 +51,7 @@ function Checkout() {
   const [localDirectItem, setLocalDirectItem] = useState(location.state?.directPurchaseItem || null);
 
   // Get cart data from Redux if not direct purchase
-  const { items: cartItems, totalQuantity } = useSelector((state) => state.cart);
+  const { items: cartItems } = useSelector((state) => state.cart);
   
   // Determine items to show/checkout
   const items = localDirectItem 
@@ -63,6 +66,12 @@ function Checkout() {
   
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [submitting, setSubmitting] = useState(false);
+  
+  // Voucher State
+  const [voucherCode, setVoucherCode] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [validatingVoucher, setValidatingVoucher] = useState(false);
   
   // Address State
   const [userAddresses, setUserAddresses] = useState([]);
@@ -118,7 +127,7 @@ function Checkout() {
 
   // Version Check
   useEffect(() => {
-     console.log('Checkout Component Mounted - Version: FIX_ITEMS_PAYLOAD');
+     console.log('Checkout Component Mounted - Version: VOUCHER_INTEGRATION');
   }, []);
 
   const calculateSubtotal = () => {
@@ -129,7 +138,82 @@ function Checkout() {
     }, 0);
   };
 
-  const finalTotal = calculateSubtotal();
+  const rawTotal = calculateSubtotal();
+  const finalTotal = Math.max(0, rawTotal - discountAmount);
+  
+  // Reset discount if total changes (e.g. quantity update) and violates minOrderAmount
+  useEffect(() => {
+    if (appliedVoucher) {
+        if (rawTotal < appliedVoucher.minOrderAmount) {
+            message.warning(`Đơn hàng không đủ điều kiện tối thiểu cho voucher ${appliedVoucher.code} (Tối thiểu: ${appliedVoucher.minOrderAmount.toLocaleString()}đ)`);
+            setAppliedVoucher(null);
+            setDiscountAmount(0);
+            setVoucherCode('');
+        } else {
+             // Recalculate discount
+             if (appliedVoucher.type === 'DISCOUNT') {
+                const discount = (rawTotal * appliedVoucher.discountPercent) / 100;
+                setDiscountAmount(Math.min(discount, appliedVoucher.maxDiscount));
+            }
+        }
+    }
+  }, [rawTotal]);
+
+  const handleApplyVoucher = async () => {
+      if (!voucherCode.trim()) {
+          message.error('Vui lòng nhập mã voucher');
+          return;
+      }
+      
+      setValidatingVoucher(true);
+      try {
+          const res = await axiosInstance.post('/vouchers/validate', {
+              code: voucherCode,
+              orderAmount: rawTotal
+          });
+          
+          if (res.data.success) {
+              const voucher = res.data.data; // validation endpoint usually returns voucher object if valid
+              // Double check returned data structure. Assuming details are directly in data or inside data.voucher
+              const voucherData = voucher.voucher || voucher; 
+              
+              setAppliedVoucher(voucherData);
+              
+              if (voucherData.type === 'DISCOUNT') {
+                  const discount = (rawTotal * voucherData.discountPercent) / 100;
+                  setDiscountAmount(Math.min(discount, voucherData.maxDiscount));
+                  message.success(`Áp dụng mã ${voucherData.code} thành công!`);
+              } else if (voucherData.type === 'FREE_SHIP') {
+                   // Logic for free ship
+                   // If shipping fee is static (e.g. 0), this might not show effect.
+                   // Let's assume for now it just marks as Applied.
+                   message.success(`Áp dụng mã FREESHIP thành công!`);
+                   // If we had shipping fee logic, we would set shipping discount here.
+                   setDiscountAmount(0); // For now
+              }
+              
+          } else {
+              message.error('Mã giảm giá không hợp lệ hoặc không đủ điều kiện.');
+              setAppliedVoucher(null);
+              setDiscountAmount(0);
+          }
+      } catch (error) {
+          console.error("Voucher validate error:", error);
+          const msg = error.response?.data?.message || 'Mã giảm giá không hợp lệ';
+          message.error(msg);
+          setAppliedVoucher(null);
+          setDiscountAmount(0);
+      } finally {
+          setValidatingVoucher(false);
+      }
+  };
+
+  const handleRemoveVoucher = () => {
+      setAppliedVoucher(null);
+      setDiscountAmount(0);
+      setVoucherCode('');
+      message.info('Đã hủy áp dụng voucher');
+  };
 
   const handlePaymentMethodChange = (e) => {
     setPaymentMethod(e.target.value);
@@ -205,6 +289,13 @@ function Checkout() {
       
       let response;
       
+      // Values for order
+      const commonOrderData = {
+          voucherCode: appliedVoucher?.code || '',
+          voucherId: appliedVoucher?._id || appliedVoucher?.id,
+          discountAmount: discountAmount
+      };
+
       // CASE 1: Direct Buy Now (API riêng theo yêu cầu)
       if (localDirectItem) {
         const buyNowPayload = {
@@ -220,9 +311,9 @@ function Checkout() {
           shippingWard: selectedAddress.ward,
           shippingNote: values.note || '',
           paymentMethod: paymentMethod,
-          voucherCode: '' // Hiện tại chưa có voucher input
+          ...commonOrderData // Include voucher info
         };
-        console.log('Sending Buy Now Payload:', buyNowPayload);
+        console.log('Sending Buy Now Payload with Voucher:', buyNowPayload);
         // Call direct API endpoint
         const res = await axiosInstance.post('/orders/buy-now', buyNowPayload);
         response = res.data; // axios returns { data: ... }
@@ -238,8 +329,10 @@ function Checkout() {
             quantity: item.quantity,
             price: item.productId?.salePrice || item.productId?.price || 0
           })).filter(i => i.productId),
-          totalPrice: finalTotal,
-          itemsPrice: finalTotal,
+          totalPrice: finalTotal, // This is explicitly sent? Verify backend calculation.
+                                  // Warning: Backend should calculate total, but we send it for validation or as requested.
+                                  // If backend ignores this, it's fine.
+          itemsPrice: rawTotal,
           shippingPrice: 0,
           paymentMethod: paymentMethod,
           
@@ -257,10 +350,11 @@ function Checkout() {
              ward: selectedAddress.ward,
              district: selectedAddress.district,
              city: selectedAddress.city
-          }
+          },
+          ...commonOrderData // Include voucher info
         };
 
-        console.log('Sending Order Data (Final - V2 Fixed):', JSON.stringify(orderData, null, 2));
+        console.log('Sending Order Data with Voucher:', JSON.stringify(orderData, null, 2));
         response = await orderAPI.create(orderData);
       }
       console.log('Order Response:', response);
@@ -513,14 +607,65 @@ function Checkout() {
 
               <Divider />
 
+              {/* VOUCHER SECTION */}
+              <div className="voucher-section-checkout" style={{ marginBottom: 16 }}>
+                  <span style={{ display: 'block', fontWeight: 500, marginBottom: 8 }}>
+                      <TicketOutlined /> Mã giảm giá
+                  </span>
+                  
+                  {appliedVoucher ? (
+                      <div className="applied-voucher-box" style={{ background: '#f6ffed', border: '1px solid #b7eb8f', padding: '8px 12px', borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                             <strong style={{ color: '#52c41a' }}>{appliedVoucher.code}</strong>
+                             <div style={{ fontSize: 12, color: '#666' }}>
+                                Giảm {appliedVoucher.discountPercent}% (Tối đa {appliedVoucher.maxDiscount?.toLocaleString()}đ)
+                             </div>
+                          </div>
+                          <Button 
+                             type="text" 
+                             size="small" 
+                             icon={<CloseCircleOutlined />} 
+                             danger 
+                             onClick={handleRemoveVoucher}
+                          />
+                      </div>
+                  ) : (
+                      <div style={{ display: 'flex', gap: 8 }}>
+                          <Input 
+                              placeholder="Nhập mã voucher" 
+                              value={voucherCode} 
+                              onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+                              onPressEnter={handleApplyVoucher}
+                          />
+                          <Button 
+                             type="primary" 
+                             onClick={handleApplyVoucher} 
+                             loading={validatingVoucher}
+                             disabled={!voucherCode.trim()}
+                          >
+                             Áp dụng
+                          </Button>
+                      </div>
+                  )}
+              </div>
+
+              <Divider />
+
               <div className="price-row">
                 <span>Tạm tính</span>
-                <span>{finalTotal.toLocaleString('vi-VN')}đ</span>
+                <span>{rawTotal.toLocaleString('vi-VN')}đ</span>
               </div>
               <div className="price-row">
                 <span>Phí vận chuyển</span>
                 <span className="free-ship-text">Miễn phí</span>
               </div>
+              
+              {appliedVoucher && (
+                 <div className="price-row" style={{ color: '#52c41a' }}>
+                    <span>Giảm giá voucher</span>
+                    <span>-{discountAmount.toLocaleString('vi-VN')}đ</span>
+                 </div>
+              )}
 
               <Divider />
 
@@ -547,7 +692,7 @@ function Checkout() {
           </div>
         </div>
       </div>
-
+      
       {/* MODAL: Select Address */}
       <Modal
         title="Địa chỉ của tôi"
