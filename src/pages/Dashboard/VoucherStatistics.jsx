@@ -21,7 +21,7 @@ import {
 } from 'recharts';
 import axiosInstance from '../../api/axiosConfig';
 
-const VoucherStatistics = () => {
+const VoucherStatistics = ({ showCharts = true }) => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     total: 0,
@@ -110,65 +110,67 @@ const VoucherStatistics = () => {
       </Row>
 
       {/* Charts Section */}
-      <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
-        {/* Status Distribution */}
-        <Col xs={24} md={12}>
-          <Card title="Trạng thái Voucher" bordered={false}>
-            <div style={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer>
-                    <PieChart>
-                    <Pie
-                        data={statusData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    >
-                        {statusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                    </PieChart>
-                </ResponsiveContainer>
-            </div>
-          </Card>
-        </Col>
-        
-        {/* Type Distribution */}
-        <Col xs={24} md={12}>
-          <Card title="Phân loại Voucher" bordered={false}>
-             <div style={{ width: '100%', height: 300 }}>
-                {typeData.length > 0 ? (
+      {showCharts && (
+        <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+            {/* Status Distribution */}
+            <Col xs={24} md={12}>
+            <Card title="Trạng thái Voucher" bordered={false}>
+                <div style={{ width: '100%', height: 300 }}>
                     <ResponsiveContainer>
-                    <BarChart
-                        data={typeData}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis allowDecimals={false}/>
-                        <Tooltip cursor={{ fill: 'transparent' }} />
-                        <Legend />
-                        <Bar dataKey="value" name="Số lượng" fill="#8884d8" barSize={50}>
-                            {typeData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <PieChart>
+                        <Pie
+                            data={statusData}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                            {statusData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
-                        </Bar>
-                    </BarChart>
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                        </PieChart>
                     </ResponsiveContainer>
-                ) : (
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                        <span>Chưa có dữ liệu</span>
-                    </div>
-                )}
-             </div>
-          </Card>
-        </Col>
-      </Row>
+                </div>
+            </Card>
+            </Col>
+            
+            {/* Type Distribution */}
+            <Col xs={24} md={12}>
+            <Card title="Phân loại Voucher" bordered={false}>
+                <div style={{ width: '100%', height: 300 }}>
+                    {typeData.length > 0 ? (
+                        <ResponsiveContainer>
+                        <BarChart
+                            data={typeData}
+                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis allowDecimals={false}/>
+                            <Tooltip cursor={{ fill: 'transparent' }} />
+                            <Legend />
+                            <Bar dataKey="value" name="Số lượng" fill="#8884d8" barSize={50}>
+                                {typeData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                            <span>Chưa có dữ liệu</span>
+                        </div>
+                    )}
+                </div>
+            </Card>
+            </Col>
+        </Row>
+      )}
     </div>
   );
 };

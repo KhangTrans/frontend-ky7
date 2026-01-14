@@ -326,7 +326,7 @@ const VoucherManagement = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      <VoucherStatistics />
+      <VoucherStatistics showCharts={false} />
       
       <Card>
         <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
