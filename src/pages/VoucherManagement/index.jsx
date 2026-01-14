@@ -189,26 +189,31 @@ const VoucherManagement = () => {
   };
 
   const handleSubmitModal = async (values) => {
-    setModalLoading(true);
     try {
-        if (editingVoucher) {
-            message.info('Tính năng cập nhật chưa được cấu hình API cụ thể');
-            // TODO: Add Update API call here
-        } else {
-            // Create new voucher
-            const response = await axiosInstance.post('/vouchers/admin', values);
-            if (response.data.success || response.data) {
-                message.success('Tạo voucher thành công');
-                setIsModalVisible(false);
-                fetchData(1, pagination.pageSize); // Reset to first page to see new item
-            }
+      if (editingVoucher) {
+        // Update existing voucher
+        const response = await axiosInstance.put(`/vouchers/admin/${editingVoucher._id}`, values);
+        if (response.data.success || response.data) {
+          message.success('Cập nhật voucher thành công');
+          setIsModalVisible(false);
+          // Refresh list but keep current page
+          fetchData(pagination.current, pagination.pageSize);
         }
+      } else {
+        // Create new voucher
+        const response = await axiosInstance.post('/vouchers/admin', values);
+        if (response.data.success || response.data) {
+          message.success('Tạo voucher thành công');
+          setIsModalVisible(false);
+          fetchData(1, pagination.pageSize); // Reset to first page to see new item
+        }
+      }
     } catch (error) {
-        console.error('Error submitting voucher:', error);
-        const errorMsg = error.response?.data?.message || 'Có lỗi xảy ra khi lưu voucher';
-        message.error(errorMsg);
+      console.error('Error submitting voucher:', error);
+      const errorMsg = error.response?.data?.message || 'Có lỗi xảy ra khi lưu voucher';
+      message.error(errorMsg);
     } finally {
-        setModalLoading(false);
+      setModalLoading(false);
     }
   };
 
