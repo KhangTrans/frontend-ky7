@@ -5,11 +5,11 @@ import { Button, Badge, Dropdown } from 'antd';
 import {
   ShoppingCartOutlined,
   UserOutlined,
-  HeartOutlined,
   LoginOutlined,
   MenuOutlined,
 } from '@ant-design/icons';
 import { fetchCart } from '../../redux/slices/cartSlice';
+import NotificationBell from '../NotificationBell';
 import './HomeNavbar.css';
 
 const HomeNavbar = () => {
@@ -95,15 +95,7 @@ const HomeNavbar = () => {
 
           {/* Actions */}
           <div className="navbar-actions">
-            <Button
-              type="text"
-              icon={
-                <Badge count={0} offset={[5, 0]}>
-                  <HeartOutlined style={{ fontSize: '20px' }} />
-                </Badge>
-              }
-              className="action-btn"
-            />
+            <NotificationBell />
             <Button
               type="text"
               icon={
