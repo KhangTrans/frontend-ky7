@@ -192,16 +192,20 @@ function Checkout() {
           });
           
           if (res.data.success) {
-              const voucher = res.data.data; // validation endpoint usually returns voucher object if valid
-              // Double check returned data structure. Assuming details are directly in data or inside data.voucher
+              const voucher = res.data.data; 
               const voucherData = voucher.voucher || voucher; 
               
+              console.log('Voucher Data Applied:', voucherData);
+
               setAppliedVoucher(voucherData);
-              if (codeOverride) setVoucherCode(codeOverride); // Sync input if selected from modal
+              if (codeOverride) setVoucherCode(codeOverride);;
               
               if (voucherData.type === 'DISCOUNT') {
-                  const discount = (rawTotal * voucherData.discountPercent) / 100;
-                  setDiscountAmount(Math.min(discount, voucherData.maxDiscount));
+                  const percent = Number(voucherData.discountPercent) || 0;
+                  const maxDisc = Number(voucherData.maxDiscount) || 0;
+                  
+                  const discount = (rawTotal * percent) / 100;
+                  setDiscountAmount(Math.min(discount, maxDisc));
                   message.success(`Áp dụng mã ${voucherData.code} thành công!`);
               } else if (voucherData.type === 'FREE_SHIP') {
                    message.success(`Áp dụng mã FREESHIP thành công!`);
@@ -312,8 +316,7 @@ function Checkout() {
       
       // Values for order
       const commonOrderData = {
-          voucherCode: appliedVoucher?.code || '',
-          voucherId: appliedVoucher?._id || appliedVoucher?.id,
+          voucherCodes: appliedVoucher?.code ? [appliedVoucher.code] : [],
           discountAmount: discountAmount
       };
 
@@ -638,7 +641,7 @@ function Checkout() {
                           <div>
                              <strong style={{ color: '#52c41a' }}>{appliedVoucher.code}</strong>
                              <div style={{ fontSize: 12, color: '#666' }}>
-                                Giảm {appliedVoucher.discountPercent}% (Tối đa {appliedVoucher.maxDiscount?.toLocaleString()}đ)
+                                Giảm {appliedVoucher.discountPercent || 0}% (Tối đa {(appliedVoucher.maxDiscount || 0).toLocaleString()}đ)
                              </div>
                           </div>
                           <Button 
