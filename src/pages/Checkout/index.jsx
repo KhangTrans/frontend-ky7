@@ -322,7 +322,7 @@ function Checkout() {
       
       // Values for order
       const commonOrderData = {
-          voucherCodes: appliedVoucher?.code ? [appliedVoucher.code] : [],
+          voucherIds: appliedVoucher?._id ? [appliedVoucher._id] : [],
           discountAmount: discountAmount
       };
 
