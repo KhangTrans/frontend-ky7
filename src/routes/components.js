@@ -20,6 +20,7 @@ export const Profile = lazy(() => import('../pages/Profile'));
 export const OrderHistory = lazy(() => import('../pages/OrderHistory'));
 export const AddressBook = lazy(() => import('../pages/AddressBook'));
 export const OrderManagement = lazy(() => import('../pages/OrderManagement'));
+export const VoucherManagement = lazy(() => import('../pages/VoucherManagement'));
 
 // Map string name to component
 const componentsMap = {
@@ -39,6 +40,7 @@ const componentsMap = {
   DashboardContent,
   ProductManagement,
   CategoryManagement,
+  VoucherManagement,
   NotFound,
   Profile,
   OrderManagement,

@@ -201,6 +201,16 @@ const routesData = [
           roles: ['admin'],
         },
       },
+      {
+        path: 'dashboard/vouchers',
+        name: 'VoucherManagement',
+        component: 'VoucherManagement',
+        meta: {
+            title: 'Quản lý voucher',
+            requiresAuth: true,
+            roles: ['admin'],
+        },
+      },
     ],
   },
   {

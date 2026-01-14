@@ -10,6 +10,7 @@ import {
   ShoppingOutlined,
   AppstoreOutlined,
   HomeOutlined,
+  GiftOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -35,6 +36,11 @@ function Sidebar({ collapsed, user }) {
       key: '/dashboard/categories',
       icon: <AppstoreOutlined />,
       label: 'Thể loại',
+    },
+    {
+        key: '/dashboard/vouchers',
+        icon: <GiftOutlined />,
+        label: 'Vouchers',
     },
     ...(user?.role === 'admin' ? [
       {
