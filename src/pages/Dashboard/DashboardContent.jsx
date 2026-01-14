@@ -1,11 +1,24 @@
 import React from 'react';
-import { Space, Typography } from 'antd';
+import { Space, Typography, Tabs } from 'antd';
 import OrderStatistics from './OrderStatistics';
 import VoucherStatistics from './VoucherStatistics';
 
 const { Title, Text } = Typography;
 
 function DashboardContent({ user }) {
+  const items = [
+    {
+      key: 'orders',
+      label: 'Thống kê Đơn hàng',
+      children: <OrderStatistics />,
+    },
+    {
+      key: 'vouchers',
+      label: 'Thống kê Voucher',
+      children: <VoucherStatistics />,
+    },
+  ];
+
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <div>
@@ -17,14 +30,7 @@ function DashboardContent({ user }) {
         </Text>
       </div>
 
-      <OrderStatistics />
-      
-      <VoucherStatistics />
-
-      {/* Trong tương lai có thể thêm:
-          <ProductStatistics />
-          <UserStatistics /> 
-      */}
+      <Tabs defaultActiveKey="orders" items={items} />
     </Space>
   );
 }
