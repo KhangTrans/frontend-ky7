@@ -334,14 +334,9 @@ const VoucherManagement = () => {
             <h2 style={{ margin: 0 }}>Quản lý Voucher</h2>
           </Col>
           <Col>
-            <Space>
-              <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
-                Làm mới
-              </Button>
-              <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-                Thêm Voucher
-              </Button>
-            </Space>
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+              Thêm Voucher
+            </Button>
           </Col>
         </Row>
 
@@ -386,8 +381,8 @@ const VoucherManagement = () => {
               <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                 Tìm kiếm
               </Button>
-              <Button onClick={handleReset}>
-                Đặt lại
+              <Button icon={<ReloadOutlined />} onClick={handleReset}>
+                Làm mới
               </Button>
             </Space>
           </Col>
