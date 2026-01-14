@@ -154,13 +154,7 @@ const VoucherManagement = () => {
       key: 'type',
       render: (text) => <Tag color={text === 'DISCOUNT' ? 'green' : 'cyan'}>{text === 'DISCOUNT' ? 'Giảm giá' : 'Freeship'}</Tag>
     },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: 'Giảm giá',
       key: 'discount',
