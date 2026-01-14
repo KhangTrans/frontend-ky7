@@ -194,7 +194,11 @@ function Checkout() {
           
           if (res.data.success) {
               const voucher = res.data.data; 
-              const voucherData = voucher.voucher || voucher; 
+              // Try to resolve the voucher details object from various possible structures
+              // 1. Direct object
+              // 2. Nested in 'voucher' property
+              // 3. Nested in 'voucherId' property (common in Mongoose relations)
+              const voucherData = voucher.voucherId || voucher.voucher || voucher; 
               
               console.log('Voucher Data Applied:', voucherData);
 
@@ -202,8 +206,9 @@ function Checkout() {
               if (codeOverride) setVoucherCode(codeOverride);;
               
               if (voucherData.type === 'DISCOUNT') {
-                  const percent = Number(voucherData.discountPercent) || 0;
-                  const maxDisc = Number(voucherData.maxDiscount) || 0;
+                  // Ensure we access fields even if they are nested one level deeper unexpectedly
+                  const percent = Number(voucherData.discountPercent) || Number(voucherData.voucher?.discountPercent) || 0;
+                  const maxDisc = Number(voucherData.maxDiscount) || Number(voucherData.voucher?.maxDiscount) || 0;
                   
                   const discount = (rawTotal * percent) / 100;
                   setDiscountAmount(Math.min(discount, maxDisc));
@@ -640,9 +645,9 @@ function Checkout() {
                   {appliedVoucher ? (
                       <div className="applied-voucher-box" style={{ background: '#f6ffed', border: '1px solid #b7eb8f', padding: '8px 12px', borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
-                             <strong style={{ color: '#52c41a' }}>{appliedVoucher.code}</strong>
+                             <strong style={{ color: '#52c41a' }}>{appliedVoucher.code || appliedVoucher.voucher?.code}</strong>
                              <div style={{ fontSize: 12, color: '#666' }}>
-                                Giảm {appliedVoucher.discountPercent || 0}% (Tối đa {(appliedVoucher.maxDiscount || 0).toLocaleString()}đ)
+                                Giảm {appliedVoucher.discountPercent || appliedVoucher.voucher?.discountPercent || 0}% (Tối đa {(appliedVoucher.maxDiscount || appliedVoucher.voucher?.maxDiscount || 0).toLocaleString()}đ)
                              </div>
                           </div>
                           <Button 
