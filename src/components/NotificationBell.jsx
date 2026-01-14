@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Badge, Dropdown, Button, List, Empty, Space, Typography, Spin, Tooltip } from 'antd';
 import {
   BellOutlined,
@@ -21,6 +22,7 @@ const { Text } = Typography;
 
 const NotificationBell = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items, unreadCount, loading } = useSelector(state => state.notifications);
   const [open, setOpen] = useState(false);
 
@@ -55,6 +57,19 @@ const NotificationBell = () => {
 
   const handleClearRead = () => {
     dispatch(clearReadNotifications());
+  };
+
+  const handleItemClick = (item) => {
+    // Mark as read if unread
+    if (!item.isRead) {
+      handleMarkAsRead(item._id || item.id);
+    }
+    
+    // Navigate if orderId exists
+    if (item.orderId) {
+      navigate(`/orders/${item.orderId}`);
+      setOpen(false); // Close dropdown
+    }
   };
 
   const getNotificationIcon = (type) => {
@@ -131,8 +146,8 @@ const NotificationBell = () => {
               <List.Item
                 key={item._id || item.id}
                 className={`notification-item ${!item.isRead ? 'unread' : ''}`}
-                onClick={() => !item.isRead && handleMarkAsRead(item._id || item.id)}
-                style={{ cursor: item.isRead ? 'default' : 'pointer' }}
+                onClick={() => handleItemClick(item)}
+                style={{ cursor: 'pointer' }}
               >
                 <List.Item.Meta
                   avatar={
