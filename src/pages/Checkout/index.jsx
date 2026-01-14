@@ -36,6 +36,8 @@ import HomeNavbar from '../../components/HomeNavbar';
 import axiosInstance from '../../api/axiosConfig';
 import { addressAPI, orderAPI, paymentAPI } from '../../api';
 import { clearCart, updateCartItem } from '../../redux/slices/cartSlice';
+import AddressFormModal from '../../components/AddressFormModal';
+import AddressSelectionModal from '../../components/AddressSelectionModal';
 import './Checkout.css';
 
 const { TextArea } = Input;
@@ -693,107 +695,24 @@ function Checkout() {
       </div>
       
       {/* MODAL: Select Address */}
-      <Modal
-        title="Địa chỉ của tôi"
-        open={isAddressModalVisible}
-        onOk={handleAddressModalOk}
+      <AddressSelectionModal 
+        visible={isAddressModalVisible}
         onCancel={() => setIsAddressModalVisible(false)}
-        width={600}
-        okText="Xác nhận"
-        cancelText="Hủy"
-      >
-        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-            <Radio.Group onChange={(e) => setTempSelectedAddressId(e.target.value)} value={tempSelectedAddressId} style={{width: '100%'}}>
-            <List
-                itemLayout="horizontal"
-                dataSource={userAddresses}
-                renderItem={(item) => (
-                    <div className={`address-item ${item._id === tempSelectedAddressId ? 'selected' : ''}`}>
-                        <Radio value={item._id} style={{alignSelf: 'flex-start', marginTop: 4}} />
-                        <div className="address-content">
-                            <div className="address-header">
-                                <span className="address-name">{item.fullName}</span>
-                                <span className="address-phone">{item.phoneNumber}</span>
-                                {item.isDefault && <Tag color="red">Mặc định</Tag>}
-                            </div>
-                            <span className="address-text">{item.address}</span>
-                            <span className="address-text">{item.ward}, {item.district}, {item.city}</span>
-                            
-                            {!item.isDefault && (
-                                <div className="address-actions">
-                                    <Popconfirm
-                                        title="Xóa địa chỉ này?"
-                                        onConfirm={() => handleDeleteAddress(item._id, item.isDefault)}
-                                        okText="Xóa"
-                                        cancelText="Hủy"
-                                    >
-                                        <Button type="link" danger size="small" className="delete-address-btn">Xóa</Button>
-                                    </Popconfirm>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-            />
-            </Radio.Group>
-            
-            <Button 
-                type="dashed" 
-                block 
-                icon={<PlusOutlined />} 
-                onClick={() => setIsAddAddressModalVisible(true)}
-                className="add-new-address-btn"
-                size="large"
-            >
-                Thêm địa chỉ mới
-            </Button>
-        </div>
-      </Modal>
+        onOk={handleAddressModalOk}
+        addresses={userAddresses}
+        selectedId={tempSelectedAddressId}
+        onChange={setTempSelectedAddressId}
+        onDelete={handleDeleteAddress}
+        onAddNew={() => setIsAddAddressModalVisible(true)}
+      />
 
       {/* MODAL: Add New Address */}
-      <Modal
-        title="Thêm địa chỉ mới"
-        open={isAddAddressModalVisible}
-        onOk={() => addressForm.submit()}
+      <AddressFormModal 
+        visible={isAddAddressModalVisible}
         onCancel={() => setIsAddAddressModalVisible(false)}
-        okText="Hoàn thành"
-        cancelText="Trở lại"
-      >
-        <Form form={addressForm} layout="vertical" onFinish={handleAddNewAddress}>
-            <Row gutter={16}>
-                <Col span={12}>
-                    <Form.Item name="fullName" label="Họ và tên" rules={[{ required: true, message: 'Nhập họ tên!' }]}>
-                        <Input placeholder="Nguyễn Văn A" />
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item name="phoneNumber" label="Số điện thoại" rules={[{ required: true, message: 'Nhập SĐT!' }, { pattern: /^[0-9]{10}$/, message: 'SĐT sai định dạng!' }]}>
-                        <Input placeholder="09xxx" />
-                    </Form.Item>
-                </Col>
-            </Row>
-            <Row gutter={16}>
-                <Col span={8}>
-                     <Form.Item name="city" label="Tỉnh/Thành" rules={[{ required: true }]}>
-                        <Input placeholder="TP.HCM" />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item name="district" label="Quận/Huyện" rules={[{ required: true }]}>
-                        <Input placeholder="Quận 1" />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item name="ward" label="Phường/Xã" rules={[{ required: true }]}>
-                        <Input placeholder="Bến Nghé" />
-                    </Form.Item>
-                </Col>
-            </Row>
-            <Form.Item name="address" label="Địa chỉ cụ thể" rules={[{ required: true, message: 'Nhập địa chỉ!' }]}>
-                <TextArea rows={2} placeholder="Số nhà, tên đường..." />
-            </Form.Item>
-        </Form>
-      </Modal>
+        onSuccess={handleAddNewAddress}
+        form={addressForm}
+      />
     </>
   );
 }

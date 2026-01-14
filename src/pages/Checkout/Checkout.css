@@ -302,6 +302,11 @@
   margin: 0;
 }
 
+/* Voucher Section */
+.voucher-section-checkout {
+  margin-bottom: 16px;
+}
+
 .price-row {
   display: flex;
   justify-content: space-between;
