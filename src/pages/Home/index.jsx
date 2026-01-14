@@ -7,6 +7,7 @@ import { fetchProducts, fetchCategories } from '../../redux/slices/productSlice'
 import { addToCart, fetchCart } from '../../redux/slices/cartSlice';
 import HomeNavbar from '../../components/HomeNavbar';
 import Footer from '../../components/Footer';
+import VoucherList from '../../components/VoucherList';
 import './Home.css';
 
 const { Search } = Input;
@@ -158,6 +159,9 @@ const Home = () => {
           <div className="shape shape-3"></div>
         </div>
       </section>
+
+      {/* Voucher Section */}
+      <VoucherList />
 
       {/* Main Content */}
       <div className="main-content">
