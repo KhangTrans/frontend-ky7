@@ -42,6 +42,7 @@ import VoucherSelectionModal from '../../components/VoucherSelectionModal';
 import './Checkout.css';
 
 const { TextArea } = Input;
+const SHIPPING_FEE = 30000;
 
 function Checkout() {
   const navigate = useNavigate();
@@ -156,7 +157,7 @@ function Checkout() {
   };
 
   const rawTotal = calculateSubtotal();
-  const finalTotal = Math.max(0, rawTotal - discountAmount);
+  const finalTotal = Math.max(0, rawTotal + SHIPPING_FEE - discountAmount);
   
   // Reset discount if total changes (e.g. quantity update) and violates minOrderAmount
   useEffect(() => {
@@ -209,7 +210,7 @@ function Checkout() {
                   message.success(`Áp dụng mã ${voucherData.code} thành công!`);
               } else if (voucherData.type === 'FREE_SHIP') {
                    message.success(`Áp dụng mã FREESHIP thành công!`);
-                   setDiscountAmount(0); // For now
+                   setDiscountAmount(SHIPPING_FEE); 
               }
               
           } else {
@@ -356,7 +357,7 @@ function Checkout() {
                                   // Warning: Backend should calculate total, but we send it for validation or as requested.
                                   // If backend ignores this, it's fine.
           itemsPrice: rawTotal,
-          shippingPrice: 0,
+          shippingPrice: SHIPPING_FEE,
           paymentMethod: paymentMethod,
           
           customerName: selectedAddress.fullName,
@@ -693,7 +694,7 @@ function Checkout() {
               </div>
               <div className="price-row">
                 <span>Phí vận chuyển</span>
-                <span className="free-ship-text">Miễn phí</span>
+                <span>{SHIPPING_FEE.toLocaleString('vi-VN')}đ</span>
               </div>
               
               {appliedVoucher && (
