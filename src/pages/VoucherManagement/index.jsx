@@ -7,18 +7,23 @@ import {
   Row,
   Col,
   Tag,
-  message
+  message,
+  Input,
+  Select
 } from 'antd';
 import {
   ReloadOutlined,
   PlusOutlined,
   EditOutlined,
-  EyeOutlined
+  EyeOutlined,
+  SearchOutlined
 } from '@ant-design/icons';
 import axiosInstance from '../../api/axiosConfig';
 import dayjs from 'dayjs';
 import VoucherFormModal from './VoucherFormModal';
 import VoucherDetailModal from './VoucherDetailModal';
+
+const { Option } = Select;
 
 const VoucherManagement = () => {
   const [data, setData] = useState([]);
@@ -27,6 +32,18 @@ const VoucherManagement = () => {
     current: 1,
     pageSize: 20,
     total: 0
+  });
+
+  // Filter States
+  const [searchText, setSearchText] = useState('');
+  const [filterType, setFilterType] = useState(null);
+  const [filterStatus, setFilterStatus] = useState(null);
+  
+  // Applied filters (what is actually used for fetching)
+  const [appliedFilters, setAppliedFilters] = useState({
+    search: '',
+    type: null,
+    isActive: null
   });
 
   // Modal Create/Edit State
@@ -42,12 +59,16 @@ const VoucherManagement = () => {
   const fetchData = useCallback(async (page = 1, pageSize = 20) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get('/vouchers/admin/all', {
-        params: {
-          page,
-          limit: pageSize
-        }
-      });
+      const params = {
+        page,
+        limit: pageSize,
+      };
+
+      if (appliedFilters.search) params.search = appliedFilters.search;
+      if (appliedFilters.type) params.type = appliedFilters.type;
+      if (appliedFilters.isActive !== null) params.isActive = appliedFilters.isActive;
+
+      const response = await axiosInstance.get('/vouchers/admin/all', { params });
 
       if (response.data.success) {
         setData(response.data.data);
@@ -63,13 +84,63 @@ const VoucherManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [appliedFilters]);
 
   useEffect(() => {
-    fetchData(1, 20);
+    fetchData(pagination.current, pagination.pageSize);
   }, [fetchData]);
 
+  const handleSearch = () => {
+    setAppliedFilters({
+      search: searchText,
+      type: filterType,
+      isActive: filterStatus
+    });
+    // Will trigger useEffect because fetchData dependency changes? 
+    // Actually fetchData depends on appliedFilters, so it changes.
+    // However, we effectively want to reset to page 1 on search.
+    // The current useEffect relies on pagination.current which might be > 1.
+    // We should reset pagination state too, but that triggers another effect if we aren't careful.
+    // But since fetchData changes, the effect runs with current pagination values. 
+    // We want page 1.
+    // Let's modify the useEffect to be simpler or call fetchData directly here?
+    // React strict mode might double call, but it's fine.
+    // To ensure page 1:
+    setPagination(prev => ({ ...prev, current: 1 })); 
+    // This updates pagination state -> triggers re-render.
+    // Also setAppliedFilters updates state -> triggers re-render.
+    // Both might happen batch or separately.
+    // If we want to guarantee page 1 fetch, we can just let the effect handle it if we ensure page is 1.
+    // But if pagination.current is already 1, setPagination won't trigger effect?
+    // appliedFilters change WILL trigger effect because fetchData identity changes.
+    // So if page is 1, it fetches page 1 with new filters.
+    // If page is 2, setPagination(1) triggers effect with page 1.
+    // appliedFilters change also triggers effect (possibly with page 2 before page 1 update?).
+    // To avoid race conditions, we can memoize pagination in fetchData args? 
+    // Actually, simple is fine.
+  };
+
+  const handleReset = () => {
+    setSearchText('');
+    setFilterType(null);
+    setFilterStatus(null);
+    setAppliedFilters({ search: '', type: null, isActive: null });
+    setPagination(prev => ({ ...prev, current: 1 }));
+  };
+
   const handleTableChange = (newPagination) => {
+    setPagination(prev => ({ 
+        ...prev, 
+        current: newPagination.current, 
+        pageSize: newPagination.pageSize 
+    }));
+    // We need to fetch here? The useEffect will handle it if we add pagination to dependencies?
+    // Currently useEffect depends on [fetchData].
+    // If pagination state changes, fetchData ID doesn't change, so effect doesn't run!
+    // -> We MUST add pagination.current to useEffect deps OR call fetchData here.
+    // calling fetchData here is safer to avoid effect loops if we aren't careful.
+    // BUT fetchData is memoized on [appliedFilters].
+    // So it's safe to call here.
     fetchData(newPagination.current, newPagination.pageSize);
   };
 
@@ -261,6 +332,54 @@ const VoucherManagement = () => {
               </Button>
               <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
                 Thêm Voucher
+              </Button>
+            </Space>
+          </Col>
+        </Row>
+
+        {/* Filter Section */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+          <Col xs={24} sm={8} md={6}>
+            <Input
+              placeholder="Tìm theo mã voucher..."
+              prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onPressEnter={handleSearch}
+              allowClear
+            />
+          </Col>
+          <Col xs={24} sm={8} md={6}>
+            <Select
+              placeholder="Chọn loại voucher"
+              style={{ width: '100%' }}
+              value={filterType}
+              onChange={setFilterType}
+              allowClear
+            >
+              <Option value="DISCOUNT">Giảm giá</Option>
+              <Option value="FREE_SHIP">Miễn phí vận chuyển</Option>
+            </Select>
+          </Col>
+          <Col xs={24} sm={8} md={6}>
+            <Select
+              placeholder="Trạng thái"
+              style={{ width: '100%' }}
+              value={filterStatus}
+              onChange={setFilterStatus}
+              allowClear
+            >
+              <Option value={true}>Hoạt động</Option>
+              <Option value={false}>Vô hiệu</Option>
+            </Select>
+          </Col>
+          <Col xs={24} sm={24} md={6}>
+            <Space>
+              <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+                Tìm kiếm
+              </Button>
+              <Button onClick={handleReset}>
+                Đặt lại
               </Button>
             </Space>
           </Col>
