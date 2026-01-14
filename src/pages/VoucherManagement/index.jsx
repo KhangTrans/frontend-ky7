@@ -7,18 +7,18 @@ import {
   Row,
   Col,
   Tag,
-  message,
-  Popconfirm
+  message
 } from 'antd';
 import {
   ReloadOutlined,
   PlusOutlined,
   EditOutlined,
-  DeleteOutlined
+  EyeOutlined
 } from '@ant-design/icons';
 import axiosInstance from '../../api/axiosConfig';
 import dayjs from 'dayjs';
 import VoucherFormModal from './VoucherFormModal';
+import VoucherDetailModal from './VoucherDetailModal';
 
 const VoucherManagement = () => {
   const [data, setData] = useState([]);
@@ -29,10 +29,15 @@ const VoucherManagement = () => {
     total: 0
   });
 
-  // Modal State
+  // Modal Create/Edit State
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
   const [editingVoucher, setEditingVoucher] = useState(null);
+
+  // Modal Detail State
+  const [isDetailVisible, setIsDetailVisible] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailVoucher, setDetailVoucher] = useState(null);
 
   const fetchData = useCallback(async (page = 1, pageSize = 20) => {
     setLoading(true);
@@ -84,26 +89,44 @@ const VoucherManagement = () => {
     setIsModalVisible(true);
   };
 
+  // Open Modal for Details
+  const handleViewDetail = async (id) => {
+    setIsDetailVisible(true);
+    setDetailLoading(true);
+    try {
+      const response = await axiosInstance.get(`/vouchers/admin/${id}`);
+      if (response.data.success) {
+        setDetailVoucher(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch voucher detail:', error);
+      message.error('Không thể tải chi tiết voucher');
+      setIsDetailVisible(false);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
   const handleCancelModal = () => {
     setIsModalVisible(false);
     setEditingVoucher(null);
+  };
+
+  const handleCancelDetail = () => {
+    setIsDetailVisible(false);
+    setDetailVoucher(null);
   };
 
   const handleSubmitModal = async (values) => {
     setModalLoading(true);
     try {
         if (editingVoucher) {
-            // Update existing voucher
-            // Assuming endpoint might be PUT /vouchers/admin/:id or similar
-            // Since User only gave POST example, I'll assume standard REST if possible, 
-            // but for now I'll just focus on Create as requested specifically.
-            // However, to make the Edit button work if clicked:
             message.info('Tính năng cập nhật chưa được cấu hình API cụ thể');
-             // TODO: Add Update API call here
+            // TODO: Add Update API call here
         } else {
             // Create new voucher
             const response = await axiosInstance.post('/vouchers/admin', values);
-            if (response.data.success || response.data) { // Check response format based on typical responses
+            if (response.data.success || response.data) {
                 message.success('Tạo voucher thành công');
                 setIsModalVisible(false);
                 fetchData(1, pagination.pageSize); // Reset to first page to see new item
@@ -118,11 +141,6 @@ const VoucherManagement = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    message.info(`Xóa voucher id: ${id}`);
-    // Implement delete API call here if available
-  };
-
   const columns = [
     {
       title: 'Mã Voucher',
@@ -134,24 +152,42 @@ const VoucherManagement = () => {
       title: 'Loại',
       dataIndex: 'type',
       key: 'type',
-      render: (text) => <Tag color={text === 'DISCOUNT' ? 'green' : 'orange'}>{text}</Tag>
+      render: (text) => <Tag color={text === 'DISCOUNT' ? 'green' : 'cyan'}>{text === 'DISCOUNT' ? 'Giảm giá' : 'Freeship'}</Tag>
     },
     {
       title: 'Mô tả',
       dataIndex: 'description',
       key: 'description',
+      width: 200,
+      ellipsis: true,
     },
     {
       title: 'Giảm giá',
       key: 'discount',
-      render: (_, record) => (
-        <div>
-          <div>{record.discountPercent}%</div>
-          <div style={{ fontSize: '11px', color: '#888' }}>
-            Tối đa: {record.maxDiscount?.toLocaleString('vi-VN')}đ
+      render: (_, record) => {
+        if (record.type === 'FREE_SHIP') {
+            return (
+                <div>
+                   <div>Freeship</div>
+                   {record.maxDiscount && (
+                       <div style={{ fontSize: '11px', color: '#888' }}>
+                           Tối đa: {record.maxDiscount.toLocaleString('vi-VN')}đ
+                       </div>
+                   )}
+                </div>
+            )
+        }
+        return (
+          <div>
+            <div>{record.discountPercent}%</div>
+            {record.maxDiscount && (
+                <div style={{ fontSize: '11px', color: '#888' }}>
+                  Tối đa: {record.maxDiscount.toLocaleString('vi-VN')}đ
+                </div>
+            )}
           </div>
-        </div>
-      )
+        )
+      }
     },
     {
       title: 'Điều kiện',
@@ -167,18 +203,18 @@ const VoucherManagement = () => {
       key: 'usage',
       render: (_, record) => (
         <span>
-            {record.usedCount} / {record.usageLimit}
+            {record.usedCount} / {record.usageLimit || '∞'}
         </span>
       )
     },
     {
       title: 'Thời gian',
       key: 'time',
-      width: 200,
+      width: 160,
       render: (_, record) => (
         <div style={{ fontSize: '12px' }}>
-          <div>BĐ: {dayjs(record.startDate).format('DD/MM/YYYY HH:mm')}</div>
-          <div>KT: {dayjs(record.endDate).format('DD/MM/YYYY HH:mm')}</div>
+          <div>{dayjs(record.startDate).format('DD/MM/YY')}</div>
+          <div>{dayjs(record.endDate).format('DD/MM/YY')}</div>
         </div>
       )
     },
@@ -198,19 +234,20 @@ const VoucherManagement = () => {
       render: (_, record) => (
         <Space size="small">
           <Button 
+            icon={<EyeOutlined />} 
+            size="small"
+            onClick={() => handleViewDetail(record._id)}
+          >
+            Chi tiết
+          </Button>
+          <Button 
             type="primary" 
             icon={<EditOutlined />} 
             size="small" 
             onClick={() => handleEdit(record)}
-          />
-          <Popconfirm
-            title="Bạn có chắc chắn muốn xóa?"
-            onConfirm={() => handleDelete(record._id)}
-            okText="Xóa"
-            cancelText="Hủy"
           >
-            <Button danger icon={<DeleteOutlined />} size="small" />
-          </Popconfirm>
+            Sửa
+          </Button>
         </Space>
       )
     }
@@ -258,6 +295,13 @@ const VoucherManagement = () => {
         onSubmit={handleSubmitModal}
         loading={modalLoading}
         initialValues={editingVoucher}
+      />
+
+      <VoucherDetailModal
+        visible={isDetailVisible}
+        onCancel={handleCancelDetail}
+        voucher={detailVoucher}
+        loading={detailLoading}
       />
     </div>
   );
