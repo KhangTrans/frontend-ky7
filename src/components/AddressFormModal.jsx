@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input, Row, Col } from 'antd';
-import { addressAPI } from '../../api';
+
 
 const { TextArea } = Input;
 
