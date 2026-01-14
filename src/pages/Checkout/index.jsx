@@ -29,7 +29,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   MinusOutlined,
-  TicketOutlined,
+  TagOutlined,
   CloseCircleOutlined
 } from '@ant-design/icons';
 import HomeNavbar from '../../components/HomeNavbar';
@@ -611,7 +611,7 @@ function Checkout() {
               {/* VOUCHER SECTION */}
               <div className="voucher-section-checkout" style={{ marginBottom: 16 }}>
                   <span style={{ display: 'block', fontWeight: 500, marginBottom: 8 }}>
-                      <TicketOutlined /> Mã giảm giá
+                      <TagOutlined /> Mã giảm giá
                   </span>
                   
                   {appliedVoucher ? (
