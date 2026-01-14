@@ -40,7 +40,9 @@ const OrderDetail = () => {
     switch (status?.toLowerCase()) {
       case 'pending': return 'orange';
       case 'processing': return 'blue';
+      case 'confirmed': return 'purple';
       case 'shipping': return 'cyan';
+      case 'delivered': return 'success';
       case 'completed': return 'success';
       case 'cancelled': return 'error';
       default: return 'default';
@@ -51,12 +53,34 @@ const OrderDetail = () => {
     switch (status?.toLowerCase()) {
       case 'pending': return 'Chờ xử lý';
       case 'processing': return 'Đang xử lý';
+      case 'confirmed': return 'Đã xác nhận';
       case 'shipping': return 'Đang giao hàng';
+      case 'delivered': return 'Đã giao hàng';
       case 'completed': return 'Hoàn thành';
       case 'cancelled': return 'Đã hủy';
       default: return status;
     }
   }
+
+  const getStepStatus = (status) => {
+    const s = status?.toLowerCase();
+    if (s === 'cancelled') return 'error';
+    if (s === 'delivered' || s === 'completed') return 'finish';
+    return 'process';
+  };
+
+  const getStepCurrent = (status) => {
+    const s = status?.toLowerCase();
+    switch (s) {
+      case 'pending': return 0;
+      case 'confirmed': 
+      case 'processing': return 1;
+      case 'shipping': return 2;
+      case 'delivered': 
+      case 'completed': return 3;
+      default: return 0;
+    }
+  };
 
   // Cột cho bảng sản phẩm
   const columns = [
@@ -152,13 +176,11 @@ const OrderDetail = () => {
            {/* Timeline đơn giản (Optional) */}
            <div style={{ marginTop: 30 }}>
               <Steps 
-                current={
-                  ['pending', 'processing', 'shipping', 'completed'].indexOf(order.orderStatus?.toLowerCase())
-                }
-                status={order.orderStatus?.toLowerCase() === 'cancelled' ? 'error' : 'process'}
+                current={getStepCurrent(order.orderStatus)}
+                status={getStepStatus(order.orderStatus)}
               >
                   <Step title="Đặt hàng" description="Đơn hàng đã được tạo" />
-                  <Step title="Xác nhận" description="Người bán đang chuẩn bị" />
+                  <Step title="Xử lý" description="Người bán đang chuẩn bị" />
                   <Step title="Vận chuyển" description="Đang giao đến bạn" />
                   <Step title="Hoàn thành" description="Giao hàng thành công" />
               </Steps>
