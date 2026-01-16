@@ -228,11 +228,11 @@ const Home = () => {
               </p>
             </div>
 
-            {loading ? (
+            {loading && filteredProducts.length === 0 ? (
               <div className="loading-container">
                 <Spin size="large" tip="Đang tải sản phẩm..." />
               </div>
-            ) : filteredProducts.length === 0 ? (
+            ) : filteredProducts.length === 0 && !loading ? (
               <Empty
                 description={
                   searchText 
