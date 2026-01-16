@@ -27,11 +27,14 @@ const Home = () => {
   const isLoggedIn = !!localStorage.getItem('token');
 
   // Load categories và products khi component mount
+  // Load categories và products khi component mount (Chạy 1 lần)
   useEffect(() => {
     dispatch(fetchCategories());
     dispatch(fetchProducts({ page: 1, limit: 100 }));
-    
-    // Load cart nếu đã đăng nhập
+  }, [dispatch]);
+
+  // Load cart nếu đã đăng nhập (Chạy khi auth state thay đổi)
+  useEffect(() => {
     if (isLoggedIn) {
       dispatch(fetchCart());
     }
