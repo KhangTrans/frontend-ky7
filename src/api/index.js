@@ -199,4 +199,24 @@ export const paymentAPI = {
   },
 };
 
+// Chatbot API
+export const chatbotAPI = {
+  sendMessage: async (message, sessionId) => {
+    const response = await axiosInstance.post('/chatbot/message', { message, sessionId });
+    return response.data;
+  },
+  getHistory: async (sessionId) => {
+    const response = await axiosInstance.get(`/chatbot/history?sessionId=${sessionId}`);
+    return response.data;
+  },
+  clearHistory: async (sessionId) => {
+    const response = await axiosInstance.delete('/chatbot/history', { data: { sessionId } });
+    return response.data;
+  },
+  getSuggestions: async () => {
+    const response = await axiosInstance.get('/chatbot/suggestions');
+    return response.data;
+  }
+};
+
 export default axiosInstance;
