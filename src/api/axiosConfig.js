@@ -38,8 +38,8 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Xử lý token hết hạn (401) - nhưng không phải khi login
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/login')) {
+    // Xử lý token hết hạn (401) - nhưng không phải khi login hoặc chatbot (để tránh loop cho guest)
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/login') && !originalRequest.url.includes('/chatbot')) {
       originalRequest._retry = true;
       
       // Xóa token và chuyển về login
