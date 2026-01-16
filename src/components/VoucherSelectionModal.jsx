@@ -9,16 +9,49 @@ const { Text } = Typography;
 const VoucherSelectionModal = ({ 
     visible, 
     onCancel, 
-    onSelect, 
+    onApply,
+    selectedVouchers = [], // List of currently applied vouchers
     vouchers = [], 
     orderTotal = 0 
 }) => {
+    // Local state for selection within modal before confirming
+    const [tempSelected, setTempSelected] = React.useState([]);
+
+    React.useEffect(() => {
+        if (visible) {
+             // Initialize with currently active vouchers
+            setTempSelected(selectedVouchers);
+        }
+    }, [visible, selectedVouchers]);
+
+    const handleVoucherClick = (voucher) => {
+        const isSelected = tempSelected.some(v => v._id === voucher._id);
+        
+        if (isSelected) {
+            // Deselect
+            setTempSelected(prev => prev.filter(v => v._id !== voucher._id));
+        } else {
+            // Select: Replace existing voucher of same type
+            setTempSelected(prev => {
+                const others = prev.filter(v => v.type !== voucher.type);
+                return [...others, voucher];
+            });
+        }
+    };
+
+    const handleConfirm = () => {
+        onApply(tempSelected);
+    };
+
     return (
         <Modal
-            title="Chọn Voucher Voucher"
+            title="Chọn Khuyến Mãi"
             open={visible}
             onCancel={onCancel}
-            footer={null}
+            footer={[
+                <Button key="cancel" onClick={onCancel}>Đóng</Button>,
+                <Button key="apply" type="primary" onClick={handleConfirm}>Áp dụng</Button>
+            ]}
             width={500}
             className="voucher-selection-modal"
         >
@@ -37,11 +70,18 @@ const VoucherSelectionModal = ({
                             const isValid = orderTotal >= voucher.minOrderAmount;
                             const isExpired = dayjs().isAfter(dayjs(voucher.endDate));
                             const disabled = !isValid || isExpired;
+                            
+                            const isSelected = tempSelected.some(v => v._id === voucher._id);
 
                             return (
                                 <div 
-                                    className={`voucher-select-item ${disabled ? 'disabled' : ''}`}
-                                    onClick={() => !disabled && onSelect(voucher)}
+                                    className={`voucher-select-item ${disabled ? 'disabled' : ''} ${isSelected ? 'selected-item' : ''}`}
+                                    onClick={() => !disabled && handleVoucherClick(voucher)}
+                                    style={{ 
+                                        cursor: disabled ? 'not-allowed' : 'pointer',
+                                        border: isSelected ? '1px solid #1890ff' : '1px solid #e8e8e8',
+                                        backgroundColor: isSelected ? '#e6f7ff' : '#fff'
+                                    }}
                                 >
                                     <div className="voucher-left-part">
                                          <div className="voucher-icon-box">
@@ -69,7 +109,7 @@ const VoucherSelectionModal = ({
                                          )}
                                     </div>
                                     <div className="voucher-radio">
-                                         <div className={`radio-circle ${!disabled ? 'active' : ''}`}></div>
+                                         <div className={`radio-circle ${isSelected ? 'active' : ''}`}></div>
                                     </div>
                                 </div>
                             );

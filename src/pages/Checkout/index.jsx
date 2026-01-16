@@ -73,8 +73,9 @@ function Checkout() {
   
   // Voucher State
   const [voucherCode, setVoucherCode] = useState('');
-  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [appliedVouchers, setAppliedVouchers] = useState([]); // Array of vouchers
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [shippingDiscountAmount, setShippingDiscountAmount] = useState(0);
   const [validatingVoucher, setValidatingVoucher] = useState(false);
   const [myVouchers, setMyVouchers] = useState([]);
   const [isVoucherModalVisible, setIsVoucherModalVisible] = useState(false);
@@ -157,25 +158,47 @@ function Checkout() {
   };
 
   const rawTotal = calculateSubtotal();
-  const finalTotal = Math.max(0, rawTotal + SHIPPING_FEE - discountAmount);
-  
-  // Reset discount if total changes (e.g. quantity update) and violates minOrderAmount
+  // Calculate Discounts
   useEffect(() => {
-    if (appliedVoucher) {
-        if (rawTotal < appliedVoucher.minOrderAmount) {
-            message.warning(`Đơn hàng không đủ điều kiện tối thiểu cho voucher ${appliedVoucher.code} (Tối thiểu: ${appliedVoucher.minOrderAmount.toLocaleString()}đ)`);
-            setAppliedVoucher(null);
-            setDiscountAmount(0);
-            setVoucherCode('');
-        } else {
-             // Recalculate discount
-             if (appliedVoucher.type === 'DISCOUNT') {
-                const discount = (rawTotal * appliedVoucher.discountPercent) / 100;
-                setDiscountAmount(Math.min(discount, appliedVoucher.maxDiscount));
+    let newProdDisc = 0;
+    let newShipDisc = 0;
+    const isAutoFreeShip = rawTotal > 500000;
+
+    // Filter valid vouchers & Calculate
+    const validVouchers = appliedVouchers.filter(v => {
+        if (rawTotal < v.minOrderAmount) {
+             message.warning(`Voucher ${v.code} đã bị hủy do đơn hàng chưa đạt tối thiểu ${v.minOrderAmount.toLocaleString()}đ`);
+             return false;
+        }
+        return true;
+    });
+
+    if (validVouchers.length !== appliedVouchers.length) {
+        setAppliedVouchers(validVouchers);
+    }
+
+    validVouchers.forEach(v => {
+        if (v.type === 'DISCOUNT') {
+            const percent = Number(v.discountPercent) || v.voucher?.discountPercent || 0;
+            const maxDisc = Number(v.maxDiscount) || v.voucher?.maxDiscount || 0;
+            const disc = (rawTotal * percent) / 100;
+            newProdDisc += Math.min(disc, maxDisc);
+        } else if (v.type === 'FREE_SHIP') {
+            if (!isAutoFreeShip) {
+                newShipDisc = SHIPPING_FEE;
             }
         }
+    });
+
+    if (isAutoFreeShip) {
+        newShipDisc = SHIPPING_FEE;
     }
-  }, [rawTotal]);
+
+    setDiscountAmount(newProdDisc);
+    setShippingDiscountAmount(newShipDisc);
+  }, [rawTotal, appliedVouchers]);
+
+  const finalTotal = Math.max(0, rawTotal + SHIPPING_FEE - discountAmount - shippingDiscountAmount);
 
   const handleApplyVoucher = async (codeOverride = null) => {
       const codeToUse = codeOverride || voucherCode;
@@ -193,57 +216,41 @@ function Checkout() {
           });
           
           if (res.data.success) {
-              const voucher = res.data.data; 
-              // Try to resolve the voucher details object from various possible structures
-              // 1. Direct object
-              // 2. Nested in 'voucher' property
-              // 3. Nested in 'voucherId' property (common in Mongoose relations)
-              const voucherData = voucher.voucherId || voucher.voucher || voucher; 
+              const voucherRaw = res.data.data; 
+              const voucherData = voucherRaw.voucherId || voucherRaw.voucher || voucherRaw; 
               
-              console.log('Voucher Data Applied:', voucherData);
+              // Add to applied vouchers (Replace if same type exists)
+              setAppliedVouchers(prev => {
+                  const others = prev.filter(v => v.type !== voucherData.type);
+                  return [...others, voucherData];
+              });
 
-              setAppliedVoucher(voucherData);
-              if (codeOverride) setVoucherCode(codeOverride);;
-              
-              if (voucherData.type === 'DISCOUNT') {
-                  const percent = Number(voucherData.discountPercent) || Number(voucherData.voucher?.discountPercent) || 0;
-                  const maxDisc = Number(voucherData.maxDiscount) || Number(voucherData.voucher?.maxDiscount) || 0;
-                  
-                  const discount = (rawTotal * percent) / 100;
-                  setDiscountAmount(Math.min(discount, maxDisc));
-                  message.success(`Áp dụng mã ${voucherData.code || voucherData.voucher?.code} thành công!`);
-              } else if (voucherData.type === 'FREE_SHIP') {
-                   message.success(`Áp dụng mã FREESHIP thành công!`);
-                   setDiscountAmount(SHIPPING_FEE); 
-              }
+              message.success(`Áp dụng mã ${voucherData.code} thành công!`);
+              if (codeOverride) setVoucherCode('');
               
           } else {
-              message.error('Mã giảm giá không hợp lệ hoặc không đủ điều kiện.');
-              setAppliedVoucher(null);
-              setDiscountAmount(0);
+              message.error('Mã không hợp lệ hoặc không đủ điều kiện.');
           }
       } catch (error) {
-          console.error("Voucher validate error:", error);
           const msg = error.response?.data?.message || 'Mã giảm giá không hợp lệ';
           message.error(msg);
-          setAppliedVoucher(null);
-          setDiscountAmount(0);
       } finally {
           setValidatingVoucher(false);
       }
   };
 
-  const handleSelectVoucherFromModal = (voucher) => {
+  const handleVouchersSelected = (selectedList) => {
+      setAppliedVouchers(selectedList);
       setIsVoucherModalVisible(false);
-      handleApplyVoucher(voucher.code);
+      message.success('Đã cập nhật voucher!');
   };
 
-  const handleRemoveVoucher = () => {
-      setAppliedVoucher(null);
-      setDiscountAmount(0);
-      setVoucherCode('');
-      message.info('Đã hủy áp dụng voucher');
+  const handleRemoveVoucher = (voucherId) => {
+      setAppliedVouchers(prev => prev.filter(v => v._id !== voucherId && v.voucher?._id !== voucherId));
+      message.info('Đã hủy voucher');
   };
+
+
 
   const handlePaymentMethodChange = (e) => {
     setPaymentMethod(e.target.value);
@@ -321,15 +328,15 @@ function Checkout() {
       
       // Values for order
       const commonOrderData = {
-          voucherIds: appliedVoucher?._id ? [appliedVoucher._id] : [],
-          discountAmount: discountAmount
+          voucherIds: appliedVouchers.map(v => v._id || v.voucher?._id).filter(Boolean),
+          discountAmount: discountAmount // Note: Backend likely recalculates this
       };
 
       // CASE 1: Direct Buy Now (API riêng theo yêu cầu)
       if (localDirectItem) {
         const buyNowPayload = {
           productId: localDirectItem.product._id,
-          quantity: localDirectItem.quantity, // Use updated quantity
+          quantity: localDirectItem.quantity,
           customerName: selectedAddress.fullName,
           customerEmail: user?.email || 'email@example.com',
           customerPhone: selectedAddress.phoneNumber,
@@ -339,12 +346,13 @@ function Checkout() {
           shippingWard: selectedAddress.ward,
           shippingNote: values.note || '',
           paymentMethod: paymentMethod,
-          ...commonOrderData // Include voucher info
+          voucherIds: appliedVouchers.map(v => v._id || v.voucher?._id).filter(Boolean), // Ensure array
+          discountAmount: discountAmount // Common fields
         };
-        console.log('Sending Buy Now Payload with Voucher:', buyNowPayload);
+        console.log('Sending Buy Now Payload with Vouchers:', buyNowPayload);
         // Call direct API endpoint
         const res = await axiosInstance.post('/orders/buy-now', buyNowPayload);
-        response = res.data; // axios returns { data: ... }
+        response = res.data;
       } 
       // CASE 2: Regular Cart Checkout
       else {
@@ -464,8 +472,19 @@ function Checkout() {
       console.log('Failed Request URL:', error.config?.url);
       console.log('Failed Request BaseURL:', error.config?.baseURL);
       
+      console.log('Failed Request BaseURL:', error.config?.baseURL);
+      
       const errorMsg = error.response?.data?.message || (typeof error.response?.data === 'string' ? error.response?.data : '') || error.message || 'Đặt hàng thất bại.';
-      message.error(`${errorMsg} (API: ${error.config?.url})`);
+      
+      // Handle Specific 400 Bad Request (e.g., Voucher used, Out of stock)
+      if (error.response?.status === 400) {
+          Modal.error({
+              title: 'Không thể đặt hàng',
+              content: errorMsg,
+          });
+      } else {
+          message.error(`${errorMsg} (API: ${error.config?.url})`);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -641,25 +660,32 @@ function Checkout() {
                       <TagOutlined /> Mã giảm giá
                   </span>
                   
-                  {appliedVoucher ? (
-                      <div className="applied-voucher-box" style={{ background: '#f6ffed', border: '1px solid #b7eb8f', padding: '8px 12px', borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div>
-                             <strong style={{ color: '#52c41a' }}>{appliedVoucher.code || appliedVoucher.voucher?.code}</strong>
-                             <div style={{ fontSize: 12, color: '#666' }}>
-                                {(appliedVoucher.type === 'FREE_SHIP' || appliedVoucher.voucher?.type === 'FREE_SHIP') ? (
-                                    <span>Miễn phí vận chuyển (Tối đa {SHIPPING_FEE.toLocaleString()}đ)</span>
-                                ) : (
-                                    <span>Giảm {appliedVoucher.discountPercent || appliedVoucher.voucher?.discountPercent || 0}% (Tối đa {(appliedVoucher.maxDiscount || appliedVoucher.voucher?.maxDiscount || 0).toLocaleString()}đ)</span>
-                                )}
-                             </div>
-                          </div>
-                          <Button 
-                             type="text" 
-                             size="small" 
-                             icon={<CloseCircleOutlined />} 
-                             danger 
-                             onClick={handleRemoveVoucher}
-                          />
+                  {appliedVouchers.length > 0 ? (
+                      <div className="applied-vouchers-list">
+                          {appliedVouchers.map(v => (
+                               <div key={v._id || v.code} className="applied-voucher-box" style={{ background: '#f6ffed', border: '1px solid #b7eb8f', padding: '8px 12px', borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                  <div>
+                                     <strong style={{ color: '#52c41a' }}>{v.code}</strong>
+                                     <div style={{ fontSize: 12, color: '#666' }}>
+                                        {v.type === 'FREE_SHIP' ? (
+                                            <span>Miễn phí vận chuyển</span>
+                                        ) : (
+                                            <span>Giảm {v.discountPercent}% (Tối đa {(v.maxDiscount || 0).toLocaleString()}đ)</span>
+                                        )}
+                                     </div>
+                                  </div>
+                                  <Button 
+                                     type="text" 
+                                     size="small" 
+                                     icon={<CloseCircleOutlined />} 
+                                     danger 
+                                     onClick={() => handleRemoveVoucher(v._id || v.voucher?._id)}
+                                  />
+                              </div>
+                          ))}
+                          <Button type="link" size="small" onClick={() => setIsVoucherModalVisible(true)} style={{paddingLeft:0}}>
+                             + Chọn thêm voucher khác
+                          </Button>
                       </div>
                   ) : (
                       <div>
@@ -680,7 +706,7 @@ function Checkout() {
                             </Button>
                         </div>
                         <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: 12, color: '#888' }}>Có thể áp dụng 1 voucher</span>
+                            <span style={{ fontSize: 12, color: '#888' }}>Có thể chọn nhiều voucher (Discount + FreeShip)</span>
                             <Button 
                                 type="link" 
                                 size="small" 
@@ -702,12 +728,27 @@ function Checkout() {
               </div>
               <div className="price-row">
                 <span>Phí vận chuyển</span>
-                <span>{SHIPPING_FEE.toLocaleString('vi-VN')}đ</span>
+                {/* Rule: > 500k Free Ship */}
+                {rawTotal > 500000 ? (
+                    <span>
+                         <span style={{ textDecoration: 'line-through', color: '#888', marginRight: 8 }}>{SHIPPING_FEE.toLocaleString('vi-VN')}đ</span>
+                         <span style={{ color: '#52c41a', fontWeight: 'bold' }}>0đ (Miễn phí)</span>
+                    </span>
+                ) : (
+                    <span>{SHIPPING_FEE.toLocaleString('vi-VN')}đ</span>
+                )}
               </div>
               
-              {appliedVoucher && (
+              {shippingDiscountAmount > 0 && rawTotal <= 500000 && (
                  <div className="price-row" style={{ color: '#52c41a' }}>
-                    <span>Giảm giá voucher</span>
+                    <span>Miễn phí vận chuyển (Voucher)</span>
+                    <span>-{shippingDiscountAmount.toLocaleString('vi-VN')}đ</span>
+                 </div>
+              )}
+
+              {discountAmount > 0 && (
+                 <div className="price-row" style={{ color: '#52c41a' }}>
+                    <span>Giảm giá hàng hóa</span>
                     <span>-{discountAmount.toLocaleString('vi-VN')}đ</span>
                  </div>
               )}
@@ -762,8 +803,9 @@ function Checkout() {
       <VoucherSelectionModal
            visible={isVoucherModalVisible}
            onCancel={() => setIsVoucherModalVisible(false)}
-           onSelect={handleSelectVoucherFromModal}
+           onApply={handleVouchersSelected}
            vouchers={myVouchers}
+           selectedVouchers={appliedVouchers}
            orderTotal={rawTotal}
       />
     </>
