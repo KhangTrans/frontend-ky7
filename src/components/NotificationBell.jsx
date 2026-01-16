@@ -28,6 +28,9 @@ const NotificationBell = () => {
 
   // Fetch notifications on mount and every 30 seconds
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
     dispatch(fetchUnreadCount());
     const interval = setInterval(() => {
       dispatch(fetchUnreadCount());
