@@ -94,39 +94,44 @@ const HomeNavbar = () => {
           </div>
 
           {/* Actions */}
+          {/* Actions */}
           <div className="navbar-actions">
-            <NotificationBell />
-            <Button
-              type="text"
-              icon={
-                <Badge count={cartCount || 0} offset={[5, 0]}>
-                  <ShoppingCartOutlined style={{ fontSize: '20px' }} />
-                </Badge>
-              }
-              className="action-btn mobile-visible"
-              onClick={() => navigate('/cart')}
-            />
-            
-            {isLoggedIn ? (
-              <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+            <div className="icons-group">
+                <NotificationBell />
                 <Button
-                  type="primary"
-                  icon={<UserOutlined />}
-                  className="user-btn"
-                >
-                  Tài khoản
-                </Button>
-              </Dropdown>
-            ) : (
-              <Button
-                type="primary"
-                icon={<LoginOutlined />}
-                onClick={() => navigate('/login')}
-                className="login-btn"
-              >
-                Đăng nhập
-              </Button>
-            )}
+                  type="text"
+                  icon={
+                    <Badge count={cartCount || 0} offset={[5, 0]}>
+                      <ShoppingCartOutlined style={{ fontSize: '20px' }} />
+                    </Badge>
+                  }
+                  className="action-btn mobile-visible"
+                  onClick={() => navigate('/cart')}
+                />
+            </div>
+            
+            <div className="auth-buttons desktop-only">
+                {isLoggedIn ? (
+                  <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+                    <Button
+                      type="primary"
+                      icon={<UserOutlined />}
+                      className="user-btn"
+                    >
+                      Tài khoản
+                    </Button>
+                  </Dropdown>
+                ) : (
+                  <Button
+                    type="primary"
+                    icon={<LoginOutlined />}
+                    onClick={() => navigate('/login')}
+                    className="login-btn"
+                  >
+                    Đăng nhập
+                  </Button>
+                )}
+            </div>
 
             {/* Mobile Menu Toggle */}
             <Button

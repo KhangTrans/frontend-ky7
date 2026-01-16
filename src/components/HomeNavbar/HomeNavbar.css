@@ -118,6 +118,12 @@
   gap: 15px;
 }
 
+.icons-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .action-btn {
   color: #4a5568;
   transition: all 0.3s ease;
@@ -163,6 +169,11 @@
   
   .action-btn.mobile-visible {
     display: flex;
+  }
+
+  /* Hide raw auth buttons on mobile, show in menu instead */
+  .auth-buttons.desktop-only {
+      display: none;
   }
 }
 
