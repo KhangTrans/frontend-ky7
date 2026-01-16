@@ -118,10 +118,24 @@
   gap: 15px;
 }
 
+/* Grouping Bell and Cart */
 .icons-group {
     display: flex;
     align-items: center;
     gap: 15px;
+    position: relative;
+    margin-right: 15px;
+}
+
+/* FORCE FIX: Override any rogue absolute positioning on the cart button */
+.icons-group .action-btn {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    margin: 0 !important;
+    /* Do NOT override transform here to allow hover effects */
 }
 
 .action-btn {
@@ -172,7 +186,9 @@
   }
 
   /* Hide raw auth buttons on mobile, show in menu instead */
-  .auth-buttons.desktop-only {
+  .auth-buttons.desktop-only,
+  .login-btn,
+  .user-btn {
       display: none;
   }
 }
