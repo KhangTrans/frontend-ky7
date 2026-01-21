@@ -1,21 +1,38 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card, Table, Tag, Row, Col, Spin, message, Descriptions, Divider, Steps } from 'antd';
-import { ArrowLeftOutlined, PrinterOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { Button, Card, Table, Tag, Row, Col, Spin, message, Descriptions, Divider, Steps, Popover, Input, Modal, Form } from 'antd';
+import { ArrowLeftOutlined, PrinterOutlined, ShoppingOutlined, EnvironmentOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
 import axiosInstance from '../../api/axiosConfig';
+import { addressAPI } from '../../api';
 import HomeNavbar from '../../components/HomeNavbar';
+import AddressSelectionModal from '../../components/AddressSelectionModal';
+import AddressFormModal from '../../components/AddressFormModal';
 import './OrderDetail.css';
 
 const { Step } = Steps;
+const { TextArea } = Input;
 
 const OrderDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  
+  // Address Management
+  const [userAddresses, setUserAddresses] = useState([]);
+  const [isAddressListOpen, setIsAddressListOpen] = useState(false);
+  const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
+  const [tempSelectedAddressId, setTempSelectedAddressId] = useState(null);
+  const [addressForm] = Form.useForm();
+  
+  // Note Editing
+  const [isEditingNote, setIsEditingNote] = useState(false);
+  const [tempNote, setTempNote] = useState('');
 
   useEffect(() => {
     fetchOrderDetail();
+    fetchUserAddresses();
   }, [id]);
 
   const fetchOrderDetail = async () => {
@@ -24,9 +41,10 @@ const OrderDetail = () => {
       const response = await axiosInstance.get(`/orders/${id}`);
       if (response.data.success) {
         setOrder(response.data.data);
+        setTempNote(response.data.data.shippingNote || '');
       } else {
         message.error('Không tìm thấy đơn hàng!');
-        navigate('/profile'); // Hoặc trang danh sách đơn hàng
+        navigate('/profile');
       }
     } catch (error) {
       console.error('Error fetching order:', error);
@@ -34,6 +52,130 @@ const OrderDetail = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchUserAddresses = async () => {
+      try {
+          const res = await addressAPI.getAll();
+          if (res.success) {
+              setUserAddresses(res.data);
+          }
+      } catch (error) {
+          console.error("Fetch addresses error", error);
+      }
+  };
+
+  // Update Order with Selected Address
+  const handleAddressSelect = async () => {
+      const selectedAddr = userAddresses.find(a => a._id === tempSelectedAddressId);
+      if (!selectedAddr) {
+          setIsAddressListOpen(false);
+          return;
+      }
+      
+      await updateOrderInfo({
+          ...selectedAddr, // This contains city, district, ward, address, fullName, phoneNumber
+          // Map to payload fields if needed
+          customerName: selectedAddr.fullName,
+          customerPhone: selectedAddr.phoneNumber,
+          shippingNote: order.shippingNote // Keep existing note
+      });
+      setIsAddressListOpen(false);
+  };
+
+  const handleUpdateNote = async () => {
+      await updateOrderInfo({
+          customerName: order.shippingAddress?.fullName || order.customerName,
+          customerPhone: order.shippingAddress?.phone || order.shippingAddress?.phoneNumber || order.customerPhone,
+          shippingAddress: order.shippingAddress, // Keep existing address obj/string
+          city: order.shippingCity, // Fallback fields
+          shippingNote: tempNote
+      }, true); // isNoteUpdate
+      setIsEditingNote(false);
+  };
+
+  const updateOrderInfo = async (data, isNoteUpdate = false) => {
+      try {
+          setUpdating(true);
+          
+          let fullAddressString = "";
+          let addressComponents = {};
+
+          if (!isNoteUpdate) {
+             // If data is from Address Book, it has structured fields
+             fullAddressString = `${data.address}, ${data.ward}, ${data.district}, ${data.city}`;
+             addressComponents = {
+                 address: data.address,
+                 city: data.city,
+                 district: data.district,
+                 ward: data.ward
+             };
+          } else {
+             // If just updating note, try to preserve existing address
+             // If shippingAddress is string, keep it. If object, flatten it.
+             const currentAddr = order.shippingAddress;
+             if (typeof currentAddr === 'object' && currentAddr) {
+                 fullAddressString = `${currentAddr.address}, ${currentAddr.ward}, ${currentAddr.district}, ${currentAddr.city}`;
+                 addressComponents = {
+                     address: currentAddr.address,
+                     city: currentAddr.city,
+                     district: currentAddr.district,
+                     ward: currentAddr.ward
+                 };
+             } else {
+                 fullAddressString = currentAddr || order.address;
+             }
+          }
+
+          const payload = {
+              customerName: data.customerName || data.fullName,
+              customerPhone: data.customerPhone || data.phoneNumber,
+              shippingNote: isNoteUpdate ? data.shippingNote : order.shippingNote,
+              shippingAddress: fullAddressString,
+              ...addressComponents
+          };
+
+          const response = await axiosInstance.put(`/orders/${id}/info`, payload);
+          
+          if (response.data.success) {
+              message.success('Cập nhật thành công!');
+              // Optimistic Update
+              setOrder(prev => ({
+                  ...prev,
+                  customerName: payload.customerName,
+                  customerPhone: payload.customerPhone,
+                  shippingNote: payload.shippingNote,
+                  shippingAddress: !isNoteUpdate ? {
+                      fullName: payload.customerName,
+                      phoneNumber: payload.customerPhone,
+                      ...addressComponents
+                  } : prev.shippingAddress
+              }));
+              // Refresh addresses in case logic depends on it
+              fetchUserAddresses();
+          } else {
+              message.error(response.data.message || 'Cập nhật thất bại');
+          }
+      } catch (error) {
+          console.error(error);
+          message.error('Lỗi cập nhật: ' + error.message);
+      } finally {
+          setUpdating(false);
+      }
+  };
+
+  const handleAddNewAddress = async (values) => {
+      try {
+          const res = await addressAPI.create(values);
+          if (res.success || res.status === 201) {
+              message.success('Thêm địa chỉ thành công');
+              setIsAddAddressOpen(false);
+              addressForm.resetFields();
+              fetchUserAddresses();
+          }
+      } catch (error) {
+          message.error('Thêm địa chỉ thất bại');
+      }
   };
 
   const getStatusColor = (status) => {
@@ -151,10 +293,9 @@ const OrderDetail = () => {
       <div className="order-detail-container">
         {/* Header Actions */}
         <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
-            Quay lại
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/profile')}>
+            Quay lại danh sách
           </Button>
-          {/* <Button icon={<PrinterOutlined />}>In hóa đơn</Button> */}
         </div>
 
         {/* Title & Status */}
@@ -173,7 +314,7 @@ const OrderDetail = () => {
             </Col>
           </Row>
           
-           {/* Timeline đơn giản (Optional) */}
+           {/* Timeline đơn giản */}
            <div style={{ marginTop: 30 }}>
               <Steps 
                 current={getStepCurrent(order.orderStatus)}
@@ -195,16 +336,11 @@ const OrderDetail = () => {
                   dataSource={order.items || []} 
                   columns={columns} 
                   pagination={false} 
-                  rowKey={(record) => record._id || record.productId._id} // Fallback key
+                  rowKey={(record) => record._id || record.productId._id} 
                 />
                 
                 <div className="order-summary">
                   <div className="summary-content">
-                     {/* Nếu có phí ship, thêm dòng ở đây */}
-                     {/* <div className="summary-row">
-                        <span>Phí vận chuyển:</span>
-                        <span className="value">30.000đ</span>
-                     </div> */}
                      <div className="summary-row total">
                         <span>Tổng tiền:</span>
                         <span className="value">{order.total?.toLocaleString('vi-VN')}đ</span>
@@ -229,34 +365,88 @@ const OrderDetail = () => {
                </Descriptions>
             </Card>
 
-            <Card className="section-card" title="Địa chỉ nhận hàng">
-               <Descriptions column={1}>
-                  <Descriptions.Item label="Họ tên">
-                     {order.shippingAddress?.fullName || order.customerName || '---'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Số điện thoại">
-                     {order.shippingAddress?.phone || order.shippingAddress?.phoneNumber || order.customerPhone || '---'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Địa chỉ">
-                     {(() => {
-                        const addr = order.shippingAddress;
-                        // Case 1: shippingAddress is an object (populated or structured)
-                        if (typeof addr === 'object' && addr !== null) {
-                            return `${addr.address || ''}, ${addr.ward || ''}, ${addr.district || ''}, ${addr.city || ''}`;
-                        }
-                        // Case 2: Flat fields from order root (if backend stores them flat)
-                        if (order.shippingWard || order.shippingCity) {
-                             return `${order.shippingAddress || order.address || ''}, ${order.shippingWard || ''}, ${order.shippingDistrict || ''}, ${order.shippingCity || ''}`;
-                        }
-                        // Case 3: Simple string or fallback
-                        return addr || order.address || '---';
-                     })()}
-                  </Descriptions.Item>
-               </Descriptions>
+            <Card 
+                className="section-card" 
+                title={<span><EnvironmentOutlined /> Địa chỉ nhận hàng</span>}
+                extra={order.orderStatus === 'pending' && <Button type="link" onClick={() => setIsAddressListOpen(true)}>THAY ĐỔI</Button>}
+            >
+               {/* Checkout-style Address Display */}
+               <div className="shipping-info-display">
+                    <div style={{ marginBottom: 8 }}>
+                        <strong style={{ fontSize: 16, marginRight: 8 }}>
+                            {order.shippingAddress?.fullName || order.customerName || '---'}
+                        </strong>
+                        <span style={{ color: '#666' }}>
+                             | {order.shippingAddress?.phone || order.shippingAddress?.phoneNumber || order.customerPhone || '---'}
+                        </span>
+                    </div>
+                    <div style={{ color: '#555', marginBottom: 16 }}>
+                         {(() => {
+                            const addr = order.shippingAddress;
+                            if (typeof addr === 'object' && addr !== null) {
+                                return `${addr.address || ''}, ${addr.ward || ''}, ${addr.district || ''}, ${addr.city || ''}`;
+                            }
+                            return addr || order.address || '---';
+                         })()}
+                    </div>
+                    
+                    <Divider dashed style={{ margin: '12px 0' }} />
+                    
+                    {/* Note Section */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                        <div style={{ flex: 1 }}>
+                            <span style={{ color: '#888', fontSize: 13 }}>Ghi chú:</span>
+                            {isEditingNote ? (
+                                <div style={{ marginTop: 4 }}>
+                                    <TextArea 
+                                        rows={2} 
+                                        value={tempNote} 
+                                        onChange={(e) => setTempNote(e.target.value)} 
+                                        style={{ marginBottom: 8 }}
+                                    />
+                                    <div style={{ textAlign: 'right' }}>
+                                        <Button size="small" style={{ marginRight: 8 }} onClick={() => setIsEditingNote(false)}>Hủy</Button>
+                                        <Button type="primary" size="small" onClick={handleUpdateNote} loading={updating}>Lưu</Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p style={{ margin: 0 }}>{order.shippingNote || 'Không có ghi chú'}</p>
+                            )}
+                        </div>
+                        {!isEditingNote && order.orderStatus === 'pending' && (
+                            <Button type="text" icon={<EditOutlined />} onClick={() => setIsEditingNote(true)} />
+                        )}
+                    </div>
+               </div>
             </Card>
           </Col>
         </Row>
       </div>
+      
+      {/* Address Selection Modal */}
+      <AddressSelectionModal 
+          visible={isAddressListOpen}
+          onCancel={() => setIsAddressListOpen(false)}
+          onOk={handleAddressSelect}
+          addresses={userAddresses}
+          selectedId={tempSelectedAddressId}
+          onChange={setTempSelectedAddressId}
+          onAddNew={() => setIsAddAddressOpen(true)}
+          // Disable delete in this context if desired, or handle it
+          onDelete={async (id) => {
+              await addressAPI.delete(id);
+              fetchUserAddresses();
+              message.success('Đã xóa địa chỉ');
+          }}
+      />
+
+      {/* Add New Address Modal */}
+      <AddressFormModal 
+          visible={isAddAddressOpen}
+          onCancel={() => setIsAddAddressOpen(false)}
+          onSuccess={handleAddNewAddress}
+          form={addressForm}
+      />
     </div>
   );
 };
