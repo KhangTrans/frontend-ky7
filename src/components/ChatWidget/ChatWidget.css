@@ -7,6 +7,11 @@
   flex-direction: column;
   align-items: flex-end;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  pointer-events: none; /* Prevent container from blocking clicks */
+}
+
+.chat-widget-container > * {
+  pointer-events: auto; /* Re-enable clicks for children (button, window) */
 }
 
 .chat-toggle-btn {

@@ -62,6 +62,7 @@ function Cart() {
   };
 
   const handleCheckout = () => {
+    console.log('Checkout Clicked');
     if (items.length === 0) {
       message.warning('Giỏ hàng trống!');
       return;

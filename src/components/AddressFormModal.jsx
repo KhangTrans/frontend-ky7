@@ -1,31 +1,83 @@
-import React from 'react';
-import { Modal, Form, Input, Row, Col } from 'antd';
-
+import React, { useState, useEffect } from 'react';
+import { Modal, Form, Input, Row, Col, Select } from 'antd';
+import axios from 'axios';
 
 const { TextArea } = Input;
+const { Option } = Select;
 
 const AddressFormModal = ({ visible, onCancel, onSuccess, form }) => {
-  const handleAddNewAddress = async (values) => {
-    try {
-      const newAddrData = {
-        ...values,
-        // Assuming default handling is done by parent or API, usually first one is default if list empty.
-        // Or we can let backend handle it. Here we just pass data.
-      };
-      // We can call API here, but parent might want control.
-      // Instructions say "tách modal thêm địa chỉ ra file riêng".
-      // Previous logic was in Checkout.jsx: handleAddNewAddress.
-      // It checked userAddresses.length to set isDefault.
-      // We should probably pass that logic or `isFirstAddress` prop if needed.
-      // But typically, simply passing `onFinish` prop to handle submission in parent is cleaner for state management.
-      // However, to make it self-contained if requested, we can do API call here if we knew context.
-      // Let's stick to UI component first, or a smart component that calls onSuccess.
-      
-      // Let's pass the responsibility to parent via onSuccess (which will be `handleAddNewAddress` in parent).
-      onSuccess(values); // This will call parent's handler
-    } catch (error) {
-       // Error handled in parent
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+
+  // State lưu ID để gọi API cấp con
+  const [provinceId, setProvinceId] = useState(null);
+  const [districtId, setDistrictId] = useState(null);
+
+  // Fetch Provinces on mount
+  useEffect(() => {
+    if (visible) {
+      fetchProvinces();
     }
+  }, [visible]);
+
+  const fetchProvinces = async () => {
+    try {
+      const response = await axios.get('https://esgoo.net/api-tinhthanh/1/0.htm');
+      if (response.data.error === 0) {
+        setProvinces(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching provinces:', error);
+    }
+  };
+
+  const fetchDistricts = async (provId) => {
+    try {
+      const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${provId}.htm`);
+      if (response.data.error === 0) {
+        setDistricts(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching districts:', error);
+    }
+  };
+
+  const fetchWards = async (distId) => {
+    try {
+      const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${distId}.htm`);
+      if (response.data.error === 0) {
+        setWards(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching wards:', error);
+    }
+  };
+
+  const handleProvinceChange = (value, option) => {
+    // value là tên (do ta gán value={item.full_name} bên dưới) hoặc id tùy cách impl
+    // Để tiện lưu vào DB string, ta để value là Tên.
+    // Lấy ID từ option key hoặc data attribute
+    
+    // Reset fields
+    form.setFieldsValue({ district: undefined, ward: undefined });
+    setDistricts([]);
+    setWards([]);
+    setDistrictId(null);
+
+    // Call API next level
+    const selectedId = option.key; 
+    setProvinceId(selectedId);
+    fetchDistricts(selectedId);
+  };
+
+  const handleDistrictChange = (value, option) => {
+    form.setFieldsValue({ ward: undefined });
+    setWards([]);
+    
+    const selectedId = option.key;
+    setDistrictId(selectedId);
+    fetchWards(selectedId);
   };
 
   return (
@@ -36,6 +88,7 @@ const AddressFormModal = ({ visible, onCancel, onSuccess, form }) => {
         onCancel={onCancel}
         okText="Hoàn thành"
         cancelText="Trở lại"
+        destroyOnClose
     >
         <Form form={form} layout="vertical" onFinish={onSuccess}>
             <Row gutter={16}>
@@ -52,18 +105,52 @@ const AddressFormModal = ({ visible, onCancel, onSuccess, form }) => {
             </Row>
             <Row gutter={16}>
                 <Col span={8}>
-                     <Form.Item name="city" label="Tỉnh/Thành" rules={[{ required: true }]}>
-                        <Input placeholder="TP.HCM" />
+                     <Form.Item name="city" label="Tỉnh/Thành" rules={[{ required: true, message: 'Chọn Tỉnh/Thành' }]}>
+                        <Select 
+                            placeholder="Chọn Tỉnh" 
+                            onChange={handleProvinceChange}
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                        >
+                            {provinces.map(prov => (
+                                <Option key={prov.id} value={prov.full_name}>{prov.full_name}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 </Col>
                 <Col span={8}>
-                    <Form.Item name="district" label="Quận/Huyện" rules={[{ required: true }]}>
-                        <Input placeholder="Quận 1" />
+                    <Form.Item name="district" label="Quận/Huyện" rules={[{ required: true, message: 'Chọn Quận/Huyện' }]}>
+                        <Select 
+                            placeholder="Chọn Quận" 
+                            onChange={handleDistrictChange}
+                            disabled={!provinceId}
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                        >
+                            {districts.map(dist => (
+                                <Option key={dist.id} value={dist.full_name}>{dist.full_name}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 </Col>
                 <Col span={8}>
-                    <Form.Item name="ward" label="Phường/Xã" rules={[{ required: true }]}>
-                        <Input placeholder="Bến Nghé" />
+                    <Form.Item name="ward" label="Phường/Xã" rules={[{ required: true, message: 'Chọn Phường/Xã' }]}>
+                         <Select 
+                            placeholder="Chọn Phường" 
+                            disabled={!districtId}
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                        >
+                            {wards.map(ward => (
+                                <Option key={ward.id} value={ward.full_name}>{ward.full_name}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 </Col>
             </Row>

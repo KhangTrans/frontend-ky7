@@ -71,9 +71,14 @@ function ProductDetail() {
   };
 
   const handleBuyNow = () => {
+    console.log('Buy Now Clicked');
     const token = localStorage.getItem('token');
+    console.log('Current Token:', token);
+    
     if (!token) {
       messageApi.warning('Vui lòng đăng nhập để mua hàng!');
+      // Backup redirect to login if needed
+      setTimeout(() => navigate('/login'), 1000);
       return;
     }
 
