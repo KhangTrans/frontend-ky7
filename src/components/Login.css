@@ -79,67 +79,64 @@
   text-decoration: underline;
 }
 
+/* Social Login */
 .social-login {
   display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
 .social-button {
-  flex: 1;
-  height: 45px;
+  height: 48px;
   font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
 }
 
 .social-button.google {
-  border: 2px solid #e0e0e0;
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  color: #3c4043;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
 }
 
 .social-button.google:hover {
-  border-color: #4285f4;
-  color: #4285f4;
+  background-color: #f8fcfd;
+  color: #202124;
+  border-color: #d2e3fc;
+  box-shadow: 0 4px 8px 0 rgba(66, 133, 244, 0.2);
+  transform: translateY(-1px);
+}
+
+.social-button.google .anticon {
+  font-size: 20px;
+  color: #DB4437; /* Google Red */
+  margin-right: 8px;
 }
 
 .social-button.facebook {
   background: #1877f2;
-  border-color: #1877f2;
+  border: none;
   color: white;
+  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
 }
 
 .social-button.facebook:hover {
   background: #166fe5 !important;
-  border-color: #166fe5 !important;
   color: white !important;
-}
-
-.ant-form-item-label > label {
-  font-weight: 600;
-  color: #333;
-}
-
-.ant-input-affix-wrapper,
-.ant-input-password {
-  border-radius: 10px;
-  border: 2px solid #e0e0e0;
-}
-
-.ant-input-affix-wrapper:focus,
-.ant-input-affix-wrapper-focused,
-.ant-input-password:focus,
-.ant-input-password-focused {
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(24, 119, 242, 0.4);
 }
 
 @media (max-width: 480px) {
   .login-box {
     padding: 30px 20px;
   }
-
   .login-title {
     font-size: 28px;
-  }
-
-  .social-login {
-    flex-direction: column;
   }
 }

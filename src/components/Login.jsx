@@ -208,7 +208,6 @@ function Login() {
             onClick={() => {
                  window.location.href = `${API_BASE_URL}/auth/google`;
             }}
-            style={{ width: '100%', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             Đăng nhập bằng Google
           </Button>
