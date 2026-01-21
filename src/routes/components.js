@@ -12,6 +12,7 @@ export const PaymentCallback = lazy(() => import('../pages/PaymentCallback'));
 export const OrderSuccess = lazy(() => import('../pages/OrderSuccess'));
 export const OrderDetail = lazy(() => import('../pages/OrderDetail')); // Thêm mới
 export const MockPayment = lazy(() => import('../pages/MockPayment'));
+export const GoogleCallback = lazy(() => import('../components/GoogleCallback'));
 export const DashboardContent = lazy(() => import('../pages/Dashboard/DashboardContent'));
 export const ProductManagement = lazy(() => import('../pages/ProductManagement'));
 export const CategoryManagement = lazy(() => import('../pages/CategoryManagement'));
@@ -36,6 +37,7 @@ const componentsMap = {
   OrderHistory,
   AddressBook,
   MockPayment,
+  GoogleCallback,
   DashboardLayout, // Layout không lazy load
   DashboardContent,
   ProductManagement,

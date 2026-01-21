@@ -1,5 +1,6 @@
 import { Form, Input, Button, Checkbox, Divider, notification } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined, FacebookOutlined, CheckCircleOutlined, CloseCircleOutlined, WarningOutlined } from '@ant-design/icons';
+import { API_BASE_URL } from '../utils/constants';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useRef } from 'react';
@@ -197,24 +198,28 @@ function Login() {
           <p>Chưa có tài khoản? <a href="#" onClick={(e) => { e.preventDefault(); navigate('/register'); }}>Đăng ký ngay</a></p>
         </div>
 
-        {/* <Divider plain>Hoặc đăng nhập với</Divider>
+        <Divider plain>Hoặc đăng nhập với</Divider>
 
         <div className="social-login">
           <Button 
             icon={<GoogleOutlined />}
             size="large"
             className="social-button google"
+            onClick={() => {
+                 window.location.href = `${API_BASE_URL}/auth/google`;
+            }}
+            style={{ width: '100%', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            Google
+            Đăng nhập bằng Google
           </Button>
-          <Button 
+          {/* <Button 
             icon={<FacebookOutlined />}
             size="large"
             className="social-button facebook"
           >
             Facebook
-          </Button>
-        </div> */}
+          </Button> */}
+        </div>
       </div>
     </div>
     </>

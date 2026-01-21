@@ -11,6 +11,16 @@ const routesData = [
     },
   },
   {
+    path: '/auth/google/success',
+    name: 'GoogleCallback',
+    component: 'GoogleCallback',
+    meta: {
+      title: 'Đăng nhập Google',
+      requiresAuth: false,
+      public: true,
+    },
+  },
+  {
     path: '/register',
     name: 'Register',
     component: 'Register',
