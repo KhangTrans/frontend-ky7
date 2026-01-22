@@ -16,6 +16,7 @@ export const GoogleCallback = lazy(() => import('../components/GoogleCallback'))
 export const DashboardContent = lazy(() => import('../pages/Dashboard/DashboardContent'));
 export const ProductManagement = lazy(() => import('../pages/ProductManagement'));
 export const CategoryManagement = lazy(() => import('../pages/CategoryManagement'));
+export const UserManagement = lazy(() => import('../pages/UserManagement'));
 export const NotFound = lazy(() => import('../pages/NotFound'));
 export const Profile = lazy(() => import('../pages/Profile'));
 export const OrderHistory = lazy(() => import('../pages/OrderHistory'));
@@ -42,6 +43,7 @@ const componentsMap = {
   DashboardContent,
   ProductManagement,
   CategoryManagement,
+  UserManagement,
   VoucherManagement,
   NotFound,
   Profile,

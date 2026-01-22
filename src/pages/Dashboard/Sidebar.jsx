@@ -28,6 +28,11 @@ function Sidebar({ collapsed, user }) {
       label: 'Tổng quan',
     },
     {
+      key: '/dashboard/orders',
+      icon: <ShoppingCartOutlined />,
+      label: 'Đơn hàng',
+    },
+    {
       key: '/dashboard/products',
       icon: <ShoppingOutlined />,
       label: 'Sản phẩm',
@@ -38,21 +43,16 @@ function Sidebar({ collapsed, user }) {
       label: 'Thể loại',
     },
     {
-        key: '/dashboard/vouchers',
-        icon: <GiftOutlined />,
-        label: 'Vouchers',
+      key: '/dashboard/vouchers',
+      icon: <GiftOutlined />,
+      label: 'Vouchers',
+    },
+    {
+      key: '/dashboard/users',
+      icon: <TeamOutlined />,
+      label: 'Người dùng',
     },
     ...(user?.role === 'admin' ? [
-      {
-        key: '/dashboard/users',
-        icon: <TeamOutlined />,
-        label: 'Người dùng',
-      },
-      {
-        key: '/dashboard/orders',
-        icon: <ShoppingCartOutlined />,
-        label: 'Đơn hàng',
-      },
       {
         key: '/dashboard/reports',
         icon: <BarChartOutlined />,

@@ -202,6 +202,16 @@ const routesData = [
         },
       },
       {
+        path: 'dashboard/users',
+        name: 'UserManagement',
+        component: 'UserManagement',
+        meta: {
+          title: 'Quản lý người dùng',
+          requiresAuth: true,
+          roles: ['admin'],
+        },
+      },
+      {
         path: 'settings',
         name: 'Settings',
         component: 'Settings',
