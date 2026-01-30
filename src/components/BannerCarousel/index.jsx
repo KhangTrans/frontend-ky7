@@ -1,6 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { Carousel } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../../hooks/useSettings';
 import './BannerCarousel.css';
 
@@ -19,6 +20,7 @@ const NextArrow = ({ onClick }) => (
 
 const BannerCarousel = ({ onBannerChange }) => {
   const { settings, loading } = useSettings();
+  const navigate = useNavigate();
 
   // Sử dụng useMemo thay vì useState + useEffect
   const banners = useMemo(() => {
@@ -45,7 +47,13 @@ const BannerCarousel = ({ onBannerChange }) => {
 
   const handleBannerClick = (banner) => {
     if (banner.link) {
-      window.open(banner.link, '_blank', 'noopener,noreferrer');
+      // Kiểm tra nếu là link nội bộ (bắt đầu bằng /) thì navigate, ngược lại redirect
+      if (banner.link.startsWith('/')) {
+        navigate(banner.link);
+      } else {
+        // Nếu là link ngoài (http/https), redirect trong cùng tab
+        window.location.href = banner.link;
+      }
     }
   };
 
