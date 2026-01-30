@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Input, Spin, Empty, message, Modal } from 'antd';
@@ -8,6 +8,7 @@ import { addToCart, fetchCart } from '../../redux/slices/cartSlice';
 import HomeNavbar from '../../components/HomeNavbar';
 import Footer from '../../components/Footer';
 import VoucherList from '../../components/VoucherList';
+import BannerCarousel, { useBanners } from '../../components/BannerCarousel';
 import './Home.css';
 
 const { Search } = Input;
@@ -22,9 +23,25 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchText, setSearchText] = useState('');
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [currentBanner, setCurrentBanner] = useState(null);
+  
+  // Get banner info
+  const { banners, hasBanners } = useBanners();
 
   // Check if user is logged in
   const isLoggedIn = !!localStorage.getItem('token');
+  
+  // Set initial banner
+  useEffect(() => {
+    if (banners.length > 0 && !currentBanner) {
+      setCurrentBanner(banners[0]);
+    }
+  }, [banners, currentBanner]);
+  
+  // Handle banner change callback
+  const handleBannerChange = useCallback((banner) => {
+    setCurrentBanner(banner);
+  }, []);
 
   // Load categories và products khi component mount
   // Load categories và products khi component mount (Chạy 1 lần)
@@ -127,17 +144,35 @@ const Home = () => {
       {/* Navigation Bar */}
       <HomeNavbar />
       
-      {/* Hero Section */}
+      {/* Hero Section with Banner */}
       <section className="hero-section">
-        <div className="hero-overlay"></div>
-        <div className="hero-content">
-          <h1 className="hero-title">
-            Khám Phá Bộ Sưu Tập
-            <span className="hero-gradient"> Đặc Biệt</span>
-          </h1>
-          <p className="hero-subtitle">
-            Những sản phẩm chất lượng cao với giá tốt nhất
-          </p>
+        {/* Banner as Background */}
+        <BannerCarousel onBannerChange={handleBannerChange} />
+        
+        {/* Overlay Content */}
+        <div className="hero-overlay-content">
+          {hasBanners && currentBanner?.title ? (
+            // Hiển thị title từ banner
+            <>
+              <h1 className="hero-title banner-dynamic-title">
+                {currentBanner.title}
+              </h1>
+              {currentBanner.subtitle && (
+                <p className="hero-subtitle">{currentBanner.subtitle}</p>
+              )}
+            </>
+          ) : (
+            // Hiển thị text mặc định khi không có banner
+            <>
+              <h1 className="hero-title">
+                Khám Phá Bộ Sưu Tập
+                <span className="hero-gradient"> Đặc Biệt</span>
+              </h1>
+              <p className="hero-subtitle">
+                Những sản phẩm chất lượng cao với giá tốt nhất
+              </p>
+            </>
+          )}
           
           <div className="hero-search">
             <Search
@@ -155,11 +190,6 @@ const Home = () => {
               className="hero-search-input"
             />
           </div>
-        </div>
-        <div className="hero-shapes">
-          <div className="shape shape-1"></div>
-          <div className="shape shape-2"></div>
-          <div className="shape shape-3"></div>
         </div>
       </section>
 

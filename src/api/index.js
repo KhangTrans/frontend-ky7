@@ -219,4 +219,43 @@ export const chatbotAPI = {
   }
 };
 
+// Settings API
+export const settingsAPI = {
+  // Lấy toàn bộ thông tin settings
+  getAll: async () => {
+    const response = await axiosInstance.get('/settings');
+    return response.data;
+  },
+  
+  // Cập nhật thông tin cửa hàng
+  updateStore: async (storeData) => {
+    const response = await axiosInstance.put('/settings/store', storeData);
+    return response.data;
+  },
+  
+  // Cập nhật cấu hình giao diện
+  updateAppearance: async (appearanceData) => {
+    const response = await axiosInstance.put('/settings/appearance', appearanceData);
+    return response.data;
+  },
+  
+  // Thêm banner mới
+  createBanner: async (bannerData) => {
+    const response = await axiosInstance.post('/settings/banners', bannerData);
+    return response.data;
+  },
+  
+  // Cập nhật banner
+  updateBanner: async (bannerId, bannerData) => {
+    const response = await axiosInstance.put(`/settings/banners/${bannerId}`, bannerData);
+    return response.data;
+  },
+  
+  // Xóa banner
+  deleteBanner: async (bannerId) => {
+    const response = await axiosInstance.delete(`/settings/banners/${bannerId}`);
+    return response.data;
+  },
+};
+
 export default axiosInstance;

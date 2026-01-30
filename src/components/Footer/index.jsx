@@ -9,9 +9,23 @@ import {
   MailOutlined,
   SendOutlined
 } from '@ant-design/icons';
+import { useSettings } from '../../contexts/SettingsContext';
 import './Footer.css';
 
 const Footer = () => {
+  const { settings } = useSettings();
+  const store = settings?.store || {};
+  const appearance = settings?.appearance || {};
+  
+  const storeName = store.name || 'KY-7 Shop';
+  const storeLogo = store.logo;
+  const storeEmail = store.email || 'support@ky7shop.com';
+  const storePhone = store.phone || '1900 1234 567';
+  const storeAddress = store.address || '123 Đường ABC, Quận XYZ, TP.HCM';
+  const storeDescription = store.description || 'Điểm đến tin cậy cho các tín đồ công nghệ. Chúng tôi cam kết mang đến những sản phẩm chất lượng nhất với dịch vụ khách hàng tận tâm.';
+  const socialLinks = store.socialLinks || {};
+  const footerText = appearance.footerText || `© 2026 ${storeName}. All rights reserved.`;
+  
   return (
     <footer className="footer-container">
       {/* Newsletter Section */}
@@ -39,26 +53,28 @@ const Footer = () => {
         {/* Company Info */}
         <div className="footer-col">
           <Link to="/" className="footer-logo">
-            <span className="logo-icon">🛍️</span>
-            <span className="logo-text">KY-7 Shop</span>
+            {storeLogo ? (
+              <img src={storeLogo} alt={storeName} className="footer-logo-image" />
+            ) : (
+              <span className="logo-icon">🛍️</span>
+            )}
+            <span className="logo-text">{storeName}</span>
           </Link>
           <p className="footer-desc">
-            Điểm đến tin cậy cho các tín đồ công nghệ. 
-            Chúng tôi cam kết mang đến những sản phẩm chất lượng nhất 
-            với dịch vụ khách hàng tận tâm.
+            {storeDescription}
           </p>
           <ul className="contact-info" style={{ listStyle: 'none', padding: 0 }}>
             <li>
               <EnvironmentOutlined className="contact-icon" />
-              <span>123 Đường ABC, Quận XYZ, TP.HCM</span>
+              <span>{storeAddress}</span>
             </li>
             <li>
               <PhoneOutlined className="contact-icon" />
-              <span>1900 1234 567 (8:00 - 21:00)</span>
+              <span>{storePhone} (8:00 - 21:00)</span>
             </li>
             <li>
               <MailOutlined className="contact-icon" />
-              <span>support@ky7shop.com</span>
+              <span>{storeEmail}</span>
             </li>
           </ul>
         </div>
@@ -91,10 +107,29 @@ const Footer = () => {
         <div className="footer-col">
           <h4>Kết nối với chúng tôi</h4>
           <div className="social-links">
-            <a href="#" className="social-btn"><FacebookFilled /></a>
-            <a href="#" className="social-btn"><InstagramFilled /></a>
-            <a href="#" className="social-btn"><YoutubeFilled /></a>
-            <a href="#" className="social-btn"><TwitterCircleFilled /></a>
+            {socialLinks.facebook && (
+              <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="social-btn">
+                <FacebookFilled />
+              </a>
+            )}
+            {socialLinks.instagram && (
+              <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="social-btn">
+                <InstagramFilled />
+              </a>
+            )}
+            {socialLinks.zalo && (
+              <a href={socialLinks.zalo} target="_blank" rel="noopener noreferrer" className="social-btn zalo-btn">
+                Z
+              </a>
+            )}
+            {!socialLinks.facebook && !socialLinks.instagram && !socialLinks.zalo && (
+              <>
+                <a href="#" className="social-btn"><FacebookFilled /></a>
+                <a href="#" className="social-btn"><InstagramFilled /></a>
+                <a href="#" className="social-btn"><YoutubeFilled /></a>
+                <a href="#" className="social-btn"><TwitterCircleFilled /></a>
+              </>
+            )}
           </div>
           
           <h4 style={{ marginTop: '30px' }}>Thanh toán</h4>
@@ -112,7 +147,7 @@ const Footer = () => {
       <div className="footer-bottom">
         <div className="bottom-content">
           <div className="copyright">
-            © 2026 KY-7 Shop. All rights reserved.
+            {footerText}
           </div>
           <div className="bottom-links">
             <Link to="/privacy">Privacy Policy</Link>

@@ -1,0 +1,162 @@
+/* Banner Carousel Styles - Hero Background */
+.banner-carousel-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.banner-carousel {
+  height: 100%;
+}
+
+.banner-carousel .slick-slider,
+.banner-carousel .slick-list,
+.banner-carousel .slick-track,
+.banner-carousel .slick-slide,
+.banner-carousel .slick-slide > div {
+  height: 100%;
+}
+
+.banner-slide {
+  height: 100%;
+}
+
+.banner-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.banner-content.clickable {
+  cursor: pointer;
+}
+
+.banner-content.clickable:hover .banner-image {
+  transform: scale(1.02);
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 8s ease;
+}
+
+/* Default background when no banners */
+.banner-default {
+  background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-color-dark, #764ba2) 50%, #f64f59 100%);
+}
+
+.banner-default-bg {
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  position: relative;
+}
+
+.banner-default-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+  animation: shimmer 15s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Arrows */
+.banner-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.banner-carousel-container:hover .banner-arrow {
+  opacity: 1;
+}
+
+.banner-arrow:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.banner-arrow-prev {
+  left: 20px;
+}
+
+.banner-arrow-next {
+  right: 20px;
+}
+
+/* Dots */
+.banner-carousel .slick-dots {
+  bottom: 30px;
+  z-index: 10;
+}
+
+.banner-carousel .slick-dots li {
+  margin: 0 4px;
+}
+
+.banner-carousel .slick-dots li button {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.banner-carousel .slick-dots li button::before {
+  display: none;
+}
+
+.banner-carousel .slick-dots li.slick-active button {
+  width: 30px;
+  border-radius: 5px;
+  background: #fff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .banner-arrow {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+  
+  .banner-arrow-prev {
+    left: 10px;
+  }
+  
+  .banner-arrow-next {
+    right: 10px;
+  }
+  
+  .banner-carousel .slick-dots {
+    bottom: 20px;
+  }
+}

@@ -1,3 +1,21 @@
+:root {
+  /* Primary color - sẽ được cập nhật động từ Settings */
+  --primary-color: #1890ff;
+  --primary-color-light: #40a9ff;
+  --primary-color-dark: #096dd9;
+  
+  /* Secondary colors */
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --error-color: #ff4d4f;
+  
+  /* Neutral colors */
+  --text-color: #333;
+  --text-secondary: #666;
+  --border-color: #d9d9d9;
+  --background-color: #f5f5f5;
+}
+
 * {
   margin: 0;
   padding: 0;

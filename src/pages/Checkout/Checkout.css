@@ -22,8 +22,8 @@
 }
 
 .back-link:hover {
-  border-color: #667eea !important;
-  color: #667eea !important;
+  border-color: var(--primary-color, #667eea) !important;
+  color: var(--primary-color, #667eea) !important;
 }
 
 .checkout-title {
@@ -81,7 +81,7 @@
 }
 
 .change-address-btn {
-  color: #667eea !important;
+  color: var(--primary-color, #667eea) !important;
   font-weight: 600 !important;
   padding: 0 !important;
 }
@@ -173,12 +173,12 @@
 }
 
 .payment-radio:hover {
-  border-color: #667eea;
+  border-color: var(--primary-color, #667eea);
   background-color: #f9faff;
 }
 
 .payment-radio.ant-radio-wrapper-checked {
-  border-color: #667eea;
+  border-color: var(--primary-color, #667eea);
   background-color: #f0f5ff;
   border-width: 2px;
 }
@@ -267,7 +267,7 @@
   position: absolute;
   top: -8px;
   right: -8px;
-  background: #667eea;
+  background: var(--primary-color, #667eea);
   color: white;
   font-size: 12px;
   font-weight: 600;
@@ -328,7 +328,7 @@
 }
 
 .total-amount {
-  color: #667eea;
+  color: var(--primary-color, #667eea);
   font-size: 24px;
 }
 
@@ -338,9 +338,9 @@
   font-size: 16px !important;
   font-weight: 700 !important;
   border-radius: 8px !important;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-color-dark, #764ba2) 100%) !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+  box-shadow: 0 4px 15px rgba(var(--primary-color-rgb, 102, 126, 234), 0.4) !important;
   transition: all 0.3s ease !important;
 }
 

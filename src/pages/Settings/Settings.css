@@ -1,0 +1,214 @@
+/* Settings Page Styles */
+.settings-page {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: calc(100vh - 64px);
+}
+
+.settings-header {
+  margin-bottom: 24px;
+}
+
+.settings-header h2 {
+  margin: 0;
+  color: #1a1a1a;
+}
+
+.settings-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 200px);
+  background: #f5f5f5;
+}
+
+.settings-card {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.settings-tabs {
+  min-height: 500px;
+}
+
+.settings-tabs .ant-tabs-nav {
+  min-width: 200px;
+}
+
+.settings-tabs .ant-tabs-tab {
+  padding: 12px 24px !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+.settings-tabs .ant-tabs-tab-active {
+  background: #e6f7ff;
+}
+
+.settings-tabs .ant-tabs-content-holder {
+  padding-left: 24px;
+  border-left: 1px solid #f0f0f0;
+}
+
+/* Store Settings */
+.store-settings {
+  padding: 16px 0;
+}
+
+.settings-section-card {
+  border-radius: 8px;
+}
+
+.settings-section-card .ant-card-head {
+  background: #fafafa;
+  border-radius: 8px 8px 0 0;
+}
+
+.settings-section-card .ant-card-head-title {
+  font-weight: 600;
+}
+
+.logo-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px dashed #d9d9d9;
+}
+
+.store-logo-preview {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+}
+
+.form-actions {
+  margin-top: 24px;
+  margin-bottom: 0;
+}
+
+/* Appearance Settings */
+.appearance-settings {
+  padding: 16px 0;
+}
+
+.color-picker-container {
+  display: flex;
+  align-items: center;
+}
+
+.color-preview {
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+/* Banner Upload */
+.banner-upload-container {
+  width: 100%;
+}
+
+.banner-preview {
+  text-align: center;
+}
+
+.banner-preview .ant-image {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Banner Table */
+.settings-section-card .ant-table {
+  border-radius: 8px;
+}
+
+.settings-section-card .ant-table-thead > tr > th {
+  background: #fafafa;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 16px;
+  }
+  
+  .settings-tabs .ant-tabs-nav {
+    min-width: 150px;
+  }
+  
+  .settings-tabs .ant-tabs-content-holder {
+    padding-left: 16px;
+  }
+  
+  .color-picker-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .logo-upload-container {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .settings-tabs {
+    flex-direction: column !important;
+  }
+  
+  .settings-tabs .ant-tabs-nav {
+    min-width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .settings-tabs .ant-tabs-content-holder {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 16px;
+  }
+  
+  .settings-tabs .ant-tabs-tab {
+    padding: 8px 16px !important;
+  }
+}
+
+/* Transitions */
+.settings-section-card {
+  transition: box-shadow 0.3s ease;
+}
+
+.settings-section-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Color picker improvements */
+.ant-color-picker-trigger {
+  border-radius: 6px !important;
+}
+
+/* Upload button styling */
+.ant-upload-drag {
+  border-radius: 8px !important;
+}
+
+.ant-upload-drag:hover {
+  border-color: #1890ff !important;
+}
+
+/* Table improvements */
+.settings-section-card .ant-table-cell {
+  vertical-align: middle;
+}
+
+.settings-section-card .ant-table-cell .ant-image {
+  display: block;
+}
+
+/* Empty state */
+.ant-table-empty .ant-table-cell {
+  text-align: center;
+  padding: 40px !important;
+}

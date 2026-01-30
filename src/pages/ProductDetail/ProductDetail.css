@@ -29,7 +29,7 @@
 }
 
 .back-button:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-color-dark, #764ba2) 100%);
   color: white;
   border-color: transparent;
   transform: translateX(-5px);
@@ -134,8 +134,8 @@
 }
 
 .thumbnail.active {
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+  border-color: var(--primary-color, #667eea);
+  box-shadow: 0 4px 12px rgba(var(--primary-color-rgb, 102, 126, 234), 0.25);
   opacity: 1;
   transform: translateY(-2px);
 }
@@ -165,7 +165,7 @@
   color: #1a1a1a;
   line-height: 1.3;
   margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-color-dark, #764ba2) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -204,11 +204,11 @@
   font-size: 32px;
   font-weight: 700;
   /* Match Home Page Gradient */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-color-dark, #764ba2) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: #667eea; /* Fallback */
+  color: var(--primary-color, #667eea); /* Fallback */
 }
 
 .discount-badge {
@@ -299,9 +299,9 @@
   font-size: 16px !important;
   font-weight: 600 !important;
   border-radius: 12px !important;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-color-dark, #764ba2) 100%) !important;
   border: none !important;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4) !important;
+  box-shadow: 0 8px 24px rgba(var(--primary-color-rgb, 102, 126, 234), 0.4) !important;
   transition: all 0.3s ease !important;
 }
 
@@ -318,8 +318,8 @@
   font-weight: 600 !important;
   border-radius: 12px !important;
   background: white !important;
-  border: 2px solid #667eea !important;
-  color: #667eea !important;
+  border: 2px solid var(--primary-color, #667eea) !important;
+  color: var(--primary-color, #667eea) !important;
   transition: all 0.3s ease !important;
 }
 
@@ -435,7 +435,7 @@
 .related-products-section h2 {
   font-size: 28px;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-color-dark, #764ba2) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -506,7 +506,7 @@
     min-width: 0 !important; /* Reset min-width to allow sharing space */
     border-radius: 0 !important;
     height: 100% !important;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; /* Desktop Theme Gradient */
+    background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-color-dark, #764ba2) 100%) !important; /* Desktop Theme Gradient */
     color: white !important;
     font-size: 14px !important;
     display: flex;
@@ -528,7 +528,7 @@
     border-radius: 0 !important;
     height: 100% !important;
     background: white !important; /* Desktop Theme Secondary */
-    color: #667eea !important;
+    color: var(--primary-color, #667eea) !important;
     border: none !important;
     border-top: 1px solid #f0f0f0 !important;
     font-size: 15px !important;

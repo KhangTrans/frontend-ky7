@@ -9,6 +9,7 @@ import {
   MenuOutlined,
 } from '@ant-design/icons';
 import { fetchCart } from '../../redux/slices/cartSlice';
+import { useSettings } from '../../contexts/SettingsContext';
 import NotificationBell from '../NotificationBell';
 import './HomeNavbar.css';
 
@@ -16,6 +17,11 @@ const HomeNavbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Get settings from context
+  const { settings } = useSettings();
+  const storeName = settings?.store?.name || 'KY-7 Shop';
+  const storeLogo = settings?.store?.logo;
   
   // Get cart state from Redux
   // Get cart state from Redux
@@ -73,8 +79,12 @@ const HomeNavbar = () => {
         <div className="navbar-content">
           {/* Logo */}
           <Link to="/" className="navbar-logo">
-            <span className="logo-icon">🛍️</span>
-            <span className="logo-text">KY-7 Shop</span>
+            {storeLogo ? (
+              <img src={storeLogo} alt={storeName} className="logo-image" />
+            ) : (
+              <span className="logo-icon">🛍️</span>
+            )}
+            <span className="logo-text">{storeName}</span>
           </Link>
 
           {/* Desktop Navigation */}

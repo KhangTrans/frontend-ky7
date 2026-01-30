@@ -107,7 +107,7 @@ function Sidebar({ collapsed, user }) {
             <Avatar
               size="large"
               icon={<UserOutlined />}
-              style={{ backgroundColor: '#667eea' }}
+              style={{ backgroundColor: 'var(--primary-color, #667eea)' }}
             />
             <div>
               <Text strong style={{ color: '#fff', display: 'block', fontSize: 16 }}>
@@ -119,7 +119,7 @@ function Sidebar({ collapsed, user }) {
             </div>
           </Space>
         ) : (
-          <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#667eea' }} />
+          <Avatar icon={<UserOutlined />} style={{ backgroundColor: 'var(--primary-color, #667eea)' }} />
         )}
       </div>
 
