@@ -183,10 +183,19 @@ const BannerFormModal = ({
           name="link"
           label="Liên kết (URL)"
           rules={[
-            { type: 'url', message: 'URL không hợp lệ!' }
+            { 
+              validator: (_, value) => {
+                if (!value) return Promise.resolve();
+                // Chấp nhận path nội bộ (/product/...) hoặc URL đầy đủ
+                if (value.startsWith('/') || value.startsWith('http://') || value.startsWith('https://')) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error('Vui lòng nhập path (vd: /product/abc) hoặc URL đầy đủ!'));
+              }
+            }
           ]}
         >
-          <Input placeholder="https://example.com/product/..." />
+          <Input placeholder="/product/abc123 hoặc https://..." />
         </Form.Item>
 
         <Row gutter={16}>
