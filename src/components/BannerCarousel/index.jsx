@@ -47,12 +47,12 @@ const BannerCarousel = ({ onBannerChange }) => {
 
   const handleBannerClick = (banner) => {
     if (banner.link) {
-      // Kiểm tra nếu là link nội bộ (bắt đầu bằng /) thì navigate, ngược lại redirect
-      if (banner.link.startsWith('/')) {
-        navigate(banner.link);
-      } else {
-        // Nếu là link ngoài (http/https), redirect trong cùng tab
+      // Kiểm tra nếu là link ngoài (http/https) thì mở trong cùng tab
+      if (banner.link.startsWith('http://') || banner.link.startsWith('https://')) {
         window.location.href = banner.link;
+      } else {
+        // Link nội bộ - sử dụng React Router navigate (không reload trang)
+        navigate(banner.link);
       }
     }
   };
