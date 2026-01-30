@@ -17,6 +17,7 @@ import { chatbotAPI } from '../../api';
 import './ChatWidget.css';
 
 const SESSION_KEY = 'chatbot_session_v1';
+const MESSAGES_KEY = 'chatbot_messages_v1';
 
 const generateUUID = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -25,7 +26,7 @@ const generateUUID = () => {
     });
 };
 
-// Parser to extract Order Info from text
+// ... (keep parseOrderData and OrderInfoCard as is) ...
 const parseOrderData = (text) => {
     if (!text || typeof text !== 'string') return null;
     
@@ -140,7 +141,7 @@ const ChatWidget = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Initialize Session
+  // Initialize Session & Load History
   useEffect(() => {
      let storedSession = localStorage.getItem(SESSION_KEY);
      if (!storedSession) {
@@ -148,15 +149,31 @@ const ChatWidget = () => {
          localStorage.setItem(SESSION_KEY, storedSession);
      }
      setSessionId(storedSession);
+
+     // Load messages from local storage
+     const storedMessages = localStorage.getItem(MESSAGES_KEY);
+     if (storedMessages) {
+         try {
+             setMessages(JSON.parse(storedMessages));
+         } catch (e) {
+             console.error("Failed to parse stored messages");
+         }
+     }
   }, []);
 
-  // Fetch History & Suggestions when opened (or session ready)
+  // Fetch Suggestions when opened (or session ready)
   useEffect(() => {
       if (sessionId) {
-          fetchHistory();
           fetchSuggestions();
       }
   }, [sessionId]);
+
+  // Persist messages to local storage whenever they change
+  useEffect(() => {
+      if (messages.length > 0) {
+        localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
+      }
+  }, [messages]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -174,17 +191,6 @@ const ChatWidget = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const fetchHistory = async () => {
-      try {
-          const res = await chatbotAPI.getHistory(sessionId);
-          if (res.success && res.data) {
-              setMessages(res.data.messages || []);
-          }
-      } catch (error) {
-          console.error("Failed to load chat history", error);
-      }
-  };
-
   const fetchSuggestions = async () => {
       try {
           const res = await chatbotAPI.getSuggestions();
@@ -200,20 +206,30 @@ const ChatWidget = () => {
       if (!msgText.trim()) return;
 
       const userMsg = { role: 'user', content: msgText };
-      setMessages(prev => [...prev, userMsg]);
+      const newMessages = [...messages, userMsg];
+      
+      setMessages(newMessages);
       setInput('');
       setLoading(true);
 
+      // Map history for API: 'ai' -> 'model', 'user' -> 'user'
+      const history = messages.map(msg => ({
+          role: msg.role === 'ai' ? 'model' : 'user',
+          content: msg.content || ''
+      }));
+
+      console.log("Sending payload:", { message: msgText, sessionId, history });
+
       try {
-          const res = await chatbotAPI.sendMessage(msgText, sessionId);
+          const res = await chatbotAPI.sendMessage(msgText, sessionId, history);
           if (res.success && res.data) {
-              const aiMsg = { role: 'ai', content: res.data.message }; // Adjust based on API spec
+              const aiMsg = { role: 'ai', content: res.data.message }; 
               setMessages(prev => [...prev, aiMsg]);
           } else {
               message.error('Không thể nhận phản hồi từ AI');
           }
       } catch (error) {
-          console.error("Send message error", error);
+          console.error("Send message error details:", error.response?.data || error);
           const errorMsg = { role: 'ai', content: 'Xin lỗi, hệ thống đang bận. Vui lòng thử lại sau.' };
           setMessages(prev => [...prev, errorMsg]);
       } finally {
@@ -221,14 +237,10 @@ const ChatWidget = () => {
       }
   };
 
-  const handleClearHistory = async () => {
-      try {
-          await chatbotAPI.clearHistory(sessionId);
-          setMessages([]);
-          message.success('Đã xóa lịch sử chat');
-      } catch (error) {
-          message.error('Lỗi khi xóa lịch sử');
-      }
+  const handleClearHistory = () => {
+      setMessages([]);
+      localStorage.removeItem(MESSAGES_KEY);
+      message.success('Đã xóa lịch sử chat');
   };
 
   const handleKeyDown = (e) => {

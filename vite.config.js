@@ -6,6 +6,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      '/api/chatbot': {
+        target: 'https://backend-node-5re9.onrender.com',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path
+      },
       '/api': {
         target: 'https://backend-node-5re9.onrender.com',
         changeOrigin: true,
