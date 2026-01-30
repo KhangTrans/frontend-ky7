@@ -147,6 +147,19 @@
   color: #718096;
 }
 
+.footer-desc p {
+  margin: 0 0 10px 0;
+}
+
+.footer-desc ul, .footer-desc ol {
+  padding-left: 20px;
+  margin: 0 0 10px 0;
+}
+
+.footer-desc li {
+  margin-bottom: 4px;
+}
+
 .contact-info li {
   display: flex;
   align-items: center;

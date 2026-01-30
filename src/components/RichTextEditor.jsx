@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Color } from '@tiptap/extension-color';
@@ -34,6 +35,18 @@ const RichTextEditor = ({ value, onChange, placeholder }) => {
       onChange?.(html);
     },
   });
+
+  // Sync value changes from parent (e.g. Form.Item) to editor
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      // Only set content if it's actually different to avoid cursor jumping
+      // Compare without HTML tags might be safer but precise HTML comparison is tricky
+      // For now, simple check. If value is empty and editor is <p></p>, handle that.
+      if (value === '' && editor.getHTML() === '<p></p>') return;
+      
+      editor.commands.setContent(value || '');
+    }
+  }, [editor, value]);
 
   if (!editor) {
     return null;

@@ -68,9 +68,8 @@ const ProductFormModal = ({
           label="Mô tả"
           rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}
         >
-          <Input.TextArea 
+          <RichTextEditor 
             placeholder="Nhập mô tả chi tiết về sản phẩm..." 
-            rows={6}
           />
         </Form.Item>
 

@@ -233,6 +233,11 @@ const ProductManagement = () => {
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
+      render: (text) => {
+        // Strip HTML tags for display
+        const plainText = text ? text.replace(/<[^>]+>/g, '') : '';
+        return plainText;
+      },
     },
     {
       title: 'Giá',

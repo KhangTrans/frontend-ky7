@@ -325,8 +325,8 @@ const Home = () => {
                         <h3 className="product-name" title={product.name}>
                           {product.name}
                         </h3>
-                        <p className="product-description" title={product.description}>
-                          {product.description || 'Không có mô tả'}
+                        <p className="product-description" title={product.description ? product.description.replace(/<[^>]+>/g, '') : ''}>
+                          {product.description ? product.description.replace(/<[^>]+>/g, '') : 'Không có mô tả'}
                         </p>
                         
                         <div className="product-footer">

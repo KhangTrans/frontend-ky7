@@ -60,9 +60,10 @@ const Footer = () => {
             )}
             <span className="logo-text">{storeName}</span>
           </Link>
-          <p className="footer-desc">
-            {storeDescription}
-          </p>
+          <div 
+            className="footer-desc"
+            dangerouslySetInnerHTML={{ __html: storeDescription }}
+          />
           <ul className="contact-info" style={{ listStyle: 'none', padding: 0 }}>
             <li>
               <EnvironmentOutlined className="contact-icon" />

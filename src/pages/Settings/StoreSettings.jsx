@@ -25,6 +25,8 @@ import {
 import { uploadImage } from '../../utils/imageUpload';
 import { useProvinces } from '../../hooks/useProvinces';
 
+import RichTextEditor from '../../components/RichTextEditor';
+
 const { TextArea } = Input;
 
 const StoreSettings = ({ data, onUpdate }) => {
@@ -313,11 +315,8 @@ const StoreSettings = ({ data, onUpdate }) => {
             name="description"
             label="Mô tả"
           >
-            <TextArea 
-              rows={4} 
+            <RichTextEditor 
               placeholder="Mô tả về cửa hàng của bạn..."
-              showCount
-              maxLength={500}
             />
           </Form.Item>
         </Card>
