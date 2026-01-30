@@ -4,7 +4,8 @@ import viVN from 'antd/locale/vi_VN';
 import routes from './routes';
 
 import ChatWidget from './components/ChatWidget';
-import { SettingsProvider, useSettings } from './contexts/SettingsContext';
+import { SettingsProvider } from './contexts/SettingsContext';
+import { useSettings } from './hooks/useSettings';
 
 // Component để render routes từ JSON config
 const AppRoutes = () => {

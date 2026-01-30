@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import { settingsAPI } from '../api';
 
 // Default settings khi chưa có data từ API
@@ -106,15 +106,6 @@ export const SettingsProvider = ({ children }) => {
       {children}
     </SettingsContext.Provider>
   );
-};
-
-// Custom hook để sử dụng settings
-export const useSettings = () => {
-  const context = useContext(SettingsContext);
-  if (!context) {
-    throw new Error('useSettings must be used within a SettingsProvider');
-  }
-  return context;
 };
 
 // Utility: Điều chỉnh độ sáng màu

@@ -9,7 +9,7 @@ import {
   MailOutlined,
   SendOutlined
 } from '@ant-design/icons';
-import { useSettings } from '../../contexts/SettingsContext';
+import { useSettings } from '../../hooks/useSettings';
 import './Footer.css';
 
 const Footer = () => {

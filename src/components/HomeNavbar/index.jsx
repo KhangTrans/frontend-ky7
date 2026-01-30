@@ -9,7 +9,7 @@ import {
   MenuOutlined,
 } from '@ant-design/icons';
 import { fetchCart } from '../../redux/slices/cartSlice';
-import { useSettings } from '../../contexts/SettingsContext';
+import { useSettings } from '../../hooks/useSettings';
 import NotificationBell from '../NotificationBell';
 import './HomeNavbar.css';
 

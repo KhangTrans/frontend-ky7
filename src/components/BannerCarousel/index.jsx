@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { Carousel } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { useSettings } from '../../contexts/SettingsContext';
+import { useSettings } from '../../hooks/useSettings';
 import './BannerCarousel.css';
 
 // Custom arrows - định nghĩa ngoài component
@@ -79,19 +79,6 @@ const BannerCarousel = ({ onBannerChange }) => {
       </Carousel>
     </div>
   );
-};
-
-// Export thêm hook để lấy current banner
-export const useBanners = () => {
-  const { settings } = useSettings();
-  
-  const banners = useMemo(() => {
-    return settings?.appearance?.banners
-      ?.filter(b => b.isActive)
-      ?.sort((a, b) => (a.order || 0) - (b.order || 0)) || [];
-  }, [settings?.appearance?.banners]);
-  
-  return { banners, hasBanners: banners.length > 0 };
 };
 
 export default BannerCarousel;

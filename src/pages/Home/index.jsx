@@ -8,7 +8,8 @@ import { addToCart, fetchCart } from '../../redux/slices/cartSlice';
 import HomeNavbar from '../../components/HomeNavbar';
 import Footer from '../../components/Footer';
 import VoucherList from '../../components/VoucherList';
-import BannerCarousel, { useBanners } from '../../components/BannerCarousel';
+import BannerCarousel from '../../components/BannerCarousel';
+import { useBanners } from '../../hooks/useBanners';
 import './Home.css';
 
 const { Search } = Input;
