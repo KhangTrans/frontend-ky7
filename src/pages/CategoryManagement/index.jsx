@@ -15,6 +15,7 @@ import {
   Image,
   Modal,
   Typography,
+  Tooltip,
 } from 'antd';
 
 const { Text } = Typography;
@@ -241,39 +242,42 @@ const CategoryManagement = () => {
     {
       title: 'Hành động',
       key: 'action',
-      width: 200,
+      width: 150,
       align: 'center',
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">
-          <Button
-            type="default"
-            icon={<EyeOutlined />}
-            size="small"
-            onClick={() => showModal(record, 'view')}
-            style={{ 
-              borderColor: '#1890ff',
-              color: '#1890ff'
-            }}
-          />
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => showModal(record, 'edit')}
-          />
+          <Tooltip title="Xem chi tiết">
+            <Button
+              type="default"
+              icon={<EyeOutlined />}
+              size="small"
+              onClick={() => showModal(record, 'view')}
+            />
+          </Tooltip>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              size="small"
+              onClick={() => showModal(record, 'edit')}
+            />
+          </Tooltip>
           <Popconfirm
             title="Xác nhận xóa"
-            description="Bạn có chắc chắn muốn xóa thể loại này?"
+            description="Hành động này không thể hoàn tác!"
             onConfirm={() => handleDelete(record.id || record._id)}
-            okText="Có"
-            cancelText="Không"
+            okText="Xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
           >
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              size="small"
-            />
+            <Tooltip title="Xóa">
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                size="small"
+              />
+            </Tooltip>
           </Popconfirm>
         </Space>
       ),
@@ -281,76 +285,73 @@ const CategoryManagement = () => {
   ];
 
   return (
-    <div style={{ padding: 24 }}>
-      <Card
-        bordered={false}
-        style={{ 
-          borderRadius: 12,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-        }}
-        title={
-          <Space size="large">
-            <AppstoreOutlined style={{ fontSize: 24, color: '#1890ff' }} />
-            <span style={{ fontSize: 20, fontWeight: 600 }}>
-              Quản lý thể loại
-            </span>
-            <Tag color="blue" style={{ fontSize: 14, padding: '4px 12px' }}>
-              {pagination.total || 0} thể loại
-            </Tag>
-          </Space>
-        }
-        extra={
+    <div className="category-management" style={{ padding: 0, width: '100%' }}>
+      <Card>
+        <div style={{ marginBottom: 24, padding: '16px 24px', background: '#fff', borderBottom: '1px solid #f0f0f0' }}>
+          <Typography.Title level={2} style={{ margin: 0, color: '#1890ff', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <AppstoreOutlined /> Quản lý thể loại
+          </Typography.Title>
+        </div>
+
+        {/* Toolbar */}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Input
+            placeholder="Tìm kiếm theo tên thể loại..."
+            prefix={<SearchOutlined style={{ color: '#1890ff' }} />}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onPressEnter={handleSearch}
+            allowClear
+            size="large"
+            style={{ flex: '1 1 300px', minWidth: 200 }}
+          />
+          <Button
+            type="primary"
+            icon={<SearchOutlined />}
+            onClick={handleSearch}
+            size="large"
+          >
+            Tìm kiếm
+          </Button>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={handleReset}
+            size="large"
+          >
+            Làm mới
+          </Button>
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            size="large"
             onClick={() => showModal(null, 'add')}
-            style={{ 
-              borderRadius: 8,
-              height: 40,
-              fontWeight: 500
-            }}
+            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+            size="large"
           >
-            Thêm thể loại mới
+            Thêm thể loại
           </Button>
-        }
-      >
-        {/* Search và Filter */}
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col span={10}>
-            <Input
-              placeholder="Tìm kiếm theo tên thể loại..."
-              prefix={<SearchOutlined style={{ color: '#1890ff' }} />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              onPressEnter={handleSearch}
-              size="large"
-              style={{ borderRadius: 8 }}
-              allowClear
-            />
-          </Col>
-          <Col>
-            <Space size="middle">
-              <Button
-                type="primary"
-                icon={<SearchOutlined />}
-                onClick={handleSearch}
-                size="large"
-                style={{ borderRadius: 8 }}
-              >
-                Tìm kiếm
-              </Button>
-              <Button 
-                icon={<ReloadOutlined />} 
-                onClick={handleReset}
-                size="large"
-                style={{ borderRadius: 8 }}
-              >
-                Làm mới
-              </Button>
-            </Space>
-          </Col>
-        </Row>
+        </div>
+
+        {/* Stats Row */}
+        <div style={{ 
+          padding: '12px 16px', 
+          background: '#f0f2f5', 
+          borderRadius: '4px',
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <Space size="large" wrap>
+            <span>
+              <strong>Tổng số:</strong> {pagination.total || 0} thể loại
+            </span>
+            <span>
+              <strong>Trang:</strong> {currentPage}/{Math.ceil((pagination.total || 0) / pageSize) || 1}
+            </span>
+          </Space>
+        </div>
 
         {/* Table */}
         <Table

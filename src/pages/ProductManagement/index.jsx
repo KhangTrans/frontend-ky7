@@ -13,6 +13,8 @@ import {
   Row,
   Col,
   Select,
+  Tooltip,
+  Typography,
 } from 'antd';
 import {
   PlusOutlined,
@@ -20,6 +22,7 @@ import {
   DeleteOutlined,
   SearchOutlined,
   ReloadOutlined,
+  ShoppingOutlined,
 } from '@ant-design/icons';
 import {
   fetchProducts,
@@ -259,26 +262,33 @@ const ProductManagement = () => {
       title: 'Thao tác',
       key: 'action',
       width: 150,
+      align: 'center',
+      fixed: 'right',
       render: (_, record) => (
         <Space size="small">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => showModal(record)}
-          >
-            Sửa
-          </Button>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              size="small"
+              onClick={() => showModal(record)}
+            />
+          </Tooltip>
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa sản phẩm này?"
+            description="Hành động này không thể hoàn tác!"
             onConfirm={() => handleDelete(record._id || record.id)}
             okText="Xóa"
             cancelText="Hủy"
             okButtonProps={{ danger: true }}
           >
-            <Button danger icon={<DeleteOutlined />} size="small">
-              Xóa
-            </Button>
+            <Tooltip title="Xóa">
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                size="small"
+              />
+            </Tooltip>
           </Popconfirm>
         </Space>
       ),
@@ -286,67 +296,95 @@ const ProductManagement = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="product-management" style={{ padding: 0, width: '100%' }}>
       <Card>
-        <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
-          <Col>
-            <h2 style={{ margin: 0 }}>Quản lý sản phẩm</h2>
-          </Col>
-        </Row>
+        <div style={{ marginBottom: 24, padding: '16px 24px', background: '#fff', borderBottom: '1px solid #f0f0f0' }}>
+          <Typography.Title level={2} style={{ margin: 0, color: '#1890ff', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <ShoppingOutlined /> Quản lý sản phẩm
+          </Typography.Title>
+        </div>
 
-        {/* Filter Section */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-          <Col xs={24} sm={12} md={8}>
-            <Input
-              placeholder="Tìm kiếm sản phẩm..."
-              prefix={<SearchOutlined />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              onPressEnter={handleSearch}
-              allowClear
-            />
-          </Col>
-          <Col xs={24} sm={12} md={8}>
-            <Select
-              placeholder="Chọn danh mục"
-              style={{ width: '100%' }}
-              value={selectedCategory || undefined}
-              onChange={handleCategoryChange}
-              allowClear
-              loading={loading && categories.length === 0}
-            >
-              {categories.map((cat) => (
-                <Select.Option key={cat._id || cat.id} value={cat.name}>
-                  {cat.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Col>
-          <Col xs={24} sm={24} md={8}>
-            <Space>
-              <Button
-                type="primary"
-                icon={<SearchOutlined />}
-                onClick={handleSearch}
-              >
-                Tìm kiếm
-              </Button>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={handleReset}
-              >
-                Làm mới
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => showModal()}
-              >
-                Thêm sản phẩm
-              </Button>
-            </Space>
-          </Col>
-        </Row>
+        {/* Toolbar */}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Input
+            placeholder="Tìm kiếm sản phẩm..."
+            prefix={<SearchOutlined />}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onPressEnter={handleSearch}
+            allowClear
+            size="large"
+            style={{ flex: '1 1 300px', minWidth: 200 }}
+          />
+          <Select
+            placeholder="Chọn danh mục"
+            value={selectedCategory || undefined}
+            onChange={handleCategoryChange}
+            allowClear
+            loading={loading && categories.length === 0}
+            size="large"
+            style={{ flex: '0 1 180px', minWidth: 150 }}
+          >
+            {categories.map((cat) => (
+              <Select.Option key={cat._id || cat.id} value={cat.name}>
+                {cat.name}
+              </Select.Option>
+            ))}
+          </Select>
+          <Button
+            type="primary"
+            icon={<SearchOutlined />}
+            onClick={handleSearch}
+            size="large"
+          >
+            Tìm kiếm
+          </Button>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={handleReset}
+            size="large"
+          >
+            Làm mới
+          </Button>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => showModal()}
+            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+            size="large"
+          >
+            Thêm sản phẩm
+          </Button>
+        </div>
+
+        {/* Stats Row */}
+        <div style={{ 
+          padding: '12px 16px', 
+          background: '#f0f2f5', 
+          borderRadius: '4px',
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <Space size="large" wrap>
+            <span>
+              <strong>Tổng số:</strong> {pagination?.total || products.length} sản phẩm
+            </span>
+            <span>
+              <strong>Trang:</strong> {currentPage}/{Math.ceil((pagination?.total || products.length) / pageSize) || 1}
+            </span>
+          </Space>
+          {(activeSearch || activeCategory) && (
+            <Tag color="blue">
+              Đang lọc: {activeSearch && `"${activeSearch}"`} 
+              {activeSearch && activeCategory && ' - '}
+              {activeCategory && `Danh mục: ${activeCategory}`}
+            </Tag>
+          )}
+        </div>
 
         <Table
           columns={columns}

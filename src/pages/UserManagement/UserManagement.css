@@ -172,13 +172,13 @@
 }
 
 .user-management .ant-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+  opacity: 0.9;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
 }
 
 .user-management .ant-btn-dangerous:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
+  opacity: 0.9;
+  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
 }
 
 /* Modal styling */

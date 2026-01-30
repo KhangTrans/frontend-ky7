@@ -34,6 +34,6 @@
 }
 
 .success-content .ant-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  opacity: 0.95;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
 }

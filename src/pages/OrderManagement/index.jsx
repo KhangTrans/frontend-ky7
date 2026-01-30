@@ -296,12 +296,12 @@ const OrderManagement = () => {
             title: 'Hành động',
             key: 'action',
             fixed: 'right',
-            width: 100,
+            width: 80,
             align: 'center',
             render: (_, record) => (
-                <Space size="middle">
+                <Space size="small">
                     <Tooltip title="Xem chi tiết">
-                        <Button type="primary" size="small" ghost icon={<EyeOutlined />} onClick={() => openDetailModal(record)} />
+                        <Button type="primary" size="small" icon={<EyeOutlined />} onClick={() => openDetailModal(record)} />
                     </Tooltip>
                 </Space>
             ),

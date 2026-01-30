@@ -9,14 +9,17 @@ import {
   Tag,
   message,
   Input,
-  Select
+  Select,
+  Tooltip,
+  Typography
 } from 'antd';
 import {
   ReloadOutlined,
   PlusOutlined,
   EditOutlined,
   EyeOutlined,
-  SearchOutlined
+  SearchOutlined,
+  TagsOutlined
 } from '@ant-design/icons';
 import axiosInstance from '../../api/axiosConfig';
 import dayjs from 'dayjs';
@@ -302,91 +305,132 @@ const VoucherManagement = () => {
     {
       title: 'Thao tác',
       key: 'action',
+      width: 120,
+      align: 'center',
+      fixed: 'right',
       render: (_, record) => (
         <Space size="small">
-          <Button 
-            icon={<EyeOutlined />} 
-            size="small"
-            onClick={() => handleViewDetail(record._id)}
-          >
-            Chi tiết
-          </Button>
-          <Button 
-            type="primary" 
-            icon={<EditOutlined />} 
-            size="small" 
-            onClick={() => handleEdit(record)}
-          >
-            Sửa
-          </Button>
+          <Tooltip title="Chi tiết">
+            <Button
+              icon={<EyeOutlined />}
+              size="small"
+              onClick={() => handleViewDetail(record._id)}
+            />
+          </Tooltip>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              size="small"
+              onClick={() => handleEdit(record)}
+            />
+          </Tooltip>
         </Space>
       )
     }
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="voucher-management" style={{ padding: 0, width: '100%' }}>
       <VoucherStatistics showCharts={false} />
       
       <Card>
-        <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
-          <Col>
-            <h2 style={{ margin: 0 }}>Quản lý Voucher</h2>
-          </Col>
-          <Col>
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-              Thêm Voucher
-            </Button>
-          </Col>
-        </Row>
+        <div style={{ marginBottom: 24, padding: '16px 24px', background: '#fff', borderBottom: '1px solid #f0f0f0' }}>
+          <Typography.Title level={2} style={{ margin: 0, color: '#1890ff', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <TagsOutlined /> Quản lý Voucher
+          </Typography.Title>
+        </div>
 
-        {/* Filter Section */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-          <Col xs={24} sm={8} md={6}>
-            <Input
-              placeholder="Tìm theo mã voucher..."
-              prefix={<SearchOutlined />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              onPressEnter={handleSearch}
-              allowClear
-            />
-          </Col>
-          <Col xs={24} sm={8} md={6}>
-            <Select
-              placeholder="Chọn loại voucher"
-              style={{ width: '100%' }}
-              value={filterType}
-              onChange={setFilterType}
-              allowClear
-            >
-              <Option value="DISCOUNT">Giảm giá</Option>
-              <Option value="FREE_SHIP">Miễn phí vận chuyển</Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={8} md={6}>
-            <Select
-              placeholder="Trạng thái"
-              style={{ width: '100%' }}
-              value={filterStatus}
-              onChange={setFilterStatus}
-              allowClear
-            >
-              <Option value={true}>Hoạt động</Option>
-              <Option value={false}>Vô hiệu</Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={24} md={6}>
-            <Space>
-              <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-                Tìm kiếm
-              </Button>
-              <Button icon={<ReloadOutlined />} onClick={handleReset}>
-                Làm mới
-              </Button>
-            </Space>
-          </Col>
-        </Row>
+        {/* Toolbar */}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Input
+            placeholder="Tìm theo mã voucher..."
+            prefix={<SearchOutlined />}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onPressEnter={handleSearch}
+            allowClear
+            size="large"
+            style={{ flex: '1 1 250px', minWidth: 180 }}
+          />
+          <Select
+            placeholder="Chọn loại voucher"
+            value={filterType}
+            onChange={setFilterType}
+            allowClear
+            size="large"
+            style={{ flex: '0 1 180px', minWidth: 150 }}
+          >
+            <Option value="DISCOUNT">Giảm giá</Option>
+            <Option value="FREE_SHIP">Miễn phí vận chuyển</Option>
+          </Select>
+          <Select
+            placeholder="Trạng thái"
+            value={filterStatus}
+            onChange={setFilterStatus}
+            allowClear
+            size="large"
+            style={{ flex: '0 1 150px', minWidth: 120 }}
+          >
+            <Option value={true}>Hoạt động</Option>
+            <Option value={false}>Vô hiệu</Option>
+          </Select>
+          <Button
+            type="primary"
+            icon={<SearchOutlined />}
+            onClick={handleSearch}
+            size="large"
+          >
+            Tìm kiếm
+          </Button>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={handleReset}
+            size="large"
+          >
+            Làm mới
+          </Button>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAdd}
+            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+            size="large"
+          >
+            Thêm Voucher
+          </Button>
+        </div>
+
+        {/* Stats Row */}
+        <div style={{ 
+          padding: '12px 16px', 
+          background: '#f0f2f5', 
+          borderRadius: '4px',
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <Space size="large" wrap>
+            <span>
+              <strong>Tổng số:</strong> {pagination.total} voucher
+            </span>
+            <span>
+              <strong>Trang:</strong> {pagination.current}/{Math.ceil(pagination.total / pagination.pageSize) || 1}
+            </span>
+          </Space>
+          {(appliedFilters.search || appliedFilters.type || appliedFilters.isActive !== null) && (
+            <Tag color="blue">
+              Đang lọc: {appliedFilters.search && `"${appliedFilters.search}"`} 
+              {appliedFilters.search && appliedFilters.type && ' - '}
+              {appliedFilters.type && `Loại: ${appliedFilters.type === 'DISCOUNT' ? 'Giảm giá' : 'Freeship'}`}
+              {(appliedFilters.search || appliedFilters.type) && appliedFilters.isActive !== null && ' - '}
+              {appliedFilters.isActive !== null && `Trạng thái: ${appliedFilters.isActive ? 'Hoạt động' : 'Vô hiệu'}`}
+            </Tag>
+          )}
+        </div>
 
         <Table
           columns={columns}

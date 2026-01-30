@@ -7,7 +7,6 @@ import {
   Form,
   Input,
   message,
-  Popconfirm,
   Tag,
   Card,
   Row,
@@ -16,11 +15,11 @@ import {
   Avatar,
   Tooltip,
   Typography,
+  Switch,
 } from 'antd';
 import {
   PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
+  EyeOutlined,
   SearchOutlined,
   ReloadOutlined,
   UserOutlined,
@@ -114,13 +113,16 @@ const UserManagement = () => {
     }
   };
 
-  const handleDelete = async (userId) => {
+  const handleToggleStatus = async (userId, currentStatus) => {
     try {
-      await dispatch(deleteUser(userId)).unwrap();
-      message.success('Xóa người dùng thành công!');
+      await dispatch(updateUser({ 
+        userId, 
+        userData: { isActive: !currentStatus } 
+      })).unwrap();
+      message.success(`Đã ${!currentStatus ? 'kích hoạt' : 'vô hiệu hóa'} người dùng!`);
       loadUsers();
     } catch (error) {
-      message.error(error || 'Không thể xóa người dùng!');
+      message.error(error || 'Không thể cập nhật trạng thái!');
     }
   };
 
@@ -228,47 +230,35 @@ const UserManagement = () => {
       title: 'Trạng thái',
       dataIndex: 'isActive',
       key: 'isActive',
-      width: 120,
+      width: 140,
       align: 'center',
-      render: (isActive) => (
-        <Tag color={isActive ? 'success' : 'default'}>
-          {isActive ? '✓ Hoạt động' : '✗ Vô hiệu'}
-        </Tag>
+      render: (isActive, record) => (
+        <Space>
+          <Switch
+            checked={isActive}
+            onChange={() => handleToggleStatus(record._id, isActive)}
+            checkedChildren="Hoạt động"
+            unCheckedChildren="Vô hiệu"
+            style={{ minWidth: 90 }}
+          />
+        </Space>
       ),
     },
     {
       title: 'Hành động',
       key: 'action',
-      width: 150,
+      width: 100,
       align: 'center',
       fixed: 'right',
       render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Chỉnh sửa">
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              size="small"
-              onClick={() => showModal(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Bạn có chắc chắn muốn xóa người dùng này?"
-            description="Hành động này không thể hoàn tác!"
-            onConfirm={() => handleDelete(record._id)}
-            okText="Xóa"
-            cancelText="Hủy"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Xóa">
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                size="small"
-              />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <Tooltip title="Xem chi tiết">
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            size="small"
+            onClick={() => showModal(record)}
+          />
+        </Tooltip>
       ),
     },
   ];

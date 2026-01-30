@@ -24,15 +24,20 @@ body {
   color: #262626;
 }
 
-/* Button Hover Effects */
-.ant-btn {
-  border-radius: 4px;
+/* Button Hover Effects - Chỉ áp dụng cho button icon nhỏ */
+.ant-btn.ant-btn-icon-only:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Primary Button Style */
+.ant-btn-primary {
+  border-radius: 6px;
   transition: all 0.3s ease;
 }
 
-.ant-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.ant-btn-primary:hover {
+  opacity: 0.9;
 }
 
 /* Card Styling */

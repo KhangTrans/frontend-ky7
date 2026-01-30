@@ -292,7 +292,7 @@
   padding-top: 10px;
 }
 
-.add-to-cart-btn {
+.product-detail-container .add-to-cart-btn {
   flex: 1 1 200px;
   min-width: 200px;
   height: 52px !important;
@@ -305,12 +305,12 @@
   transition: all 0.3s ease !important;
 }
 
-.add-to-cart-btn:hover {
+.product-detail-container .add-to-cart-btn:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5) !important;
 }
 
-.buy-now-btn {
+.product-detail-container .buy-now-btn {
   flex: 1 1 200px;
   min-width: 200px;
   height: 52px !important;
@@ -323,7 +323,7 @@
   transition: all 0.3s ease !important;
 }
 
-.buy-now-btn:hover {
+.product-detail-container .buy-now-btn:hover {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2) !important;
@@ -501,7 +501,7 @@
     display: none !important; /* Hide wishlist for now to match simplified bar */
   }
 
-  .add-to-cart-btn {
+  .product-detail-container .add-to-cart-btn {
     flex: 1;
     min-width: 0 !important; /* Reset min-width to allow sharing space */
     border-radius: 0 !important;
@@ -517,12 +517,12 @@
     box-shadow: none !important;
   }
   
-  .add-to-cart-btn::before {
+  .product-detail-container .add-to-cart-btn::before {
     /* content: '\e73d'; Antd icon code for shopping cart if needed, or just keep icon component */
     font-size: 20px;
   }
 
-  .buy-now-btn {
+  .product-detail-container .buy-now-btn {
     flex: 1;
     min-width: 0 !important; /* Reset min-width to allow sharing space */
     border-radius: 0 !important;

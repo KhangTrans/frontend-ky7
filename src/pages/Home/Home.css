@@ -102,7 +102,7 @@
 
 .hero-search-input .ant-btn:hover {
   background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-  transform: translateX(-2px);
+  opacity: 0.95;
 }
 
 /* Animated Background Shapes */
@@ -499,11 +499,13 @@
 
 /* Product Footer */
 .product-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
+  position: relative;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 12px;
   margin-top: auto;
   padding-top: 15px;
   border-top: 1px solid #e2e8f0;
@@ -513,12 +515,15 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .product-price {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: #667eea;
+  white-space: nowrap;
 }
 
 .product-original-price {
@@ -528,24 +533,31 @@
 }
 
 .add-to-cart-btn {
-  display: flex;
+  position: relative !important;
+  display: inline-flex !important;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px !important;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 25px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
+  width: auto !important;
+  max-width: none !important;
+  min-width: fit-content;
 }
 
 .add-to-cart-btn:hover:not(.disabled) {
-  transform: translateX(-3px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
 }
 
 .add-to-cart-btn.disabled {
@@ -631,8 +643,18 @@
     font-size: 13px;
   }
 
+  .product-footer {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
   .add-to-cart-btn {
-    padding: 8px 16px;
-    font-size: 13px;
+    padding: 8px 14px !important;
+    font-size: 12px;
+    width: auto !important;
+  }
+
+  .product-price {
+    font-size: 16px;
   }
 }
