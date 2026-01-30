@@ -47,13 +47,9 @@ const BannerCarousel = ({ onBannerChange }) => {
 
   const handleBannerClick = (banner) => {
     if (banner.link) {
-      // Kiểm tra nếu là link ngoài (http/https) thì mở trong cùng tab
-      if (banner.link.startsWith('http://') || banner.link.startsWith('https://')) {
-        window.location.href = banner.link;
-      } else {
-        // Link nội bộ - sử dụng React Router navigate (không reload trang)
-        navigate(banner.link);
-      }
+      // Luôn sử dụng React Router navigate - không reload trang
+      // Admin nên nhập path nội bộ như: /products/abc hoặc /category/laptop
+      navigate(banner.link);
     }
   };
 
