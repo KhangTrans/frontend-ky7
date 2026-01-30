@@ -23,6 +23,7 @@ import {
   SearchOutlined,
   ReloadOutlined,
   ShoppingOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import {
   fetchProducts,
@@ -47,7 +48,9 @@ const ProductManagement = () => {
   const [activeCategory, setActiveCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [modalMode, setModalMode] = useState('add'); // 'add', 'edit', 'view'
   const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
 
   // Load products function - chỉ phụ thuộc vào activeSearch và activeCategory
   const loadProducts = useCallback(() => {
@@ -57,7 +60,7 @@ const ProductManagement = () => {
     };
     
     if (activeSearch) params.search = activeSearch;
-    if (activeCategory) params.category = activeCategory;
+    if (activeCategory) params.categoryId = activeCategory;
     
     dispatch(fetchProducts(params));
   }, [currentPage, pageSize, activeSearch, activeCategory, dispatch]);
@@ -74,13 +77,14 @@ const ProductManagement = () => {
 
   useEffect(() => {
     if (error) {
-      message.error(error);
+      messageApi.error(error);
       dispatch(clearError());
     }
-  }, [error, dispatch]);
+  }, [error, dispatch, messageApi]);
 
-  const showModal = (product = null) => {
+  const showModal = (product = null, mode = 'add') => {
     setEditingProduct(product);
+    setModalMode(mode);
     if (product) {
       const formData = {
         name: product.name,
@@ -101,6 +105,7 @@ const ProductManagement = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setEditingProduct(null);
+    setModalMode('add');
     form.resetFields();
   };
 
@@ -133,10 +138,10 @@ const ProductManagement = () => {
       
       if (editingProduct) {
         await dispatch(updateProduct({ id: editingProduct._id || editingProduct.id, productData: formattedValues })).unwrap();
-        message.success('Cập nhật sản phẩm thành công!');
+        messageApi.success('Cập nhật sản phẩm thành công!');
       } else {
         await dispatch(createProduct(formattedValues)).unwrap();
-        message.success('Thêm sản phẩm thành công!');
+        messageApi.success('Thêm sản phẩm thành công!');
       }
       
       handleCancel();
@@ -151,7 +156,7 @@ const ProductManagement = () => {
   const handleDelete = async (id) => {
     try {
       await dispatch(deleteProduct(id)).unwrap();
-      message.success('Xóa sản phẩm thành công!');
+      messageApi.success('Xóa sản phẩm thành công!');
       loadProducts();
     } catch (error) {
       console.error('Error:', error);
@@ -170,7 +175,7 @@ const ProductManagement = () => {
         limit: pageSize,
       };
       if (searchText.trim()) params.search = searchText.trim();
-      if (selectedCategory) params.category = selectedCategory;
+      if (selectedCategory) params.categoryId = selectedCategory;
       dispatch(fetchProducts(params));
     }
   };
@@ -276,25 +281,17 @@ const ProductManagement = () => {
               type="primary"
               icon={<EditOutlined />}
               size="small"
-              onClick={() => showModal(record)}
+              onClick={() => showModal(record, 'edit')}
             />
           </Tooltip>
-          <Popconfirm
-            title="Bạn có chắc chắn muốn xóa sản phẩm này?"
-            description="Hành động này không thể hoàn tác!"
-            onConfirm={() => handleDelete(record._id || record.id)}
-            okText="Xóa"
-            cancelText="Hủy"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Xóa">
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                size="small"
-              />
-            </Tooltip>
-          </Popconfirm>
+          <Tooltip title="Xem chi tiết">
+            <Button
+              type="default"
+              icon={<EyeOutlined />}
+              size="small"
+              onClick={() => showModal(record, 'view')}
+            />
+          </Tooltip>
         </Space>
       ),
     },
@@ -302,6 +299,7 @@ const ProductManagement = () => {
 
   return (
     <div className="product-management" style={{ padding: 0, width: '100%' }}>
+      {contextHolder}
       <Card>
         <div style={{ marginBottom: 24, padding: '16px 24px', background: '#fff', borderBottom: '1px solid #f0f0f0' }}>
           <Typography.Title level={2} style={{ margin: 0, color: '#1890ff', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -331,7 +329,7 @@ const ProductManagement = () => {
             style={{ flex: '0 1 180px', minWidth: 150 }}
           >
             {categories.map((cat) => (
-              <Select.Option key={cat._id || cat.id} value={cat.name}>
+              <Select.Option key={cat._id || cat.id} value={cat._id || cat.id}>
                 {cat.name}
               </Select.Option>
             ))}
@@ -386,7 +384,7 @@ const ProductManagement = () => {
             <Tag color="blue">
               Đang lọc: {activeSearch && `"${activeSearch}"`} 
               {activeSearch && activeCategory && ' - '}
-              {activeCategory && `Danh mục: ${activeCategory}`}
+              {activeCategory && `Danh mục: ${categories.find(c => (c._id || c.id) === activeCategory)?.name || activeCategory}`}
             </Tag>
           )}
         </div>
@@ -417,6 +415,8 @@ const ProductManagement = () => {
         editingProduct={editingProduct}
         categories={categories}
         loading={loading}
+        mode={modalMode}
+        onSwitchToEdit={() => setModalMode('edit')}
       />
     </div>
   );

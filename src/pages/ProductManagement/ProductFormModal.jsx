@@ -34,23 +34,28 @@ const ProductFormModal = ({
   form, 
   editingProduct, 
   categories, 
-  loading 
+  loading,
+  mode = 'add', // 'add', 'edit', 'view'
+  onSwitchToEdit
 }) => {
   const [uploadingImages, setUploadingImages] = useState({});
+  const isViewMode = mode === 'view';
 
   return (
     <Modal
-      title={editingProduct ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới'}
+      title={isViewMode ? 'Chi tiết sản phẩm' : (editingProduct ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới')}
       open={visible}
-      onOk={onSubmit}
+      onOk={isViewMode ? onSwitchToEdit : onSubmit}
       onCancel={onCancel}
-      okText={editingProduct ? 'Cập nhật' : 'Thêm'}
-      cancelText="Hủy"
+      okText={isViewMode ? 'Sửa sản phẩm' : (editingProduct ? 'Cập nhật' : 'Thêm')}
+      cancelText={isViewMode ? 'Đóng' : 'Hủy'}
+      okButtonProps={{ style: { background: '#1890ff' } }}
+      cancelButtonProps={{}}
       width={900}
       confirmLoading={loading}
       style={{ top: 20 }}
     >
-      <Form form={form} layout="vertical" name="productForm">
+      <Form form={form} layout="vertical" name="productForm" disabled={isViewMode}>
         {/* Basic Information */}
         <Form.Item
           name="name"
@@ -70,6 +75,7 @@ const ProductFormModal = ({
         >
           <RichTextEditor 
             placeholder="Nhập mô tả chi tiết về sản phẩm..." 
+            disabled={isViewMode}
           />
         </Form.Item>
 
@@ -153,44 +159,46 @@ const ProductFormModal = ({
                   size="small"
                   style={{ marginBottom: 8, background: '#fafafa' }}
                   extra={
-                    <Space>
-                      <Form.Item noStyle shouldUpdate>
-                        {() => {
-                          const images = form.getFieldValue('images') || [];
-                          const publicId = images[name]?.publicId;
-                          return publicId ? (
-                            <Button
-                              type="link"
-                              danger
-                              size="small"
-                              onClick={async () => {
-                                const success = await deleteImage(publicId);
-                                if (success) {
-                                  const images =
-                                    form.getFieldValue('images') || [];
-                                  images[name] = {
-                                    ...images[name],
-                                    imageUrl: '',
-                                    publicId: '',
-                                  };
-                                  form.setFieldsValue({ images });
-                                }
-                              }}
-                            >
-                              Xóa khỏi Cloudinary
-                            </Button>
-                          ) : null;
-                        }}
-                      </Form.Item>
-                      <Button
-                        type="link"
-                        danger
-                        icon={<MinusCircleOutlined />}
-                        onClick={() => remove(name)}
-                      >
-                        Xóa
-                      </Button>
-                    </Space>
+                    !isViewMode && (
+                      <Space>
+                        <Form.Item noStyle shouldUpdate>
+                          {() => {
+                            const images = form.getFieldValue('images') || [];
+                            const publicId = images[name]?.publicId;
+                            return publicId ? (
+                              <Button
+                                type="link"
+                                danger
+                                size="small"
+                                onClick={async () => {
+                                  const success = await deleteImage(publicId);
+                                  if (success) {
+                                    const images =
+                                      form.getFieldValue('images') || [];
+                                    images[name] = {
+                                      ...images[name],
+                                      imageUrl: '',
+                                      publicId: '',
+                                    };
+                                    form.setFieldsValue({ images });
+                                  }
+                                }}
+                              >
+                                Xóa khỏi Cloudinary
+                              </Button>
+                            ) : null;
+                          }}
+                        </Form.Item>
+                        <Button
+                          type="link"
+                          danger
+                          icon={<MinusCircleOutlined />}
+                          onClick={() => remove(name)}
+                        >
+                          Xóa
+                        </Button>
+                      </Space>
+                    )
                   }
                 >
                   <Row gutter={16} align="middle">
@@ -209,66 +217,68 @@ const ProductFormModal = ({
                         <Input
                           placeholder="https://res.cloudinary.com/... hoặc upload ảnh"
                           prefix={<PictureOutlined />}
-                          disabled={uploadingImages[name]}
+                          disabled={uploadingImages[name] || isViewMode}
                         />
                       </Form.Item>
                     </Col>
                     <Col span={4}>
-                      <Upload
-                        beforeUpload={(file) => {
-                          const isImage = file.type.startsWith('image/');
-                          if (!isImage) {
-                            message.error('Chỉ được upload file ảnh!');
-                            return Upload.LIST_IGNORE;
-                          }
-                          const isLt4M = file.size / 1024 / 1024 < 4;
-                          if (!isLt4M) {
-                            message.error(
-                              'Ảnh phải nhỏ hơn 4MB (giới hạn Vercel)!'
-                            );
-                            return Upload.LIST_IGNORE;
-                          }
-
-                          setUploadingImages((prev) => ({
-                            ...prev,
-                            [name]: true,
-                          }));
-                          uploadImage(file, 'products').then((result) => {
+                      {!isViewMode && (
+                        <Upload
+                          beforeUpload={(file) => {
+                            const isImage = file.type.startsWith('image/');
+                            if (!isImage) {
+                              message.error('Chỉ được upload file ảnh!');
+                              return Upload.LIST_IGNORE;
+                            }
+                            const isLt4M = file.size / 1024 / 1024 < 4;
+                            if (!isLt4M) {
+                              message.error(
+                                'Ảnh phải nhỏ hơn 4MB (giới hạn Vercel)!'
+                              );
+                              return Upload.LIST_IGNORE;
+                            }
+  
                             setUploadingImages((prev) => ({
                               ...prev,
-                              [name]: false,
+                              [name]: true,
                             }));
-                            if (result) {
-                              const images =
-                                form.getFieldValue('images') || [];
-                              images[name] = {
-                                ...images[name],
-                                imageUrl: result.url,
-                                publicId: result.publicId,
-                              };
-                              form.setFieldsValue({ images });
-                            }
-                          });
-
-                          return false;
-                        }}
-                        showUploadList={false}
-                        accept="image/*"
-                      >
-                        <Button
-                          icon={
-                            uploadingImages[name] ? (
-                              <LoadingOutlined />
-                            ) : (
-                              <UploadOutlined />
-                            )
-                          }
-                          loading={uploadingImages[name]}
-                          size="small"
+                            uploadImage(file, 'products').then((result) => {
+                              setUploadingImages((prev) => ({
+                                ...prev,
+                                [name]: false,
+                              }));
+                              if (result) {
+                                const images =
+                                  form.getFieldValue('images') || [];
+                                images[name] = {
+                                  ...images[name],
+                                  imageUrl: result.url,
+                                  publicId: result.publicId,
+                                };
+                                form.setFieldsValue({ images });
+                              }
+                            });
+  
+                            return false;
+                          }}
+                          showUploadList={false}
+                          accept="image/*"
                         >
-                          Upload
-                        </Button>
-                      </Upload>
+                          <Button
+                            icon={
+                              uploadingImages[name] ? (
+                                <LoadingOutlined />
+                              ) : (
+                                <UploadOutlined />
+                              )
+                            }
+                            loading={uploadingImages[name]}
+                            size="small"
+                          >
+                            Upload
+                          </Button>
+                        </Upload>
+                      )}
                     </Col>
                     <Col span={3}>
                       <Form.Item
@@ -324,83 +334,85 @@ const ProductFormModal = ({
                 </Card>
               ))}
               <Form.Item>
-                <Space direction="vertical" style={{ width: '100%' }}>
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    block
-                    icon={<PlusOutlined />}
-                  >
-                    Thêm ảnh thủ công
-                  </Button>
-                  <Upload
-                    multiple
-                    beforeUpload={() => false}
-                    fileList={[]}
-                    onChange={async (info) => {
-                      if (info.fileList.length > 0) {
-                        const files = info.fileList
-                          .map((f) => f.originFileObj)
-                          .filter(Boolean);
-
-                        if (files.length === 0) return;
-
-                        // Validate files
-                        const validFiles = [];
-                        for (const file of files) {
-                          const isImage = file.type.startsWith('image/');
-                          const isLt5M = file.size / 1024 / 1024 < 5;
-
-                          if (!isImage) {
-                            message.error(`${file.name} không phải file ảnh!`);
-                            continue;
-                          }
-                          if (!isLt5M) {
-                            message.error(`${file.name} quá lớn (>5MB)!`);
-                            continue;
-                          }
-                          validFiles.push(file);
-                        }
-
-                        if (validFiles.length > 0) {
-                          message.loading({
-                            content: `Đang upload ${validFiles.length} ảnh...`,
-                            key: 'uploadMultiple',
-                          });
-
-                          const results = await uploadMultipleImages(
-                            validFiles,
-                            'products'
-                          );
-
-                          if (results) {
-                            const currentImages =
-                              form.getFieldValue('images') || [];
-                            form.setFieldsValue({
-                              images: [...currentImages, ...results],
-                            });
-                            message.success({
-                              content: `Upload ${results.length} ảnh thành công!`,
-                              key: 'uploadMultiple',
-                              duration: 2,
-                            });
-                          } else {
-                            message.error({
-                              content: 'Upload thất bại!',
-                              key: 'uploadMultiple',
-                            });
-                          }
-                        }
-                      }
-                    }}
-                    showUploadList={false}
-                    accept="image/*"
-                  >
-                    <Button type="primary" block icon={<UploadOutlined />}>
-                      Upload nhiều ảnh cùng lúc
+                {!isViewMode && (
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <Button
+                      type="dashed"
+                      onClick={() => add()}
+                      block
+                      icon={<PlusOutlined />}
+                    >
+                      Thêm ảnh thủ công
                     </Button>
-                  </Upload>
-                </Space>
+                    <Upload
+                      multiple
+                      beforeUpload={() => false}
+                      fileList={[]}
+                      onChange={async (info) => {
+                        if (info.fileList.length > 0) {
+                          const files = info.fileList
+                            .map((f) => f.originFileObj)
+                            .filter(Boolean);
+  
+                          if (files.length === 0) return;
+  
+                          // Validate files
+                          const validFiles = [];
+                          for (const file of files) {
+                            const isImage = file.type.startsWith('image/');
+                            const isLt5M = file.size / 1024 / 1024 < 5;
+  
+                            if (!isImage) {
+                              message.error(`${file.name} không phải file ảnh!`);
+                              continue;
+                            }
+                            if (!isLt5M) {
+                              message.error(`${file.name} quá lớn (>5MB)!`);
+                              continue;
+                            }
+                            validFiles.push(file);
+                          }
+  
+                          if (validFiles.length > 0) {
+                            message.loading({
+                              content: `Đang upload ${validFiles.length} ảnh...`,
+                              key: 'uploadMultiple',
+                            });
+  
+                            const results = await uploadMultipleImages(
+                              validFiles,
+                              'products'
+                            );
+  
+                            if (results) {
+                              const currentImages =
+                                form.getFieldValue('images') || [];
+                              form.setFieldsValue({
+                                images: [...currentImages, ...results],
+                              });
+                              message.success({
+                                content: `Upload ${results.length} ảnh thành công!`,
+                                key: 'uploadMultiple',
+                                duration: 2,
+                              });
+                            } else {
+                              message.error({
+                                content: 'Upload thất bại!',
+                                key: 'uploadMultiple',
+                              });
+                            }
+                          }
+                        }
+                      }}
+                      showUploadList={false}
+                      accept="image/*"
+                    >
+                      <Button type="primary" block icon={<UploadOutlined />}>
+                        Upload nhiều ảnh cùng lúc
+                      </Button>
+                    </Upload>
+                  </Space>
+                )}
               </Form.Item>
             </>
           )}
@@ -421,14 +433,16 @@ const ProductFormModal = ({
                   style={{ marginBottom: 8, background: '#f0f5ff' }}
                   title={`Biến thể ${name + 1}`}
                   extra={
-                    <Button
-                      type="link"
-                      danger
-                      icon={<MinusCircleOutlined />}
-                      onClick={() => remove(name)}
-                    >
-                      Xóa
-                    </Button>
+                    !isViewMode && (
+                      <Button
+                        type="link"
+                        danger
+                        icon={<MinusCircleOutlined />}
+                        onClick={() => remove(name)}
+                      >
+                        Xóa
+                      </Button>
+                    )
                   }
                 >
                   <Form.Item
@@ -517,16 +531,18 @@ const ProductFormModal = ({
                   </Row>
                 </Card>
               ))}
-              <Form.Item>
-                <Button
-                  type="dashed"
-                  onClick={() => add()}
-                  block
-                  icon={<PlusOutlined />}
-                >
-                  Thêm biến thể
-                </Button>
-              </Form.Item>
+              {!isViewMode && (
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                  >
+                    Thêm biến thể
+                  </Button>
+                </Form.Item>
+              )}
             </>
           )}
         </Form.List>
