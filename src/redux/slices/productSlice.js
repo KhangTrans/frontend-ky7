@@ -7,7 +7,13 @@ export const fetchCategories = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get('/categories');
-      return response.data.data || response.data || [];
+      if (Array.isArray(response.data.data)) {
+        return response.data.data;
+      }
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      return [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Không thể tải danh mục');
     }

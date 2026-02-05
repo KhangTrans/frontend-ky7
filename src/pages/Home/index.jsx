@@ -213,7 +213,7 @@ const Home = () => {
                 <span className="chip-count">{products?.length || 0}</span>
               </button>
               
-              {categories.map((category) => {
+              {Array.isArray(categories) && categories.map((category) => {
                 const categoryCount = products?.filter(
                   p => (p.categoryId?.name || p.category?.name) === category.name
                 ).length || 0;

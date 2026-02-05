@@ -2,7 +2,7 @@ import { Form, Input, Button, notification } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, CheckCircleOutlined, CloseCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosConfig';
 import './Login.css'; // Sử dụng chung CSS với Login
 
 function Register() {
@@ -25,7 +25,7 @@ function Register() {
       console.log('Registering with:', requestData);
 
       // Gọi API đăng ký
-      const response = await axios.post('/api/auth/register', requestData);
+      const response = await axiosInstance.post('/auth/register', requestData);
 
       console.log('Register response:', response.data);
 

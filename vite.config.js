@@ -5,20 +5,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    proxy: {
-      '/api/chatbot': {
+      '/api': {
         target: 'https://backend-node-5re9.onrender.com',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path
-      },
-      '/api': {
-        target: 'https://backend-node-5re9.onrender.com',
-        changeOrigin: true,
-        secure: true,
-        rewrite: (path) => path
       }
-    }
   },
   build: {
     chunkSizeWarningLimit: 1600,

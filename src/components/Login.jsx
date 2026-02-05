@@ -76,18 +76,33 @@ function Login() {
         
         console.log('Login failed with:', errorMessage);
         
-        api.error({
-          message: 'Đăng nhập thất bại',
-          description: errorMessage,
-          placement: 'topRight',
-          duration: 4,
-          icon: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />,
-          style: {
-            borderRadius: '10px',
-            boxShadow: '0 4px 12px rgba(255, 77, 79, 0.15)',
-            border: '1px solid #ffccc7',
-          },
-        });
+        if (errorMessage.toLowerCase().includes('xác thực email')) {
+            api.error({
+                message: 'Chưa xác thực email',
+                description: 'Vui lòng kiểm tra email của bạn để xác thực tài khoản trước khi đăng nhập.',
+                placement: 'topRight',
+                duration: 6,
+                icon: <WarningOutlined style={{ color: '#faad14' }} />,
+                style: {
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 12px rgba(250, 173, 20, 0.15)',
+                  border: '1px solid #ffe58f',
+                },
+            });
+        } else {
+            api.error({
+                message: 'Đăng nhập thất bại',
+                description: errorMessage,
+                placement: 'topRight',
+                duration: 4,
+                icon: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />,
+                style: {
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 12px rgba(255, 77, 79, 0.15)',
+                  border: '1px solid #ffccc7',
+                },
+            });
+        }
       }
     } catch (err) {
       isLoggingIn.current = false;
