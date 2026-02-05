@@ -31,6 +31,16 @@ const routesData = [
     },
   },
   {
+    path: '/verify-email',
+    name: 'VerifyEmail',
+    component: 'VerifyEmail',
+    meta: {
+      title: 'Xác thực Email',
+      requiresAuth: false,
+      public: true,
+    },
+  },
+  {
     path: '/',
     name: 'Home',
     component: 'Home',

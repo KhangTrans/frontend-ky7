@@ -32,9 +32,9 @@ function Register() {
       // Hiển thị thông báo thành công
       api.success({
         message: 'Đăng ký thành công!',
-        description: response.data?.message || 'Tài khoản đã được tạo. Vui lòng đăng nhập!',
+        description: 'Vui lòng kiểm tra email để xác thực tài khoản trước khi đăng nhập.',
         placement: 'topRight',
-        duration: 3,
+        duration: 5,
         icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
         style: {
           borderRadius: '10px',

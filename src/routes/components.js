@@ -4,6 +4,7 @@ import DashboardLayout from '../components/DashboardLayout';
 // Lazy load components để tối ưu performance
 export const Login = lazy(() => import('../components/Login'));
 export const Register = lazy(() => import('../components/Register'));
+export const VerifyEmail = lazy(() => import('../components/VerifyEmail'));
 export const Home = lazy(() => import('../pages/Home'));
 export const ProductDetail = lazy(() => import('../pages/ProductDetail'));
 export const Cart = lazy(() => import('../pages/Cart'));
@@ -29,6 +30,7 @@ export const Settings = lazy(() => import('../pages/Settings'));
 const componentsMap = {
   Login,
   Register,
+  VerifyEmail,
   Home,
   ProductDetail,
   Cart,
