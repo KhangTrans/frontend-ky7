@@ -115,7 +115,8 @@ function Register() {
               name="username"
               rules={[
                 { required: true, message: '⚠️ Vui lòng nhập tên đăng nhập!' },
-                { min: 3, message: '⚠️ Tên đăng nhập phải có ít nhất 3 ký tự!' }
+                { min: 3, message: '⚠️ Tên đăng nhập phải có ít nhất 3 ký tự!' },
+                { pattern: /^[a-zA-Z0-9_]+$/, message: '⚠️ Tên đăng nhập không được chứa dấu hoặc ký tự đặc biệt!' }
               ]}
               validateTrigger={['onChange', 'onBlur']}
             >

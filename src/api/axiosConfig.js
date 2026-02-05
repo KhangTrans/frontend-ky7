@@ -2,17 +2,18 @@ import axios from 'axios';
 import { API_CONFIG } from '../utils/constants';
 
 // Sử dụng proxy khi dev, full URL khi production
-// Sử dụng biến môi trường hoặc proxy
-const API_BASE_URL = import.meta.env.VITE_API_REST_URL || '/api';
+const API_BASE_URL = import.meta.env.DEV 
+  ? '/api'  // Proxy qua Vite dev server
+  : `${API_CONFIG.REST_URL}/api`;
 
 // Tạo axios instance với config mặc định
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000,
+  timeout: 30000, // 30 seconds (cho upload file lớn)
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: false,
+  withCredentials: false, // Không cần credentials cho CORS
 });
 
 // Request interceptor - Tự động thêm token vào header
