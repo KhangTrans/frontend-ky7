@@ -9,7 +9,7 @@ const API_BASE_URL = import.meta.env.DEV
 // Tạo axios instance với config mặc định
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30 seconds (cho upload file lớn)
+  timeout: 60000, // 60 seconds (cho upload file lớn và cold start)
   headers: {
     'Content-Type': 'application/json',
   },
