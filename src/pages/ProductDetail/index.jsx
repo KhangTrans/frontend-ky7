@@ -7,6 +7,7 @@ import { addToCart, fetchCart } from '../../redux/slices/cartSlice';
 import axiosInstance from '../../api/axiosConfig';
 import HomeNavbar from '../../components/HomeNavbar';
 import Footer from '../../components/Footer';
+import ProductReviews from '../../components/ProductReviews';
 import './ProductDetail.css';
 
 function ProductDetail() {
@@ -275,8 +276,15 @@ function ProductDetail() {
                   </div>
                 ),
               },
-
-
+              {
+                key: '2',
+                label: 'Đánh giá & Nhận xét',
+                children: (
+                  <div className="tab-content">
+                    <ProductReviews productId={product._id || product.id} />
+                  </div>
+                ),
+              },
             ]}
           />
         </div>

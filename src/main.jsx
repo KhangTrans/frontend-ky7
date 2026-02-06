@@ -5,8 +5,12 @@ import { store } from './redux/store'
 // import './index.css'
 import App from './App.jsx'
 
+import { SocketProvider } from './contexts/SocketContext'
+
 createRoot(document.getElementById('root')).render(
     <Provider store={store}>
-      <App />
+      <SocketProvider>
+        <App />
+      </SocketProvider>
     </Provider>
 )

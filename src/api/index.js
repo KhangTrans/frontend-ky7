@@ -251,4 +251,27 @@ export const settingsAPI = {
   },
 };
 
+// Review API
+export const reviewAPI = {
+  getStats: async (productId) => {
+    const response = await axiosInstance.get(`/reviews/stats/${productId}`);
+    return response.data;
+  },
+  
+  getAll: async (productId) => {
+    const response = await axiosInstance.get(`/reviews/${productId}`);
+    return response.data;
+  },
+  
+  create: async (data) => {
+    const response = await axiosInstance.post('/reviews', data);
+    return response.data;
+  },
+  
+  reply: async (reviewId, data) => {
+    const response = await axiosInstance.post(`/reviews/${reviewId}/reply`, data);
+    return response.data;
+  }
+};
+
 export default axiosInstance;

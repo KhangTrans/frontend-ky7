@@ -1,0 +1,168 @@
+.product-reviews-container {
+  margin-top: 2rem;
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.review-header {
+  margin-bottom: 24px;
+}
+
+.review-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+/* Review Stats */
+.review-stats {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.review-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 200px;
+}
+
+.average-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-number {
+  font-size: 48px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+}
+
+.total-reviews {
+  color: #666;
+  font-size: 14px;
+}
+
+.rating-distribution {
+  flex: 1;
+  max-width: 500px;
+}
+
+.distribution-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.star-label {
+  min-width: 40px;
+  font-size: 14px;
+  color: #333;
+}
+
+.progress-bar {
+  flex: 1;
+}
+
+.count-label {
+  min-width: 30px;
+  text-align: right;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Review List */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.review-item {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 24px;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+}
+
+.review-header-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.user-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.review-date {
+  color: #999;
+  font-size: 12px;
+}
+
+.review-content {
+  margin-top: 12px;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Reply Box */
+.shop-reply {
+  margin-top: 16px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  padding: 16px;
+  border-radius: 4px;
+  margin-left: 20px;
+}
+
+.reply-header {
+  font-weight: 600;
+  color: #389e0d;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.reply-content {
+  color: #333;
+}
+
+.admin-action {
+  margin-top: 12px;
+}
+
+/* Review Form */
+.review-form-container {
+  margin-bottom: 32px;
+  border: 1px solid #f0f0f0;
+  padding: 24px;
+  border-radius: 8px;
+}
+
+.form-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
