@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Rate, message, Card, Alert } from 'antd';
+import React, { useState } from 'react';
+import { Form, Input, Button, Rate, message, Card } from 'antd';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { reviewAPI } from '../../api';
@@ -11,35 +11,6 @@ const ReviewForm = ({ productId, onSuccess }) => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  
-  // Permission state
-  const [canReview, setCanReview] = useState(true);
-  const [permissionMessage, setPermissionMessage] = useState('');
-  const [checkingPermission, setCheckingPermission] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticated && productId) {
-      checkEligibility();
-    }
-  }, [isAuthenticated, productId]);
-
-  const checkEligibility = async () => {
-    try {
-      setCheckingPermission(true);
-      const res = await reviewAPI.checkPermission(productId);
-      if (res.success) {
-        setCanReview(res.data.canReview);
-        if (!res.data.canReview) {
-          setPermissionMessage(res.data.message);
-        }
-      }
-    } catch (error) {
-      console.error('Check permission error:', error);
-      // Nếu API check lỗi (403, 500) thì mặc định cứ để form hiện, logic submit sẽ chặn sau
-    } finally {
-      setCheckingPermission(false);
-    }
-  };
 
   // Nếu chưa đăng nhập -> Đã xử lý UI login
   if (!isAuthenticated) {
@@ -50,20 +21,6 @@ const ReviewForm = ({ productId, onSuccess }) => {
           Đăng nhập ngay
         </Button>
       </Card>
-    );
-  }
-
-  // Nếu không đủ điều kiện review -> Hiện Alert thay vì Form
-  if (!canReview) {
-    return (
-      <div className="review-form-container">
-        <Alert
-          message="Không thể đánh giá"
-          description={permissionMessage}
-          type="info"
-          showIcon
-        />
-      </div>
     );
   }
 
@@ -80,18 +37,23 @@ const ReviewForm = ({ productId, onSuccess }) => {
       
       message.success('Cảm ơn bạn đã đánh giá sản phẩm!');
       form.resetFields();
-      setCanReview(false); // Đánh giá xong thì ẩn form luôn
-      setPermissionMessage('Bạn đã đánh giá sản phẩm này rồi.');
-      
       if (onSuccess) onSuccess();
       
     } catch (error) {
-      console.error('Submit review error:', error);
-      if (error.response?.status === 400) {
-        message.error(error.response.data.message || 'Bạn đã đánh giá sản phẩm này rồi!');
-      } else {
-        message.error('Gửi đánh giá thất bại. Vui lòng thử lại sau.');
+      // Handle known errors cleanly
+      if (error.response) {
+        if (error.response.status === 403) {
+          message.error('Bạn cần mua và nhận hàng thành công mới được đánh giá sản phẩm này.');
+          return;
+        }
+        if (error.response.status === 400) {
+          message.error(error.response.data.message || 'Bạn đã đánh giá sản phẩm này rồi!');
+          return;
+        }
       }
+      
+      console.error('Submit review error:', error);
+      message.error('Gửi đánh giá thất bại. Vui lòng thử lại sau.');
     } finally {
       setLoading(false);
     }
@@ -105,7 +67,6 @@ const ReviewForm = ({ productId, onSuccess }) => {
         layout="vertical"
         onFinish={onFinish}
         initialValues={{ rating: 5 }}
-        disabled={checkingPermission} // Disable while checking
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
           <span style={{ fontWeight: 500 }}>Chất lượng sản phẩm:</span>
@@ -130,7 +91,7 @@ const ReviewForm = ({ productId, onSuccess }) => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading || checkingPermission}>
+          <Button type="primary" htmlType="submit" loading={loading}>
             Gửi đánh giá
           </Button>
         </Form.Item>
