@@ -241,6 +241,16 @@ const routesData = [
             roles: ['admin'],
         },
       },
+      {
+        path: 'dashboard/reviews',
+        name: 'ReviewManagement',
+        component: 'ReviewManagement',
+        meta: {
+            title: 'Quản lý đánh giá',
+            requiresAuth: true,
+            roles: ['admin'],
+        },
+      },
     ],
   },
   {

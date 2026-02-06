@@ -11,6 +11,7 @@ import {
   AppstoreOutlined,
   HomeOutlined,
   GiftOutlined,
+  StarOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -46,6 +47,11 @@ function Sidebar({ collapsed, user }) {
       key: '/dashboard/vouchers',
       icon: <GiftOutlined />,
       label: 'Vouchers',
+    },
+    {
+      key: '/dashboard/reviews',
+      icon: <StarOutlined />,
+      label: 'Đánh giá',
     },
     {
       key: '/dashboard/users',

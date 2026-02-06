@@ -271,6 +271,18 @@ export const reviewAPI = {
   reply: async (reviewId, data) => {
     const response = await axiosInstance.post(`/reviews/${reviewId}/reply`, data);
     return response.data;
+  },
+  
+  // Admin Methods
+  getAdminReviews: async (params) => {
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    const response = await axiosInstance.get(`/reviews/admin/all${queryString}`);
+    return response.data;
+  },
+  
+  delete: async (reviewId) => {
+    const response = await axiosInstance.delete(`/reviews/${reviewId}`);
+    return response.data;
   }
 };
 
