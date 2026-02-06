@@ -7,15 +7,15 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/chatbot': {
-        target: 'http://localhost:5000',
+        target: 'https://backend-node-5re9.onrender.com',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path
       },
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://backend-node-5re9.onrender.com',
         changeOrigin: true,
-        secure: false,
+        secure: true,
         rewrite: (path) => path
       }
       }
