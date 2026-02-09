@@ -142,21 +142,78 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .banner-image {
+    object-fit: contain;
+    object-position: center;
+  }
+
   .banner-arrow {
-    width: 36px;
-    height: 36px;
-    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    opacity: 0.8;
+  }
+  
+  .banner-carousel-container:hover .banner-arrow {
+    opacity: 1;
   }
   
   .banner-arrow-prev {
-    left: 10px;
+    left: 8px;
   }
   
   .banner-arrow-next {
-    right: 10px;
+    right: 8px;
   }
   
   .banner-carousel .slick-dots {
-    bottom: 20px;
+    bottom: 15px;
+  }
+
+  .banner-carousel .slick-dots li button {
+    width: 8px;
+    height: 8px;
+  }
+
+  .banner-carousel .slick-dots li.slick-active button {
+    width: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-image {
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .banner-arrow {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+  
+  .banner-arrow-prev {
+    left: 5px;
+  }
+  
+  .banner-arrow-next {
+    right: 5px;
+  }
+
+  .banner-carousel .slick-dots {
+    bottom: 10px;
+  }
+
+  .banner-carousel .slick-dots li {
+    margin: 0 3px;
+  }
+
+  .banner-carousel .slick-dots li button {
+    width: 6px;
+    height: 6px;
+  }
+
+  .banner-carousel .slick-dots li.slick-active button {
+    width: 20px;
   }
 }

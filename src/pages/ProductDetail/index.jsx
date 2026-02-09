@@ -8,6 +8,7 @@ import axiosInstance from '../../api/axiosConfig';
 import HomeNavbar from '../../components/HomeNavbar';
 import Footer from '../../components/Footer';
 import ProductReviews from '../../components/ProductReviews';
+import ProductVouchers from '../../components/ProductVouchers';
 import './ProductDetail.css';
 
 function ProductDetail() {
@@ -211,6 +212,9 @@ function ProductDetail() {
                 <span className="meta-value">{product.categoryId?.name || product.category?.name || 'Chưa phân loại'}</span>
               </div>
             </div>
+
+            {/* Vouchers Section */}
+            <ProductVouchers />
 
             {/* Quantity Selector */}
             <div className="quantity-section">

@@ -7,7 +7,6 @@ import { fetchProducts, fetchCategories } from '../../redux/slices/productSlice'
 import { addToCart, fetchCart } from '../../redux/slices/cartSlice';
 import HomeNavbar from '../../components/HomeNavbar';
 import Footer from '../../components/Footer';
-import VoucherList from '../../components/VoucherList';
 import BannerCarousel from '../../components/BannerCarousel';
 import { useBanners } from '../../hooks/useBanners';
 import './Home.css';
@@ -193,9 +192,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* Voucher Section */}
-      <VoucherList />
 
       {/* Main Content */}
       <div className="main-content">
