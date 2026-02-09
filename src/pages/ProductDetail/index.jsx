@@ -26,7 +26,7 @@ import ProductReviews from "../../components/ProductReviews";
 import ProductVouchers from "../../components/ProductVouchers";
 import { recommendationsAPI } from "../../api";
 import "../Home/Home.css"; // Reuse product card styles
-import "../Home/Recommendations.css"; // Reuse section styles
+import "../Products/Recommendations.css"; // Reuse section styles
 import "./ProductDetail.css";
 
 function ProductDetail() {

@@ -6,6 +6,7 @@ export const Login = lazy(() => import('../components/Login'));
 export const Register = lazy(() => import('../components/Register'));
 export const VerifyEmail = lazy(() => import('../components/VerifyEmail'));
 export const Home = lazy(() => import('../pages/Home'));
+export const Products = lazy(() => import('../pages/Products'));
 export const ProductDetail = lazy(() => import('../pages/ProductDetail'));
 export const Cart = lazy(() => import('../pages/Cart'));
 export const Checkout = lazy(() => import('../pages/Checkout'));
@@ -33,6 +34,7 @@ const componentsMap = {
   Register,
   VerifyEmail,
   Home,
+  Products,
   ProductDetail,
   Cart,
   Checkout,

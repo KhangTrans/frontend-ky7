@@ -66,6 +66,10 @@ export const productAPI = {
 
 // Category API
 export const categoryAPI = {
+  getFeatured: async () => {
+    const response = await axiosInstance.get('/categories/featured');
+    return response.data;
+  },
   getAll: async (params) => {
     const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
     const response = await axiosInstance.get(`/categories${queryString}`);

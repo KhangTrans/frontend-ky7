@@ -50,6 +50,17 @@ const routesData = [
       public: true,
     },
   },
+
+  {
+    path: '/products',
+    name: 'Products',
+    component: 'Products',
+    meta: {
+      title: 'Danh sách sản phẩm',
+      requiresAuth: false,
+      public: true,
+    },
+  },
   {
     path: '/product/:id',
     name: 'ProductDetail',

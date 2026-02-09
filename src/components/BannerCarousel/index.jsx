@@ -1,42 +1,51 @@
-import { useMemo, useCallback } from 'react';
-import { Carousel } from 'antd';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { useSettings } from '../../hooks/useSettings';
-import './BannerCarousel.css';
-
-// Custom arrows - định nghĩa ngoài component
-const PrevArrow = ({ onClick }) => (
-  <button className="banner-arrow banner-arrow-prev" onClick={onClick}>
-    <LeftOutlined />
-  </button>
-);
-
-const NextArrow = ({ onClick }) => (
-  <button className="banner-arrow banner-arrow-next" onClick={onClick}>
-    <RightOutlined />
-  </button>
-);
+import { useState, useEffect, useCallback, useRef } from "react";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSettings } from "../../hooks/useSettings";
+import "./BannerCarousel.css";
 
 const BannerCarousel = ({ onBannerChange }) => {
   const { settings, loading } = useSettings();
   const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const timerRef = useRef(null);
 
-  // Sử dụng useMemo thay vì useState + useEffect
-  const banners = useMemo(() => {
-    return settings?.appearance?.banners
-      ?.filter(b => b.isActive)
-      ?.sort((a, b) => (a.order || 0) - (b.order || 0)) || [];
-  }, [settings?.appearance?.banners]);
+  // Lấy danh sách banners active
+  const banners = (settings?.appearance?.banners || [])
+    .filter((b) => b.isActive)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 
-  // Callback when slide changes
-  const handleBeforeChange = useCallback((from, to) => {
-    if (onBannerChange && banners[to]) {
-      onBannerChange(banners[to]);
+  // Reset timer khi chuyển slide
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      handleNext();
+    }, 5000);
+  }, [currentIndex, banners.length]);
+
+  const handleNext = useCallback(() => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1 === banners.length ? 0 : prev + 1));
+  }, [banners.length]);
+
+  const handlePrev = useCallback(() => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+  }, [banners.length]);
+
+  // Thông báo banner thay đổi ra ngoài
+  useEffect(() => {
+    if (onBannerChange && banners[currentIndex]) {
+      onBannerChange(banners[currentIndex]);
     }
-  }, [banners, onBannerChange]);
+    resetTimer();
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [currentIndex, banners, onBannerChange, resetTimer]);
 
-  // Loading state hoặc không có banner - hiển thị default gradient
   if (loading || banners.length === 0) {
     return (
       <div className="banner-carousel-container banner-default">
@@ -46,41 +55,95 @@ const BannerCarousel = ({ onBannerChange }) => {
   }
 
   const handleBannerClick = (banner) => {
-    if (banner.link) {
-      // Luôn sử dụng React Router navigate - không reload trang
-      // Admin nên nhập path nội bộ như: /products/abc hoặc /category/laptop
-      navigate(banner.link);
-    }
+    if (banner.link) navigate(banner.link);
+  };
+
+  const variants = {
+    enter: (direction) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0,
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction) => ({
+      zIndex: 0,
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0,
+    }),
   };
 
   return (
-    <div className="banner-carousel-container">
-      <Carousel
-        autoplay
-        autoplaySpeed={5000}
-        dots={{ className: 'banner-dots' }}
-        arrows
-        prevArrow={<PrevArrow />}
-        nextArrow={<NextArrow />}
-        effect="fade"
-        className="banner-carousel"
-        beforeChange={handleBeforeChange}
-      >
-        {banners.map((banner) => (
-          <div key={banner._id} className="banner-slide">
-            <div 
-              className={`banner-content ${banner.link ? 'clickable' : ''}`}
-              onClick={() => handleBannerClick(banner)}
-            >
-              <img 
-                src={banner.imageUrl} 
-                alt="Banner" 
-                className="banner-image"
-              />
-            </div>
-          </div>
-        ))}
-      </Carousel>
+    <div className="banner-carousel-container custom-slider">
+      <div className="slider-viewport">
+        <AnimatePresence initial={false} custom={direction}>
+          <motion.div
+            key={currentIndex}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "spring", stiffness: 300, damping: 30 },
+              opacity: { duration: 0.5 },
+            }}
+            className="banner-slide"
+            onClick={() => handleBannerClick(banners[currentIndex])}
+            style={{
+              backgroundImage: `url(${banners[currentIndex].imageUrl})`,
+              backgroundSize: "100% 100%",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              width: "100%",
+              height: "100%",
+              cursor: banners[currentIndex].link ? "pointer" : "default",
+            }}
+          />
+        </AnimatePresence>
+      </div>
+
+      {/* Điều hướng - Arrows */}
+      {banners.length > 1 && (
+        <>
+          <button
+            className="banner-arrow banner-arrow-prev"
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePrev();
+            }}
+          >
+            <LeftOutlined />
+          </button>
+          <button
+            className="banner-arrow banner-arrow-next"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNext();
+            }}
+          >
+            <RightOutlined />
+          </button>
+        </>
+      )}
+
+      {/* Điều hướng - Dots */}
+      {banners.length > 1 && (
+        <div className="banner-dots">
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              className={`dot ${index === currentIndex ? "active" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentIndex(index);
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

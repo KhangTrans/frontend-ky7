@@ -1,77 +1,30 @@
-/* Banner Carousel Styles - Hero Background */
-.banner-carousel-container {
+/* Custom Banner Slider Styles */
+.banner-carousel-container.custom-slider {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
+  overflow: hidden;
+  background: #000;
 }
 
-.banner-carousel {
-  height: 100%;
-}
-
-.banner-carousel .slick-slider,
-.banner-carousel .slick-list,
-.banner-carousel .slick-track,
-.banner-carousel .slick-slide,
-.banner-carousel .slick-slide > div {
+.slider-viewport {
+  position: relative;
+  width: 100%;
   height: 100%;
 }
 
 .banner-slide {
-  height: 100%;
-}
-
-.banner-content {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.banner-content.clickable {
-  cursor: pointer;
-}
-
-.banner-content.clickable:hover .banner-image {
-  transform: scale(1.02);
-}
-
-.banner-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 8s ease;
-}
-
-/* Default background when no banners */
-.banner-default {
-  background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-color-dark, #764ba2) 50%, #f64f59 100%);
-}
-
-.banner-default-bg {
-  width: 100%;
-  height: 100%;
-  background: inherit;
-  position: relative;
-}
-
-.banner-default-bg::before {
-  content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
-  animation: shimmer 15s linear infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 /* Arrows */
@@ -102,6 +55,7 @@
 
 .banner-arrow:hover {
   background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-50%) scale(1.1);
 }
 
 .banner-arrow-prev {
@@ -113,107 +67,69 @@
 }
 
 /* Dots */
-.banner-carousel .slick-dots {
-  bottom: 30px;
+.banner-dots {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
+  display: flex;
+  gap: 8px;
 }
 
-.banner-carousel .slick-dots li {
-  margin: 0 4px;
-}
-
-.banner-carousel .slick-dots li button {
-  width: 10px;
-  height: 10px;
+.dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  padding: 0;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.banner-carousel .slick-dots li button::before {
-  display: none;
+.dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background: #fff;
 }
 
-.banner-carousel .slick-dots li.slick-active button {
-  width: 30px;
-  border-radius: 5px;
-  background: #fff;
+/* Default state */
+.banner-default {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  width: 100%;
+  height: 100%;
+  position: absolute;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .banner-image {
-    object-fit: contain;
-    object-position: center;
-  }
-
   .banner-arrow {
     width: 32px;
     height: 32px;
-    font-size: 12px;
-    opacity: 0.8;
+    font-size: 14px;
+    opacity: 0.7;
   }
   
-  .banner-carousel-container:hover .banner-arrow {
-    opacity: 1;
-  }
+  .banner-arrow-prev { left: 10px; }
+  .banner-arrow-next { right: 10px; }
   
-  .banner-arrow-prev {
-    left: 8px;
-  }
-  
-  .banner-arrow-next {
-    right: 8px;
-  }
-  
-  .banner-carousel .slick-dots {
+  .banner-dots {
     bottom: 15px;
-  }
-
-  .banner-carousel .slick-dots li button {
-    width: 8px;
-    height: 8px;
-  }
-
-  .banner-carousel .slick-dots li.slick-active button {
-    width: 24px;
   }
 }
 
 @media (max-width: 480px) {
-  .banner-image {
-    object-fit: contain;
-    object-position: center;
-  }
-
   .banner-arrow {
-    width: 28px;
-    height: 28px;
-    font-size: 11px;
+    display: none; /* Hide arrows on small mobile to save space */
   }
   
-  .banner-arrow-prev {
-    left: 5px;
-  }
-  
-  .banner-arrow-next {
-    right: 5px;
-  }
-
-  .banner-carousel .slick-dots {
-    bottom: 10px;
-  }
-
-  .banner-carousel .slick-dots li {
-    margin: 0 3px;
-  }
-
-  .banner-carousel .slick-dots li button {
+  .dot {
     width: 6px;
     height: 6px;
   }
-
-  .banner-carousel .slick-dots li.slick-active button {
-    width: 20px;
+  
+  .dot.active {
+    width: 16px;
   }
 }
