@@ -286,4 +286,37 @@ export const reviewAPI = {
   }
 };
 
+// Recommendations API
+export const recommendationsAPI = {
+  // Lấy sản phẩm trending (bán chạy)
+  getTrending: async (limit = 8) => {
+    const response = await axiosInstance.get(`/recommendations/trending?limit=${limit}`);
+    return response.data;
+  },
+  
+  // Lấy sản phẩm mới về
+  getNewArrivals: async (limit = 8) => {
+    const response = await axiosInstance.get(`/recommendations/new-arrivals?limit=${limit}`);
+    return response.data;
+  },
+  
+  // Lấy sản phẩm tương tự
+  getSimilar: async (productId, limit = 6) => {
+    const response = await axiosInstance.get(`/recommendations/similar/${productId}?limit=${limit}`);
+    return response.data;
+  },
+  
+  // Lấy sản phẩm theo danh mục
+  getByCategory: async (categoryId, limit = 12) => {
+    const response = await axiosInstance.get(`/recommendations/by-category/${categoryId}?limit=${limit}`);
+    return response.data;
+  },
+  
+  // Lấy gợi ý cá nhân hóa (Phase 2)
+  getForYou: async (limit = 10) => {
+    const response = await axiosInstance.get(`/recommendations/for-you?limit=${limit}`);
+    return response.data;
+  }
+};
+
 export default axiosInstance;

@@ -1,0 +1,108 @@
+/* ===============================================
+   Recommendations Sections Styles
+   =============================================== */
+
+.recommendations-section {
+  padding: 60px 0;
+  background: #ffffff;
+}
+
+.recommendations-section + .recommendations-section {
+  padding-top: 40px;
+}
+
+.recommendations-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.recommendations-section .section-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recommendations-section .title-icon {
+  font-size: 32px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.recommendations-section .section-subtitle {
+  font-size: 15px;
+  color: #718096;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* New Badge for New Arrivals */
+.product-badge.new-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 2;
+  box-shadow: 0 3px 10px rgba(251, 191, 36, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Trending Section Specific Styles */
+.trending-section {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+}
+
+/* New Arrivals Section Specific Styles */
+.new-arrivals-section {
+  background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+}
+
+/* Responsive for Recommendations */
+@media (max-width: 768px) {
+  .recommendations-section {
+    padding: 40px 0;
+  }
+
+  .recommendations-section .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .recommendations-section .section-title {
+    font-size: 22px;
+  }
+
+  .recommendations-section .title-icon {
+    font-size: 26px;
+  }
+
+  .recommendations-section .section-subtitle {
+    font-size: 13px;
+  }
+}
