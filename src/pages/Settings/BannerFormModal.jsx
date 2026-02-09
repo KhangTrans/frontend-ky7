@@ -30,7 +30,6 @@ const BannerFormModal = ({
       if (initialValues) {
         const newImageUrl = initialValues.imageUrl || '';
         form.setFieldsValue({
-          title: initialValues.title || '',
           link: initialValues.link || '',
           order: initialValues.order || 0,
           isActive: initialValues.isActive !== false,
@@ -168,16 +167,7 @@ const BannerFormModal = ({
           </div>
         </Form.Item>
 
-        <Form.Item
-          name="title"
-          label="Tiêu đề"
-          rules={[
-            { required: true, message: 'Vui lòng nhập tiêu đề!' },
-            { max: 100, message: 'Tiêu đề tối đa 100 ký tự!' }
-          ]}
-        >
-          <Input placeholder="Nhập tiêu đề banner" />
-        </Form.Item>
+
 
         <Form.Item
           name="link"

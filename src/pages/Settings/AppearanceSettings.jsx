@@ -130,12 +130,6 @@ const AppearanceSettings = ({
       ),
     },
     {
-      title: 'Tiêu đề',
-      dataIndex: 'title',
-      key: 'title',
-      ellipsis: true,
-    },
-    {
       title: 'Link',
       dataIndex: 'link',
       key: 'link',

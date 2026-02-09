@@ -74,7 +74,7 @@ const BannerCarousel = ({ onBannerChange }) => {
             >
               <img 
                 src={banner.imageUrl} 
-                alt={banner.title || 'Banner'} 
+                alt="Banner" 
                 className="banner-image"
               />
             </div>
