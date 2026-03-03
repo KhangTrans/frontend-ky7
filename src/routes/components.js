@@ -5,6 +5,7 @@ import DashboardLayout from '../components/DashboardLayout';
 export const Login = lazy(() => import('../components/Login'));
 export const Register = lazy(() => import('../components/Register'));
 export const VerifyEmail = lazy(() => import('../components/VerifyEmail'));
+export const ForgotPassword = lazy(() => import('../components/ForgotPassword'));
 export const Home = lazy(() => import('../pages/Home'));
 export const Products = lazy(() => import('../pages/Products'));
 export const ProductDetail = lazy(() => import('../pages/ProductDetail'));
@@ -31,6 +32,7 @@ export const ReviewManagement = lazy(() => import('../pages/ReviewManagement'));
 // Map string name to component
 const componentsMap = {
   Login,
+  ForgotPassword,
   Register,
   VerifyEmail,
   Home,

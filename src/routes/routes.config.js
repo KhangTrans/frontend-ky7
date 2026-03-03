@@ -31,6 +31,16 @@ const routesData = [
     },
   },
   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: 'ForgotPassword',
+    meta: {
+      title: 'Quên mật khẩu',
+      requiresAuth: false,
+      public: true,
+    },
+  },
+  {
     path: '/verify-email',
     name: 'VerifyEmail',
     component: 'VerifyEmail',
