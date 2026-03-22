@@ -142,4 +142,29 @@
     flex-direction: column;
     align-items: flex-start;
   }
+
+  /* NEW MOBILE OPTIMIZATIONS */
+  .status-actions-col {
+    text-align: left !important;
+  }
+  
+  .status-space {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .cancel-btn-mobile {
+      width: 100%;
+      margin-top: 8px;
+  }
+}
+
+@media (min-width: 768px) {
+  .status-actions-col {
+    text-align: right;
+  }
+  
+  .status-space {
+    justify-content: flex-end;
+  }
 }

@@ -180,6 +180,10 @@ export const orderAPI = {
       const response = await axiosInstance.get('/orders/admin/statistics');
       return response.data;
   },
+  cancel: async (orderId, reason) => {
+      const response = await axiosInstance.put(`/orders/${orderId}/cancel`, { reason });
+      return response.data;
+  },
 };
 
 // Payment API

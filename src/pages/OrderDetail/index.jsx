@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card, Table, Tag, Row, Col, Spin, message, Descriptions, Divider, Steps, Popover, Input, Modal, Form } from 'antd';
+import { Button, Card, Table, Tag, Row, Col, Spin, message, Descriptions, Divider, Steps, Popover, Input, Modal, Form, Space } from 'antd';
 import { ArrowLeftOutlined, PrinterOutlined, ShoppingOutlined, EnvironmentOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
 import axiosInstance from '../../api/axiosConfig';
 import { addressAPI } from '../../api';
 import HomeNavbar from '../../components/HomeNavbar';
 import AddressSelectionModal from '../../components/AddressSelectionModal';
 import AddressFormModal from '../../components/AddressFormModal';
+import CancelOrderModal from '../../components/CancelOrderModal';
+import { Trash2 } from 'lucide-react';
 import './OrderDetail.css';
 
 const { Step } = Steps;
@@ -18,6 +20,7 @@ const OrderDetail = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
   
   // Address Management
   const [userAddresses, setUserAddresses] = useState([]);
@@ -164,6 +167,13 @@ const OrderDetail = () => {
       }
   };
 
+  const handleCancelSuccess = () => {
+      setOrder(prev => ({
+          ...prev,
+          orderStatus: 'cancelled'
+      }));
+  };
+
   const handleAddNewAddress = async (values) => {
       try {
           const res = await addressAPI.create(values);
@@ -300,17 +310,31 @@ const OrderDetail = () => {
 
         {/* Title & Status */}
         <Card className="section-card">
-          <Row justify="space-between" align="middle">
-            <Col>
-              <h2 className="page-title">Đơn hàng #{order.orderNumber}</h2>
+          <Row justify="space-between" align="middle" gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <h2 className="page-title" style={{ margin: 0 }}>Đơn hàng #{order.orderNumber}</h2>
               <span className="order-meta">
                 Ngày đặt: {new Date(order.createdAt).toLocaleString('vi-VN')}
               </span>
             </Col>
-            <Col>
-              <Tag color={getStatusColor(order.orderStatus)} style={{ fontSize: '16px', padding: '6px 12px' }}>
-                {getStatusText(order.orderStatus).toUpperCase()}
-              </Tag>
+            <Col xs={24} md={12} className="status-actions-col">
+              <Space size="small" wrap className="status-space">
+                {order?.orderStatus && (order.orderStatus.toLowerCase() === 'pending' || order.orderStatus.toLowerCase() === 'confirmed' || order.orderStatus.toLowerCase() === 'processing') && (
+                    <Button 
+                        danger 
+                        type="primary" 
+                        size={window.innerWidth < 768 ? "middle" : "large"}
+                        icon={<Trash2 size={16} />} 
+                        onClick={() => setCancelModalVisible(true)}
+                        className="cancel-btn-mobile"
+                    >
+                        Hủy đơn hàng
+                    </Button>
+                )}
+                <Tag color={getStatusColor(order.orderStatus)} style={{ fontSize: '16px', padding: '6px 12px', margin: 0 }}>
+                    {getStatusText(order.orderStatus).toUpperCase()}
+                </Tag>
+              </Space>
             </Col>
           </Row>
           
@@ -446,6 +470,13 @@ const OrderDetail = () => {
           onCancel={() => setIsAddAddressOpen(false)}
           onSuccess={handleAddNewAddress}
           form={addressForm}
+      />
+
+      <CancelOrderModal 
+          visible={cancelModalVisible}
+          onCancel={() => setCancelModalVisible(false)}
+          onSuccess={handleCancelSuccess}
+          orderId={id}
       />
     </div>
   );

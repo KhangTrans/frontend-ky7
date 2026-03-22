@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Card, Table, Tag, Button, Typography, message } from 'antd';
+import { Card, Table, Tag, Button, Typography, message, Space } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { orderAPI } from '../../api';
 import HomeNavbar from '../../components/HomeNavbar';
+import CancelOrderModal from '../../components/CancelOrderModal';
 import './OrderHistory.css';
 
 const { Title } = Typography;
@@ -12,6 +13,8 @@ const OrderHistory = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -31,6 +34,22 @@ const OrderHistory = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCancelClick = (orderId) => {
+    setCancellingOrderId(orderId);
+    setCancelModalVisible(true);
+  };
+
+  const handleCancelSuccess = (orderId) => {
+    // Update local state without reloading
+    setOrders(prevOrders => 
+      prevOrders.map(order => 
+        (order._id === orderId || order.id === orderId) 
+        ? { ...order, orderStatus: 'cancelled' } 
+        : order
+      )
+    );
   };
 
   const columns = [
@@ -62,8 +81,10 @@ const OrderHistory = () => {
         const s = status?.toLowerCase();
         
         if (s === 'pending') { color = 'orange'; text = 'Chờ xử lý'; }
-        else if (s === 'processing') { color = 'blue'; text = 'Đang xử lý'; }
-        else if (s === 'shipping') { color = 'cyan'; text = 'Đang giao'; }
+        else if (s === 'confirmed') { color = 'blue'; text = 'Đã xác nhận'; }
+        else if (s === 'processing') { color = 'cyan'; text = 'Đang xử lý'; }
+        else if (s === 'shipping') { color = 'purple'; text = 'Đang giao'; }
+        else if (s === 'delivered') { color = 'success'; text = 'Đã giao'; }
         else if (s === 'completed') { color = 'success'; text = 'Hoàn thành'; }
         else if (s === 'cancelled') { color = 'error'; text = 'Đã hủy'; }
         
@@ -73,11 +94,26 @@ const OrderHistory = () => {
     {
       title: 'Hành động',
       key: 'action',
-      render: (_, record) => (
-        <Button type="primary" size="small" onClick={() => navigate(`/orders/${record._id || record.id}`)}>
-          Chi tiết
-        </Button>
-      ),
+      render: (_, record) => {
+        const canCancel = ['pending', 'confirmed', 'processing'].includes(record.orderStatus?.toLowerCase());
+        return (
+          <Space>
+            <Button type="primary" size="small" onClick={() => navigate(`/orders/${record._id || record.id}`)}>
+              Chi tiết
+            </Button>
+            {canCancel && (
+              <Button 
+                type="primary" 
+                danger 
+                size="small" 
+                onClick={() => handleCancelClick(record._id || record.id)}
+              >
+                Hủy đơn
+              </Button>
+            )}
+          </Space>
+        );
+      },
     },
   ];
 
@@ -89,12 +125,19 @@ const OrderHistory = () => {
           <Table 
             columns={columns} 
             dataSource={orders} 
-            rowKey="_id" 
+            rowKey={(record) => record._id || record.id} 
             loading={loading}
             pagination={{ pageSize: 10 }}
           />
         </Card>
       </div>
+
+      <CancelOrderModal 
+        visible={cancelModalVisible}
+        onCancel={() => setCancelModalVisible(false)}
+        onSuccess={handleCancelSuccess}
+        orderId={cancellingOrderId}
+      />
     </div>
   );
 };
