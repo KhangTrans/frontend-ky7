@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button, Input, Avatar, Tooltip, message, Popconfirm, Card, Tag, Typography, Divider } from 'antd';
 const { Text } = Typography;
 import { 
@@ -140,6 +141,10 @@ const ChatWidget = () => {
   const [suggestions, setSuggestions] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const location = useLocation();
+
+  // Hide on dashboard routes
+  const isDashboard = location.pathname.includes('/dashboard');
 
   // Initialize Session & Load History
   useEffect(() => {
@@ -249,6 +254,8 @@ const ChatWidget = () => {
       }
   };
 
+  if (isDashboard) return null;
+
   return (
     <div className="chat-widget-container">
        {/* Chat Window */}
@@ -333,13 +340,13 @@ const ChatWidget = () => {
                         <div className="avatar ai">
                                <RobotOutlined />
                         </div>
-                        <div className="message-content" style={{ minWidth: 40 }}>
-                             <div className="chat-loader">
-                                 <div className="dot"></div>
-                                 <div className="dot"></div>
-                                 <div className="dot"></div>
-                             </div>
-                        </div>
+                         <div className="message-content" style={{ minWidth: 60, padding: '12px 16px' }}>
+                              <div className="chat-loader">
+                                  <span></span>
+                                  <span></span>
+                                  <span></span>
+                              </div>
+                         </div>
                    </div>
                )}
                <div ref={messagesEndRef} />
