@@ -5,6 +5,7 @@ import { ArrowRightOutlined } from "@ant-design/icons";
 import HomeNavbar from "../../components/HomeNavbar";
 import Footer from "../../components/Footer";
 import { categoryAPI } from "../../api";
+import BannerCarousel from "../../components/BannerCarousel";
 import "./Home.css";
 
 const LandingPage = () => {
@@ -34,42 +35,10 @@ const LandingPage = () => {
     <div className="landing-container">
       <HomeNavbar />
 
-      {/* 1. HERO SECTION */}
-      <section className="landing-hero">
-        <div className="hero-wrap">
-          <motion.div
-            className="hero-content"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1>
-              Nâng Tầm
-              <br />
-              Phong Cách
-              <br />
-              Công Nghệ.
-            </h1>
-            <p>
-              Khám phá bộ sưu tập thiết bị và phụ kiện công nghệ định hình tương
-              lai. Trải nghiệm mua sắm đẳng cấp và khác biệt ngay hôm nay.
-            </p>
-            <button className="btn-neo" onClick={() => navigate("/products")}>
-              Bắt Đầu Mua Sắm <ArrowRightOutlined style={{ marginLeft: 8 }} />
-            </button>
-          </motion.div>
-
-          <motion.div
-            className="hero-image-frame"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <img
-              src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1981&auto=format&fit=crop"
-              alt="Modern Tech Lifestyle"
-            />
-          </motion.div>
+      {/* 1. BANNER CAROUSEL SECTION */}
+      <section className="banner-section" style={{ padding: '20px 0' }}>
+        <div className="content-wrap">
+          <BannerCarousel />
         </div>
       </section>
 

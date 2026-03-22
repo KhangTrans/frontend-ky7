@@ -12,6 +12,7 @@ import {
   HomeOutlined,
   GiftOutlined,
   StarOutlined,
+  PictureOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -57,6 +58,11 @@ function Sidebar({ collapsed, user }) {
       key: '/dashboard/users',
       icon: <TeamOutlined />,
       label: 'Người dùng',
+    },
+    {
+      key: '/dashboard/banners',
+      icon: <PictureOutlined />,
+      label: 'Banners',
     },
     ...(user?.role === 'admin' ? [
       {

@@ -152,7 +152,7 @@ function Checkout() {
   const calculateSubtotal = () => {
     return items.reduce((sum, item) => {
       const product = item.productId || item.product || {};
-      const price = product.salePrice || product.price || 0;
+      const price = item.price || product.salePrice || product.price || 0;
       return sum + (price * item.quantity);
     }, 0);
   };
@@ -363,7 +363,7 @@ function Checkout() {
             name: item.productId?.name || item.product?.name || 'Sản phẩm',
             image: item.productId?.images?.[0] || item.productId?.image || '',
             quantity: item.quantity,
-            price: item.productId?.salePrice || item.productId?.price || 0
+            price: item.price || item.productId?.salePrice || item.productId?.price || 0
           })).filter(i => i.productId),
           totalPrice: finalTotal, // This is explicitly sent? Verify backend calculation.
                                   // Warning: Backend should calculate total, but we send it for validation or as requested.
@@ -598,7 +598,7 @@ function Checkout() {
               <div className="order-items">
                 {items.map((item) => {
                   const product = item.productId || item.product || {};
-                  const price = product.salePrice || product.price || 0;
+                  const price = item.price || product.salePrice || product.price || 0;
                   let imageUrl = '';
                   if (Array.isArray(product.images) && product.images.length > 0) {
                       const firstImg = product.images[0];

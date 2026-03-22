@@ -184,6 +184,16 @@ const routesData = [
     },
   },
   {
+    path: '/promotion/:id',
+    name: 'Promotion',
+    component: 'Promotion',
+    meta: {
+      title: 'Chương trình khuyến mãi',
+      requiresAuth: false,
+      public: true,
+    },
+  },
+  {
     path: '/',
     name: 'DashboardLayout',
     component: 'DashboardLayout',
@@ -268,6 +278,16 @@ const routesData = [
         component: 'ReviewManagement',
         meta: {
             title: 'Quản lý đánh giá',
+            requiresAuth: true,
+            roles: ['admin'],
+        },
+      },
+      {
+        path: 'dashboard/banners',
+        name: 'BannerManagement',
+        component: 'BannerManagement',
+        meta: {
+            title: 'Quản lý Banner',
             requiresAuth: true,
             roles: ['admin'],
         },

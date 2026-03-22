@@ -3,9 +3,9 @@
    =============================================== */
 
 /* Global Container */
-.home-container {
+.home-container, .products-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: #f5f7fa;
 }
 
 /* ===============================================
@@ -13,211 +13,60 @@
    =============================================== */
 .hero-section {
   position: relative;
-  min-height: 500px;
-  display: flex;
-  align-items: flex-end; /* Move search bar to bottom */
-  justify-content: center;
+  width: 100%;
+  height: 480px;
+  background: #000;
   overflow: hidden;
-  background: transparent; /* Ensure banner behind is visible */
-  padding-bottom: 60px; /* Space from bottom */
 }
 
-/* Overlay content on top of banner */
-.hero-overlay-content {
-  position: relative;
-  z-index: 5;
-  text-align: center;
-  max-width: 800px;
-  width: 100%;
-  padding: 60px 20px;
-}
-
-/* Dark overlay for better text readability */
-.hero-section::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 100%); /* Fade from top to bottom */
-  z-index: 1;
-  pointer-events: none;
-}
-
-.hero-overlay-content {
-  position: relative;
-  z-index: 5;
-  text-align: center;
-  width: 100%;
-  max-width: 800px; /* Narrower for better focus */
-  padding: 0 20px;
-}
-
-.hero-title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 800;
-  color: white;
-  margin-bottom: 20px;
-  line-height: 1.2;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  animation: fadeInUp 0.8s ease-out;
-}
-
-.hero-gradient {
-  background: linear-gradient(45deg, #ffd89b, #19547b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  display: inline-block;
-}
-
-.hero-subtitle {
-  font-size: clamp(1rem, 2vw, 1.25rem);
-  color: rgba(255, 255, 255, 0.95);
-  margin-bottom: 40px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  animation: fadeInUp 0.8s ease-out 0.2s backwards;
-}
-
-/* Dynamic banner title - thay đổi khi slide */
-.banner-dynamic-title {
-  animation: fadeInUp 0.5s ease-out;
-  transition: opacity 0.3s ease;
-}
-
-.hero-search {
-  width: 100%;
-  animation: fadeInUp 0.8s ease-out;
-}
-
-.hero-search-input {
-  max-width: 800px;
-  margin: 0 auto;
-  border: 2px solid white !important;
-  border-radius: 50px !important; /* Maximized rounding for pill shape */
-  overflow: hidden !important;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-  background: white !important;
-}
-
-/* Force height on the main wrapper */
-.hero-search-input.ant-input-search-large {
-  height: 60px !important;
-}
-
-/* Ensure the group takes full height */
-.hero-search-input .ant-input-group {
+.hero-section .banner-carousel-container {
+  position: relative !important;
+  width: 100% !important;
   height: 100% !important;
-  display: table !important; /* Antd default stable structure */
-}
-
-/* Input Styles */
-.hero-search-input .ant-input-affix-wrapper {
-  height: 60px !important;
-  border: none !important;
-  background: white !important;
-  padding: 0 20px !important;
-  display: table-cell !important;
-  vertical-align: middle !important;
-}
-
-.hero-search-input .ant-input {
-  font-size: 16px !important;
-  height: 100% !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Search Button Styles - Fix the "squashed" button */
-.hero-search-input .ant-input-group-addon {
-  width: 1px; /* Antd trick to make button take only needed space but not squash */
-  white-space: nowrap;
-  vertical-align: top;
-}
-
-.hero-search-input .ant-input-search-button {
-  height: 60px !important;
-  min-width: 140px !important; /* Ensure button is wide enough */
-  border: none !important;
   border-radius: 0 !important;
-  background: var(--primary-color) !important;
-  color: white !important;
-  font-weight: 700 !important;
+}
+
+/* Search Bar Section Below Banner */
+.search-bar-section {
+  padding: 30px 0;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.search-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.products-search-input {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+.products-search-input.ant-input-search-large {
+  height: 60px !important;
+  border-radius: 50px !important;
+  overflow: hidden;
+}
+
+.products-search-input .ant-input-affix-wrapper {
+  height: 60px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 50px 0 0 50px !important;
+  padding: 0 24px !important;
+}
+
+.products-search-input .ant-input-search-button {
+  height: 60px !important;
+  min-width: 140px !important;
+  border-radius: 0 50px 50px 0 !important;
+}
+
+.products-search-input .ant-input {
   font-size: 16px !important;
-  text-transform: uppercase;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin: 0 !important;
-}
-
-.hero-search-input .ant-input-search-button:hover {
-  background: var(--primary-color-dark) !important;
-}
-
-/* Clear button position fix */
-.hero-search-input .ant-input-clear-icon {
-  font-size: 16px;
-  color: #bfbfbf;
-}
-
-@media (max-width: 480px) {
-  .hero-search-input.ant-input-search-large {
-    height: 50px !important;
-  }
-  .hero-search-input .ant-input-affix-wrapper {
-    height: 50px !important;
-  }
-  .hero-search-input .ant-input-search-button {
-    height: 50px !important;
-    min-width: 100px !important;
-    padding: 0 15px !important;
-  }
 }
 
 /* Animated Background Shapes */
-.hero-shapes {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.shape {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.shape-1 {
-  width: 300px;
-  height: 300px;
-  top: -100px;
-  left: -100px;
-  animation: float 20s ease-in-out infinite;
-}
-
-.shape-2 {
-  width: 200px;
-  height: 200px;
-  bottom: -50px;
-  right: 10%;
-  animation: float 15s ease-in-out infinite reverse;
-}
-
-.shape-3 {
-  width: 150px;
-  height: 150px;
-  top: 50%;
-  right: -50px;
-  animation: float 18s ease-in-out infinite;
-}
-
 @keyframes float {
   0%, 100% {
     transform: translate(0, 0) rotate(0deg);
@@ -536,6 +385,14 @@
   color: white;
 }
 
+.product-badge.discount-badge {
+  left: 15px;
+  right: auto; /* Dàn trang về bên trái */
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(255, 77, 79, 0.4);
+}
+
 /* Product Info */
 .product-info {
   padding: 20px;
@@ -605,10 +462,11 @@
 }
 
 .product-price {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 800;
-  color: var(--primary-color, #667eea);
+  color: #ff4d4f; /* Nổi bật giá hiện tại */
   white-space: nowrap;
+  letter-spacing: -0.5px;
 }
 
 .product-original-price {

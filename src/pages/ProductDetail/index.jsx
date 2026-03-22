@@ -229,17 +229,17 @@ function ProductDetail() {
             <h1 className="product-title">{product.name}</h1>
 
             <div className="product-price">
-              {product.salePrice < product.price && (
+              {product.hasDiscount && (
                 <span className="original-price">
-                  {product.price.toLocaleString("vi-VN")}đ
+                  {product.originalPrice?.toLocaleString("vi-VN")}đ
                 </span>
               )}
               <span className="current-price">
-                {(product.salePrice || product.price).toLocaleString("vi-VN")}đ
+                {(product.discountedPrice || product.price).toLocaleString("vi-VN")}đ
               </span>
-              {product.salePrice < product.price && (
+              {product.hasDiscount && (
                 <span className="discount-badge">
-                  -{Math.round((1 - product.salePrice / product.price) * 100)}%
+                  -{product.discountPercent}%
                 </span>
               )}
             </div>
@@ -351,7 +351,7 @@ function ProductDetail() {
         </div>
 
         {/* Related Products */}
-        <div className="related-products-section">
+        <div className="related-products-section recommendations-section">
           <h2 className="section-title">Sản phẩm tương tự</h2>
           <p className="section-subtitle">
             Các sản phẩm cùng phân khúc và danh mục

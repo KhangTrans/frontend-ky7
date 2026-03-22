@@ -259,6 +259,38 @@ export const settingsAPI = {
   },
 };
 
+// Banner API
+export const bannerAPI = {
+  getActive: async () => {
+    const response = await axiosInstance.get('/product-banners/active');
+    return response.data;
+  },
+  getById: async (id) => {
+    const response = await axiosInstance.get(`/product-banners/${id}`);
+    return response.data;
+  },
+  getAdminAll: async () => {
+    const response = await axiosInstance.get('/product-banners/admin/all');
+    return response.data;
+  },
+  create: async (data) => {
+    const response = await axiosInstance.post('/product-banners', data);
+    return response.data;
+  },
+  update: async (id, data) => {
+    const response = await axiosInstance.put(`/product-banners/${id}`, data);
+    return response.data;
+  },
+  delete: async (id) => {
+    const response = await axiosInstance.delete(`/product-banners/${id}`);
+    return response.data;
+  },
+  toggle: async (id) => {
+    const response = await axiosInstance.patch(`/product-banners/${id}/toggle`);
+    return response.data;
+  }
+};
+
 // Review API
 export const reviewAPI = {
   getStats: async (productId) => {

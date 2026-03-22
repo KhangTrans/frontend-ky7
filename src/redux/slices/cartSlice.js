@@ -97,11 +97,12 @@ const cartSlice = createSlice({
         // Logic parse response structure: { success: true, data: { cart: { items: [...] }, summary: {...} } }
         const data = action.payload.data || action.payload;
         const cart = data.cart || data;
+        const summary = data.summary || {};
 
         state.items = cart.items || [];
         // Tự tính toán totalQuantity để đảm bảo chính xác
         state.totalQuantity = state.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-        state.totalPrice = cart.totalPrice || state.items.reduce((sum, item) => sum + ((item.productId?.salePrice || item.productId?.price || 0) * item.quantity), 0);
+        state.totalPrice = summary.subtotal || cart.totalPrice || state.items.reduce((sum, item) => sum + ((item.price || item.productId?.price || 0) * item.quantity), 0);
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
@@ -118,6 +119,7 @@ const cartSlice = createSlice({
         // Tương tự, parse structure cho add to cart response
         const data = action.payload.data || action.payload;
         const cart = data.cart || data;
+        const summary = data.summary || {};
         
         if (cart && cart.items) {
           state.items = cart.items || [];
@@ -126,9 +128,7 @@ const cartSlice = createSlice({
         // Tự tính lại quantity sau khi add
         state.totalQuantity = state.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
         
-        if (cart) {
-           state.totalPrice = cart.totalPrice || 0;
-        }
+        state.totalPrice = summary.subtotal || cart.totalPrice || state.items.reduce((sum, item) => sum + ((item.price || item.productId?.price || 0) * item.quantity), 0);
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.loading = false;

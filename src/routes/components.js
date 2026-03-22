@@ -28,6 +28,8 @@ export const OrderManagement = lazy(() => import('../pages/OrderManagement'));
 export const VoucherManagement = lazy(() => import('../pages/VoucherManagement'));
 export const Settings = lazy(() => import('../pages/Settings'));
 export const ReviewManagement = lazy(() => import('../pages/ReviewManagement'));
+export const BannerManagement = lazy(() => import('../pages/BannerManagement'));
+export const Promotion = lazy(() => import('../pages/Promotion'));
 
 // Map string name to component
 const componentsMap = {
@@ -58,6 +60,8 @@ const componentsMap = {
   OrderManagement,
   Settings,
   ReviewManagement,
+  BannerManagement,
+  Promotion,
 };
 
 export default componentsMap;

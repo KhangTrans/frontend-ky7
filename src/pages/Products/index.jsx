@@ -198,27 +198,26 @@ const Products = () => {
 
       {/* Hero Section with Banner */}
       <section className="hero-section">
-        {/* Banner as Background */}
         <BannerCarousel onBannerChange={handleBannerChange} />
+      </section>
 
-        {/* Overlay Content */}
-        <div className="hero-overlay-content">
-          <div className="hero-search">
+      {/* Separate Search Bar Section */}
+      <section className="search-bar-section">
+        <div className="container">
+          <div className="search-wrapper">
             <Search
               placeholder="Tìm kiếm sản phẩm bạn yêu thích..."
               allowClear
               enterButton={
-                <span
-                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
-                >
+                <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <SearchOutlined />
-                  Tìm kiếm
+                  TÌM KIẾM
                 </span>
               }
               size="large"
               onSearch={handleSearch}
               onChange={(e) => setSearchText(e.target.value)}
-              className="hero-search-input"
+              className="products-search-input"
             />
           </div>
         </div>
@@ -481,6 +480,11 @@ const Products = () => {
                         {product.stock > 0 && product.stock <= 10 && (
                           <div className="product-badge low-stock">Sắp hết</div>
                         )}
+                        {product.hasDiscount && (
+                           <div className="product-badge discount-badge">
+                              -{product.discountPercent}%
+                           </div>
+                        )}
                       </div>
 
                       <div className="product-info">
@@ -508,16 +512,15 @@ const Products = () => {
                         <div className="product-footer">
                           <div className="product-price-container">
                             <span className="product-price">
-                              {parseInt(product.price || 0).toLocaleString(
+                              {parseInt(product.discountedPrice || product.price || 0).toLocaleString(
                                 "vi-VN",
                               )}
                               đ
                             </span>
-                            {product.originalPrice &&
-                              product.originalPrice > product.price && (
+                            {product.hasDiscount && (
                                 <span className="product-original-price">
                                   {parseInt(
-                                    product.originalPrice,
+                                    product.originalPrice || 0,
                                   ).toLocaleString("vi-VN")}
                                   đ
                                 </span>
@@ -633,16 +636,15 @@ const Products = () => {
                         <div className="product-footer">
                           <div className="product-price-container">
                             <span className="product-price">
-                              {parseInt(product.price || 0).toLocaleString(
+                              {parseInt(product.discountedPrice || product.price || 0).toLocaleString(
                                 "vi-VN",
                               )}
                               đ
                             </span>
-                            {product.originalPrice &&
-                              product.originalPrice > product.price && (
+                            {product.hasDiscount && (
                                 <span className="product-original-price">
                                   {parseInt(
-                                    product.originalPrice,
+                                    product.originalPrice || 0,
                                   ).toLocaleString("vi-VN")}
                                   đ
                                 </span>

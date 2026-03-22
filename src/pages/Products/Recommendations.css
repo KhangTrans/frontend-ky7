@@ -119,7 +119,8 @@
   opacity: 1;
 }
 
-.recommendations-section .action-btn {
+.recommendations-section .action-btn,
+.recommendations-section .product-action-btn {
   width: 45px;
   height: 45px;
   border-radius: 50%;
@@ -135,7 +136,8 @@
   transition: all 0.3s ease;
 }
 
-.recommendations-section .action-btn:hover {
+.recommendations-section .action-btn:hover,
+.recommendations-section .product-action-btn:hover {
   transform: scale(1.1);
   color: var(--primary-color, #667eea);
 }
@@ -167,6 +169,7 @@
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
@@ -179,15 +182,25 @@
   border-top: 1px solid #e2e8f0;
 }
 
-/* Price with Cyan background */
+/* Price styling */
 .recommendations-section .product-price {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
-  color: #00bcd4;
-  background: rgba(0, 188, 212, 0.08);
-  padding: 6px 12px;
-  border-radius: 8px;
+  color: #ff4d4f; /* Modern Red/Orange for discount */
   white-space: nowrap;
+}
+
+.recommendations-section .product-original-price {
+  font-size: 13px;
+  color: #a0aec0;
+  text-decoration: line-through;
+  margin-left: 8px;
+}
+
+.recommendations-section .product-price-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 /* Add to cart button - Pills shape matching Products.css */

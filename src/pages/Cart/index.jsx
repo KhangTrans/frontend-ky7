@@ -23,6 +23,7 @@ import { fetchCategories } from "../../redux/slices/productSlice";
 import { recommendationsAPI } from "../../api";
 import HomeNavbar from "../../components/HomeNavbar";
 import "../Home/Home.css";
+import "../Products/Recommendations.css";
 import "./Cart.css";
 
 function Cart() {
@@ -178,8 +179,7 @@ function Cart() {
 
   const calculateSubtotal = () => {
     return items.reduce((sum, item) => {
-      const product = item.productId || item.product || {};
-      const price = product.salePrice || product.price || 0;
+      const price = item.price || item.productId?.price || item.product?.price || 0;
       return sum + price * item.quantity;
     }, 0);
   };
@@ -238,10 +238,9 @@ function Cart() {
                 <div className="cart-items">
                   {items.map((item) => {
                     const product = item.productId || item.product || {};
-                    const price = product.salePrice || product.price || 0;
+                    const price = item.price || product.price || 0;
                     const originalPrice = product.price || 0;
-                    const hasDiscount =
-                      product.salePrice && product.salePrice < product.price;
+                    const hasDiscount = price < originalPrice;
                     const imageUrl =
                       Array.isArray(product.images) && product.images.length > 0
                         ? typeof product.images[0] === "object"
@@ -295,7 +294,7 @@ function Cart() {
                                 <span className="discount-badge">
                                   -
                                   {Math.round(
-                                    (1 - product.salePrice / product.price) *
+                                    (1 - price / originalPrice) *
                                       100,
                                   )}
                                   %
@@ -445,7 +444,7 @@ function Cart() {
 
             {recommendations.length > 0 && (
               <div
-                className="cart-recommendations-section"
+                className="cart-recommendations-section recommendations-section"
                 style={{
                   marginTop: "60px",
                   paddingTop: "30px",
