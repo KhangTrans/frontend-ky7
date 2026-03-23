@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Tag, Space, Button, message, Card, Input, Select, Row, Col, Statistic, Tooltip, Modal } from 'antd';
 import { orderAPI } from '../../api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SearchOutlined, FilterOutlined, ReloadOutlined, ShoppingCartOutlined, DollarCircleOutlined, SyncOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import OrderDetailModal from './OrderDetailModal';
 
@@ -33,6 +33,7 @@ const OrderManagement = () => {
     const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     // Use a single param object to fetch orders, defaulting to current state if not provided
     const fetchOrders = useCallback(async (paramsObj = {}) => {
@@ -102,12 +103,39 @@ const OrderManagement = () => {
         }
     };
 
+    // Detail Modal Logic
+    const openDetailModal = useCallback(async (order) => {
+        setIsDetailModalVisible(true);
+        try {
+            const res = await orderAPI.getById(order._id);
+            if (res.success) {
+                setDetailOrder(res.data);
+            } else {
+                // Fallback to table data if API fails, though unlikely
+                 setDetailOrder(order);
+            }
+        } catch (error) {
+            console.error("Failed to fetch order details:", error);
+            // Fallback content or error message could be better, but for now fallback to row data
+            setDetailOrder(order);
+        }
+    }, []);
+
     // Initial load
     useEffect(() => {
         fetchOrders({ page: 1 });
         fetchStats();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); 
+
+    // Handle open order detail from notification or other pages
+    useEffect(() => {
+        if (location.state?.openOrderId) {
+            openDetailModal({ _id: location.state.openOrderId });
+            // Clear state to avoid reopening on page refresh
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }, [location.state?.openOrderId, navigate, location.pathname, openDetailModal]);
 
     const handleSearch = (value) => {
         setSearchText(value);
@@ -172,24 +200,6 @@ const OrderManagement = () => {
             message.error('Lỗi cập nhật: ' + (error.message || 'Unknown error'));
         } finally {
             setUpdatingStatus(false);
-        }
-    };
-
-    // Detail Modal Logic
-    const openDetailModal = async (order) => {
-        setIsDetailModalVisible(true);
-        try {
-            const res = await orderAPI.getById(order._id);
-            if (res.success) {
-                setDetailOrder(res.data);
-            } else {
-                // Fallback to table data if API fails, though unlikely
-                 setDetailOrder(order);
-            }
-        } catch (error) {
-            console.error("Failed to fetch order details:", error);
-            // Fallback content or error message could be better, but for now fallback to row data
-            setDetailOrder(order);
         }
     };
 

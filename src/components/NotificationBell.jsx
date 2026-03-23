@@ -23,6 +23,7 @@ const { Text } = Typography;
 const NotificationBell = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector(state => state.auth);
   const { items, unreadCount, loading } = useSelector(state => state.notifications);
   const [open, setOpen] = useState(false);
 
@@ -70,7 +71,11 @@ const NotificationBell = () => {
     
     // Navigate if orderId exists
     if (item.orderId) {
-      navigate(`/orders/${item.orderId}`);
+      if (user?.role === 'admin') {
+        navigate(`/dashboard/orders`, { state: { openOrderId: item.orderId } });
+      } else {
+        navigate(`/orders/${item.orderId}`);
+      }
       setOpen(false); // Close dropdown
     }
   };
