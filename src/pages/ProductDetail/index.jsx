@@ -96,49 +96,59 @@ function ProductDetail() {
   };
 
   const handleAddToCart = async () => {
-    // Kiểm tra đăng nhập
+    // Check login
     const token = localStorage.getItem("token");
     if (!token) {
       messageApi.warning("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!");
       return;
     }
 
+    const productId = product._id || product.id;
+    if (!productId) {
+        messageApi.error("Không tìm thấy mã sản phẩm!");
+        return;
+    }
+
     try {
       await dispatch(
         addToCart({
-          productId: product._id,
-          quantity: quantity,
+          productId: productId,
+          quantity: quantity || 1,
         }),
       ).unwrap();
 
-      // Load lại giỏ hàng ngay lập tức để cập nhật số lượng trên Navbar
+      // Load cart immediately to update badge in Navbar
       dispatch(fetchCart());
 
-      messageApi.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
+      messageApi.success(`Đã thêm ${quantity || 1} sản phẩm vào giỏ hàng!`);
     } catch (err) {
       console.error(err);
-      messageApi.error("Lỗi khi thêm vào giỏ hàng!");
+      messageApi.error(err?.message || "Lỗi khi thêm vào giỏ hàng!");
     }
   };
 
   const handleBuyNow = () => {
     console.log("Buy Now Clicked");
     const token = localStorage.getItem("token");
-    console.log("Current Token:", token);
 
     if (!token) {
       messageApi.warning("Vui lòng đăng nhập để mua hàng!");
-      // Backup redirect to login if needed
       setTimeout(() => navigate("/login"), 1000);
       return;
     }
 
-    // Chuyển hướng sang Checkout kèm data sản phẩm (không thêm vào giỏ hàng)
+    const productId = product._id || product.id;
+    if (!productId) {
+        messageApi.error("Không tìm thấy mã sản phẩm!");
+        return;
+    }
+
+    // Redirect to Checkout with product data (don't add to cart)
     navigate("/checkout", {
       state: {
         directPurchaseItem: {
           product: product,
-          quantity: quantity,
+          quantity: quantity || 1,
         },
       },
     });
